@@ -1,0 +1,6 @@
+{
+  "name": "GodsEye — WordPress AI Assistant",
+  "description": "Connect your WordPress site to an AI-powered Telegram bot and manage it in plain English. Stop logging into wp-admin for routine tasks.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
