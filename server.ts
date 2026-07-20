@@ -7,12 +7,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY,
-  httpOptions: {
-    headers: {
-      'User-Agent': 'aistudio-build',
-    }
-  }
+  apiKey: process.env.GEMINI_API_KEY || "",
 });
 
 async function startServer() {

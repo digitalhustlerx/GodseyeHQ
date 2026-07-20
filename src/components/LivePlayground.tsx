@@ -17,8 +17,8 @@ export default function LivePlayground({
   const [messages, setMessages] = useState<PlaygroundMessage[]>([
     {
       id: "init",
-      sender: "bot",
-      text: "🧞‍♂️ Welcome to GodsEye! I am your WordPress AI companion. You can manage your entire site by talking to me.\n\nType a command below or tap any of the quick-action cards to see me in action!",
+      sender: "agent",
+      text: "👁️ Welcome to GodsEye! I am your WordPress AI Agent. Let's manage your site together.\n\nType a command below or tap any of the quick-action cards to see me in action!",
       timestamp: "05:14 AM"
     }
   ]);
@@ -55,7 +55,7 @@ export default function LivePlayground({
       });
 
       if (!response.ok) {
-        throw new Error("Failed to communicate with bot");
+        throw new Error("Failed to communicate with agent");
       }
 
       const data = await response.json();
@@ -65,13 +65,13 @@ export default function LivePlayground({
       const botMsgId = `bot_${Date.now()}`;
       const botMessage: PlaygroundMessage = {
         id: botMsgId,
-        sender: "bot",
-        text: data.telegramResponse || "🧞‍♂️ Command received and processed successfully.",
+        sender: "agent",
+        text: data.telegramResponse || "👁️ Command received and processed successfully.",
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
       setMessages(prev => [...prev, botMessage]);
 
-      // Apply updates to the mock state based on the structured action returned by Gemini
+      // Apply updates to the mock state based on the structured action
       if (data.wordpressAction) {
         const action = data.wordpressAction;
         const type = action.type;
@@ -154,7 +154,7 @@ export default function LivePlayground({
         ...prev,
         {
           id: `err_${Date.now()}`,
-          sender: "bot",
+          sender: "agent",
           text: "⚠️ Sorry, there was an issue processing that command through the OpenClaw gateway. Please try again.",
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         }
@@ -168,14 +168,14 @@ export default function LivePlayground({
       <div className="bg-[#080808] px-4 py-3 border-b border-white/10 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center font-display text-lg shadow-inner">
-            🧞‍♂️
+            👁️
           </div>
           <div>
             <h3 className="text-xs font-semibold text-white flex items-center gap-1.5">
               GodsEye AI Assistant
               <Sparkles className="w-3.5 h-3.5 text-[#C4A484]" />
             </h3>
-            <span className="text-[10px] text-green-400 font-medium">bot • online</span>
+            <span className="text-[10px] text-green-400 font-medium">agent • online</span>
           </div>
         </div>
         <div className="text-[10px] text-white/40 font-mono">

@@ -146,19 +146,19 @@ export default function App() {
   const FAQS = [
     {
       q: "How does GodsEye work?",
-      a: "GodsEye connects your WordPress site's REST API with a secure Telegram bot. When you send messages to the bot, they are parsed by our OpenClaw natural-language gateway, authenticated using your WordPress application password, and securely executed on your site via a lightweight custom-made WordPress plugin."
+      a: "GodsEye connects your WordPress site's REST API with a secure Telegram Agent. When you send messages to the agent, they are parsed by our OpenClaw natural-language gateway, authenticated using your WordPress application password, and securely executed on your site via a lightweight custom-made WordPress plugin."
     },
     {
       q: "Is it secure to connect my site?",
       a: "Absolutely. GodsEye uses WordPress Application Passwords, meaning your main admin password is never shared or stored. The connection is encrypted via HTTPS and processed through OpenClaw's security gateway, and the plugin strictly restricts operations to standard rest-capabilities with 20+ active security filters."
     },
     {
-      q: "What operations can the AI bot perform?",
+      q: "What operations can the AI Agent perform?",
       a: "You can manage posts & pages (create, edit drafts, publish), manage installed plugins (activate/deactivate), monitor WooCommerce e-commerce orders, edit basic Elementor visual content blocks (like updating headers and pricing fields), check overall site health, and browse or upload media files directly through your Telegram interface!"
     },
     {
       q: "What counts as a credit?",
-      a: "1 credit corresponds exactly to 1 parsed command or message sent to your bot. If the bot doesn't understand your command, no credits are deducted."
+      a: "1 credit corresponds exactly to 1 parsed command or message sent to your agent. If the agent doesn't understand your command, no credits are deducted."
     },
     {
       q: "Do monthly plan credits roll over?",
@@ -181,8 +181,8 @@ export default function App() {
       a: "Yes. You can manage or cancel your subscription instantly through our Polar.sh billing panel. If you cancel, your remaining credits will remain in your Telegram wallet and will not be lost."
     },
     {
-      q: "What happens if the bot can't fulfill a complex request?",
-      a: "The WordPress REST API has certain boundaries (like not being able to modify your PHP configurations, access raw server files, or bulk-delete databases). If your request exceeds REST boundaries, the bot will politely explain the limitations and outline what you can do instead."
+      q: "What happens if the Agent can't fulfill a complex request?",
+      a: "The WordPress REST API has certain boundaries (like not being able to modify your PHP configurations, access raw server files, or bulk-delete databases). If your request exceeds REST boundaries, the agent will politely explain the limitations and outline what you can do instead."
     }
   ];
 
@@ -191,7 +191,7 @@ export default function App() {
       
       {/* Top Banner Warning for Development SSL Restoration */}
       <div className="bg-white/5 border-b border-white/10 text-center py-2.5 px-4 text-xs font-mono text-[#C4A484] uppercase tracking-widest">
-        🧞‍♂️ GodsEye v2.0 Operational Environment • Payments Securely Powered by Polar.sh
+        👁️ GodsEye v2.0 Operational Environment • Payments Securely Powered by Polar.sh
       </div>
 
       {/* Navigation Header */}
@@ -202,7 +202,7 @@ export default function App() {
             className="flex items-center gap-2.5 cursor-pointer hover:opacity-90 transition-opacity"
           >
             <div className="w-9 h-9 rounded-full bg-white/10 border border-white/20 flex items-center justify-center font-display text-lg text-white shadow-md">
-              🧞
+              👁️
             </div>
             <span className="text-xl font-bold tracking-tighter text-[#F2F2F2]">
               GODS<span className="text-[#C4A484]">EYE</span>
@@ -284,6 +284,18 @@ export default function App() {
               className="text-xs font-medium text-gray-400 hover:text-white text-left"
             >
               FAQ
+            </button>
+            <button 
+              onClick={() => { setMobileMenuOpen(false); setActiveView('dashboard'); }} 
+              className="text-xs font-medium text-gray-400 hover:text-white text-left"
+            >
+              Dashboard
+            </button>
+            <button 
+              onClick={() => { setMobileMenuOpen(false); setActiveView('playground'); }} 
+              className="text-xs font-medium text-gray-400 hover:text-white text-left"
+            >
+              Sandbox
             </button>
             <button 
               onClick={() => { setMobileMenuOpen(false); setActiveView('download'); }} 
@@ -461,7 +473,7 @@ export default function App() {
                 <span className="text-[#C4A484] text-xs font-mono">01 / DISCORD TRIALS</span>
                 <h4 className="text-base font-medium text-[#F2F2F2]">Proven in the wild</h4>
                 <p className="text-xs text-white/50 leading-relaxed font-light">
-                  Version 1.0 of GodsEye was a private bot on Discord. Over 15,000 automated commands successfully updated real sites, and our core parsing engine grew bulletproof.
+                  Version 1.0 of GodsEye was a private agent on Discord. Over 15,000 automated commands successfully updated real sites, and our core parsing engine grew bulletproof.
                 </p>
               </div>
               <div className="space-y-3">
@@ -544,7 +556,7 @@ export default function App() {
                     💬 Start Free — 50 credits/mo
                   </a>
                   <button 
-                    onClick={() => document.getElementById('playground')?.scrollIntoView({ behavior: 'smooth' })}
+                    onClick={() => document.getElementById('how')?.scrollIntoView({ behavior: 'smooth' })}
                     className="w-full sm:w-auto bg-transparent hover:bg-white/5 border border-white/20 text-[#F2F2F2] px-10 py-4 rounded-full font-bold text-xs uppercase tracking-widest transition-all text-center cursor-pointer"
                   >
                     See How It Works
@@ -893,7 +905,7 @@ export default function App() {
             {/* Header */}
             <div className="text-center space-y-3">
               <div className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center font-display text-xl mx-auto shadow-md">
-                🧞‍♂️
+                👁️
               </div>
               <h2 className="text-3xl md:text-5xl font-light text-white tracking-tighter" style={{ fontFamily: "'Georgia', serif" }}>
                 GodsEye — Credits & Plans
@@ -1149,7 +1161,7 @@ export default function App() {
               {/* Sim download click button */}
               <button
                 onClick={() => {
-                  alert("🧞 GodsEye v1.0.5 package download initiated! In production, this saves the godseye-agent.zip archive file directly to your workspace download folder.");
+                  alert("👁️ GodsEye v1.0.5 package download initiated! In production, this saves the godseye-agent.zip archive file directly to your workspace download folder.");
                 }}
                 className="w-full md:w-auto shrink-0 bg-[#C4A484] hover:bg-[#b59574] text-black font-bold px-8 py-4 rounded-full text-xs flex items-center justify-center gap-2 tracking-widest uppercase transition-all active:scale-95 shadow-md cursor-pointer"
               >
@@ -1185,7 +1197,7 @@ export default function App() {
                   <div className="w-7 h-7 rounded-full bg-white/5 text-[#C4A484] border border-white/20 flex items-center justify-center font-mono shrink-0 mt-0.5">03</div>
                   <div>
                     <h4 className="font-bold text-white uppercase tracking-wide">Generate App Password</h4>
-                    <p className="text-white/60 leading-relaxed font-light mt-1">Go to <code className="bg-white/5 px-2 py-0.5 rounded text-[10px] font-mono text-[#C4A484] border border-white/10">Users &gt; Profile</code>, scroll down to "Application Passwords", input "GodsEye Bot" and click generate. Copy the 24-character code.</p>
+                    <p className="text-white/60 leading-relaxed font-light mt-1">Go to <code className="bg-white/5 px-2 py-0.5 rounded text-[10px] font-mono text-[#C4A484] border border-white/10">Users &gt; Profile</code>, scroll down to "Application Passwords", input "GodsEye Agent" and click generate. Copy the 24-character code.</p>
                   </div>
                 </div>
 
@@ -1328,7 +1340,7 @@ export default function App() {
           <div className="space-y-4 text-left">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-base text-white">
-                🧞
+                👁️
               </div>
               <span className="text-lg font-bold tracking-tighter text-[#F2F2F2]">
                 GODS<span className="text-[#C4A484]">EYE</span>

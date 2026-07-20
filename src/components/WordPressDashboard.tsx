@@ -347,7 +347,7 @@ export default function WordPressDashboard({
                 <AlertTriangle className="w-5 h-5 text-yellow-500 shrink-0" />
                 <div>
                   <h4 className="text-xs font-semibold text-yellow-400">2 Inactive Plugins Detected</h4>
-                  <p className="text-[10px] text-white/70 mt-0.5">Classic Editor and Yoast SEO can be activated instantly via bot conversation.</p>
+                  <p className="text-[10px] text-white/70 mt-0.5">Classic Editor and Yoast SEO can be activated instantly via agent conversation.</p>
                 </div>
               </div>
             </div>
