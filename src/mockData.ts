@@ -27,7 +27,9 @@ export const PRICING_PLANS: PricingPlan[] = [
       "WooCommerce Orders & Products",
       "Elementor Price/Text Edits",
       "E-mail Support (24h)",
-      "Unused Credits Carry Over"
+      "Unused Credits Carry Over",
+      "5 competitor analysis reports per day",
+      "Basic topic suggestions for your niche"
     ],
     polarProductId: "21f41008-1dbf-4d1a-8f1c-96ea518203b3",
     isPopular: true
@@ -43,7 +45,11 @@ export const PRICING_PLANS: PricingPlan[] = [
       "Multi-Site Management",
       "Media Upload Actions",
       "Priority Email Support (4h)",
-      "Dedicated Gateway Access"
+      "Dedicated Gateway Access",
+      "Unlimited competitor analysis & market research",
+      "Advanced topic suggestions with content ideas",
+      "Weekly content planning templates",
+      "Automated daily draft scheduling"
     ],
     polarProductId: "ff6a89c7-6d4e-4748-a760-3c73179b7b44"
   },
@@ -58,7 +64,10 @@ export const PRICING_PLANS: PricingPlan[] = [
       "Up to 10 Connected Sites",
       "Dedicated OpenClaw Node",
       "Dedicated Slack/Telegram Support",
-      "Custom Workflow Automation"
+      "Custom Workflow Automation",
+      "All Pro features, unlimited usage",
+      "Custom content workflows & automations",
+      "Priority support"
     ],
     polarProductId: "2dadbaf0-24a2-4d45-abd1-5a6e11c4c741"
   }

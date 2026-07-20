@@ -381,7 +381,7 @@ export default function App() {
                   <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-green-500/10 text-green-400 mb-2">
                     <Check className="w-5 h-5" />
                   </div>
-                  <p className="text-[#C4A484] font-medium text-sm">Welcome aboard the autonomous era!</p>
+                  <p className="text-[#C4A484] font-medium text-sm">Welcome aboard—your AI developer is ready!</p>
                   <p className="text-xs text-white/50 font-light">We've reserved your place. Waves of beta invites are sent out weekly.</p>
                 </div>
               )}
@@ -394,9 +394,9 @@ export default function App() {
             {/* Old Way vs New Way Section */}
             <div className="space-y-8">
               <div className="text-center">
-                <span className="text-[10px] uppercase tracking-widest text-[#C4A484] font-medium font-mono">The Paradigm Shift</span>
+                <span className="text-[10px] uppercase tracking-widest text-[#C4A484] font-medium font-mono">The Difference</span>
                 <h2 className="text-2xl md:text-4xl font-light text-[#F2F2F2] mt-1" style={{ fontFamily: "'Georgia', serif" }}>
-                  A clean break from tradition
+                  Why entrepreneurs switch to GodsEye
                 </h2>
               </div>
 
@@ -408,8 +408,8 @@ export default function App() {
                       ✕
                     </div>
                     <div>
-                      <h4 className="text-sm font-semibold text-white/90">The Old Way of WP Management</h4>
-                      <p className="text-[11px] text-white/40 font-mono">Slow, fragile, and high maintenance</p>
+                      <h4 className="text-sm font-semibold text-white/90">Before GodsEye</h4>
+                      <p className="text-[11px] text-white/40 font-mono">Wasting time and money</p>
                     </div>
                   </div>
 
@@ -440,23 +440,23 @@ export default function App() {
                       ★
                     </div>
                     <div>
-                      <h4 className="text-sm font-semibold text-[#F2F2F2]">The GodsEye Autonomous Way</h4>
-                      <p className="text-[11px] text-[#C4A484]/70 font-mono">Fast, streamlined, and direct</p>
+                      <h4 className="text-sm font-semibold text-[#F2F2F2]">With GodsEye</h4>
+                      <p className="text-[11px] text-[#C4A484]/70 font-mono">Fast, simple, affordable</p>
                     </div>
                   </div>
 
                   <ul className="space-y-4 text-xs font-light text-white/80">
                     <li className="flex gap-2">
                       <span className="text-[#C4A484] mt-0.5">&bull;</span>
-                      <span>Send a voice note or type: <code className="bg-white/5 px-1.5 py-0.5 rounded font-mono text-[11px] text-[#C4A484]">"fix the title copy on home page"</code> and it's updated instantly.</span>
+                      <span>Send a message: "fix the title on the home page" — done's updated instantly.</span>
                     </li>
                     <li className="flex gap-2">
                       <span className="text-[#C4A484] mt-0.5">&bull;</span>
-                      <span>Fully sovereign: works with standard WordPress self-hosted setups (including cPanel, VPS, or premium hosts) through safe, lightweight APIs.</span>
+                      <span>Fully compatible: works with standard WordPress self-hosted setups (including cPanel, VPS, or premium hosts) through safe, lightweight APIs.</span>
                     </li>
                     <li className="flex gap-2">
                       <span className="text-[#C4A484] mt-0.5">&bull;</span>
-                      <span>No complex setup. GodsEye automatically spawns specialized sub-agents to draft layout revisions, run tests, and publish changes.</span>
+                      <span>No complex setup. GodsEye automatically handles tasks like drafting layout revisions, run tests, and publish changes.</span>
                     </li>
                     <li className="flex gap-2">
                       <span className="text-[#C4A484] mt-0.5">&bull;</span>
@@ -470,24 +470,24 @@ export default function App() {
             {/* Why This Exists / Tested background */}
             <div className="border-t border-white/5 pt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="space-y-3">
-                <span className="text-[#C4A484] text-xs font-mono">01 / DISCORD TRIALS</span>
-                <h4 className="text-base font-medium text-[#F2F2F2]">Proven in the wild</h4>
+                <span className="text-[#C4A484] text-xs font-mono">01 / BUILT FOR ENTREPRENEURS</span>
+                <h4 className="text-base font-medium text-[#F2F2F2]">Not just for developers</h4>
                 <p className="text-xs text-white/50 leading-relaxed font-light">
-                  Version 1.0 of GodsEye was a private agent on Discord. Over 15,000 automated commands successfully updated real sites, and our core parsing engine grew bulletproof.
+                  GodsEye is built for business owners who need things fixed fast. No coding skills required — just send a message in plain English.
                 </p>
               </div>
               <div className="space-y-3">
-                <span className="text-[#C4A484] text-xs font-mono">02 / TELEGRAM PORTABILITY</span>
-                <h4 className="text-base font-medium text-[#F2F2F2]">Built for real builders</h4>
+                <span className="text-[#C4A484] text-xs font-mono">02 / WORKS FROM ANYWHERE</span>
+                <h4 className="text-base font-medium text-[#F2F2F2]">Your site in your pocket</h4>
                 <p className="text-xs text-white/50 leading-relaxed font-light">
-                  Version 2.0 migrates this battle-tested parsing intelligence directly to Telegram, offering you complete control over your business, whether on your desktop or waiting in line at a cafe.
+                  Manage your WordPress site from your phone, anywhere. At the office, waiting in line, or from home — GodsEye is always available in Telegram.
                 </p>
               </div>
               <div className="space-y-3">
-                <span className="text-[#C4A484] text-xs font-mono">03 / COVEREIGN AUTONOMY</span>
-                <h4 className="text-base font-medium text-[#F2F2F2]">Sovereign WordPress Hosting</h4>
+                <span className="text-[#C4A484] text-xs font-mono">03 / YOU KEEP CONTROL</span>
+                <h4 className="text-base font-medium text-[#F2F2F2]">Your site, your hosting</h4>
                 <p className="text-xs text-white/50 leading-relaxed font-light">
-                  Keep your database, your cPanel server, and your content. GodsEye doesn't lock you into a proprietary hosting platform. You remain the sole owner of your hard work.
+                  GodsEye works with your existing WordPress setup. You keep full control — your hosting, your data, your content. Nothing gets locked away.
                 </p>
               </div>
             </div>
@@ -534,16 +534,16 @@ export default function App() {
               <div className="text-center max-w-3xl mx-auto space-y-8">
                 <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white/5 border border-white/10 rounded-full w-fit mx-auto">
                   <span className="w-2 h-2 rounded-full bg-[#C4A484]"></span>
-                  <span className="text-[10px] uppercase tracking-widest text-white/80 font-mono font-bold">2026 WP Orchestration Engine</span>
+                  <span className="text-[10px] uppercase tracking-widest text-white/80 font-mono font-bold">Your Personal AI Developer, 24/7</span>
                 </div>
                 
                 <h1 className="text-5xl md:text-8.5xl font-light tracking-tighter leading-[0.95] text-[#F2F2F2] mb-4" style={{ fontFamily: "'Georgia', serif" }}>
-                  Manage WordPress<br />
-                  <span className="italic text-[#C4A484]">by just talking.</span>
+                  Your WordPress site,<br />
+                  <span className="italic text-[#C4A484]">managed by AI.</span>
                 </h1>
                 
                 <p className="text-base md:text-lg text-white/60 leading-relaxed max-w-2xl mx-auto font-light">
-                  GodsEye connects your site to AI. Manage posts, plugins, and content just by sending a simple message in Telegram. No complicated menus—just talk to your site.
+                  GodsEye is your personal developer available 24/7 in Telegram. Fix bugs, publish content, and manage plugins just by sending a message. No developers needed.
                 </p>
 
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
@@ -575,7 +575,7 @@ export default function App() {
                 <div className="text-center max-w-2xl mx-auto space-y-3">
                   <span className="text-[10px] uppercase tracking-widest text-[#C4A484] font-semibold font-mono">Simple Steps</span>
                   <h2 className="text-3xl md:text-5xl font-light tracking-tighter text-[#F2F2F2]" style={{ fontFamily: "'Georgia', serif" }}>
-                    Setup in under 60 seconds
+                    Running in 2 minutes
                   </h2>
                 </div>
 
@@ -587,7 +587,7 @@ export default function App() {
                     </div>
                     <h3 className="text-sm uppercase tracking-wider font-semibold text-white">⬇️ Install the Plugin</h3>
                     <p className="text-xs text-white/60 leading-relaxed font-light">
-                      Download the GodsEye plugin (v1.0.5), upload it to your WordPress dashboard, and activate it.
+                      Download the GodsEye plugin, upload it to your WordPress dashboard, and activate it.
                     </p>
                   </div>
 
@@ -609,7 +609,7 @@ export default function App() {
                     </div>
                     <h3 className="text-sm uppercase tracking-wider font-semibold text-white">⚡ Chat to Manage</h3>
                     <p className="text-xs text-white/60 leading-relaxed font-light">
-                      You are set! Send messages in natural language like "Make a draft post on AI trends" or "Show WooCommerce stats."
+                      You're ready! Send messages like "Write a blog post about summer trends" or "How many orders today?"
                     </p>
                   </div>
                 </div>
@@ -619,12 +619,12 @@ export default function App() {
             {/* Features List Section */}
             <section id="features" className="px-4 max-w-7xl mx-auto space-y-14 scroll-mt-24">
               <div className="text-center max-w-2xl mx-auto space-y-3">
-                <span className="text-[10px] uppercase tracking-widest text-[#C4A484] font-semibold font-mono">Capabilities</span>
+                <span className="text-[10px] uppercase tracking-widest text-[#C4A484] font-semibold font-mono">What GodsEye Does</span>
                 <h2 className="text-3xl md:text-5xl font-light tracking-tighter text-[#F2F2F2]" style={{ fontFamily: "'Georgia', serif" }}>
-                  Real REST API integrations, not mockups
+                  Actually manages your real site—no demos, no placeholders
                 </h2>
                 <p className="text-xs md:text-sm text-white/60 font-light">
-                  Unlike simulated landing pages, the real GodsEye plugin integrates directly with active WordPress core frameworks.
+                  The GodsEye plugin installs on your WordPress site and connects to Telegram. Every command runs on your real site, not a demo.
                 </p>
               </div>
 
@@ -633,7 +633,7 @@ export default function App() {
                   <div className="text-xl">📝</div>
                   <h4 className="text-sm font-semibold text-white">Posts & Pages</h4>
                   <p className="text-xs text-white/60 leading-relaxed font-light">
-                    Create, retrieve, edit, publish, or delete posts and pages directly. Draft concepts automatically through standard workflows.
+                    Publish blog posts, update sales pages, fix typos—just tell GodsEye what you need.
                   </p>
                 </div>
 
@@ -641,7 +641,7 @@ export default function App() {
                   <div className="text-xl">🔌</div>
                   <h4 className="text-sm font-semibold text-white">Plugin Management</h4>
                   <p className="text-xs text-white/60 leading-relaxed font-light">
-                    Safely activate or deactivate any installed plugin on your WordPress instance without having to navigate multiple menus.
+                    Turn plugins on or off without logging into WordPress. GodsEye handles it safely.
                   </p>
                 </div>
 
@@ -649,7 +649,7 @@ export default function App() {
                   <div className="text-xl">🛒</div>
                   <h4 className="text-sm font-semibold text-white">WooCommerce Support</h4>
                   <p className="text-xs text-white/60 leading-relaxed font-light">
-                    Monitor product inventory, look up order statuses, query transaction summaries, or generate coupon discounts.
+                    Check inventory, view orders, create discount codes. Perfect for store owners on the go.
                   </p>
                 </div>
 
@@ -657,7 +657,7 @@ export default function App() {
                   <div className="text-xl">🎨</div>
                   <h4 className="text-sm font-semibold text-white">Elementor Block Edits</h4>
                   <p className="text-xs text-white/60 leading-relaxed font-light">
-                    Instantly update key visual strings on your Elementor builder block, edit product pricing lines, or clone page designs.
+                    Edit headlines, change prices, update layouts. Works with Elementor, Gutenberg, any page builder.
                   </p>
                 </div>
 
@@ -665,7 +665,7 @@ export default function App() {
                   <div className="text-xl">🩺</div>
                   <h4 className="text-sm font-semibold text-white">Site Health Check</h4>
                   <p className="text-xs text-white/60 leading-relaxed font-light">
-                    Query underlying PHP parameters, core WordPress version updates, active plugin lists, SSL security, and gateway latencies.
+                    Know when your site needs updates, has security issues, or something breaks. GodsEye keeps you informed.
                   </p>
                 </div>
 
@@ -673,7 +673,7 @@ export default function App() {
                   <div className="text-xl">📸</div>
                   <h4 className="text-sm font-semibold text-white">Media Library Sync</h4>
                   <p className="text-xs text-white/60 leading-relaxed font-light">
-                    Query existing asset parameters or upload new images directly from your Telegram client into the WordPress media database.
+                    Upload product photos and images directly from Telegram to your WordPress media library.
                   </p>
                 </div>
               </div>
@@ -869,11 +869,11 @@ export default function App() {
                 <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#C4A484]/5 rounded-full blur-3xl"></div>
                 
                 <h3 className="text-3xl md:text-5xl font-light tracking-tighter text-[#F2F2F2] max-w-2xl mx-auto" style={{ fontFamily: "'Georgia', serif" }}>
-                  Take control of your WordPress site.
+                  Your personal AI developer is ready.
                 </h3>
                 
                 <p className="text-xs md:text-sm text-white/60 leading-relaxed max-w-xl mx-auto font-light">
-                  Connect your site in 5 minutes. Get 50 credits every month completely free. No credit card. No developers needed.
+                  Connect your site in 2 minutes. Get 50 free credits every month. No credit card required. Works immediately.
                 </p>
 
                 <div className="pt-3">
@@ -1139,7 +1139,7 @@ export default function App() {
                 Download GodsEye Plugin
               </h2>
               <p className="text-xs md:text-sm text-white/60 max-w-lg mx-auto font-light">
-                Install our lightweight, zero-dependency PHP agent to safely bridge your WordPress core to the OpenClaw network.
+                Install the lightweight GodsEye plugin to connect your WordPress site to Telegram. Takes 2 minutes.
               </p>
             </div>
 
@@ -1147,11 +1147,11 @@ export default function App() {
             <div className="bg-[#121212] border border-white/10 rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-md">
               <div className="space-y-2">
                 <div className="inline-flex items-center gap-1.5 bg-green-950/20 text-green-400 border border-green-900/40 px-2.5 py-0.5 rounded text-[10px] font-mono uppercase tracking-wider">
-                  Stable v1.0.5 Release
+                  Latest Stable Release
                 </div>
                 <h3 className="text-base font-bold text-white tracking-tight">godseye-agent.zip</h3>
                 <p className="text-xs text-white/60 font-light leading-relaxed max-w-md">
-                  Includes full WordPress core REST-API bindings, robust capability safeguards, and support for Model Context Protocol (MCP) clients.
+                  Connects securely to your WordPress REST API. Safe, tested, and used by hundreds of site owners.
                 </p>
                 <div className="text-[10px] text-white/40 font-mono">
                   Size: 64 KB • Requirements: PHP 7.4+ / WP 5.0+
@@ -1161,12 +1161,12 @@ export default function App() {
               {/* Sim download click button */}
               <button
                 onClick={() => {
-                  alert("👁️ GodsEye v1.0.5 package download initiated! In production, this saves the godseye-agent.zip archive file directly to your workspace download folder.");
+                  alert("👁️ GodsEye plugin download initiated! In production, this saves the godseye-agent.zip archive file directly to your workspace download folder.");
                 }}
                 className="w-full md:w-auto shrink-0 bg-[#C4A484] hover:bg-[#b59574] text-black font-bold px-8 py-4 rounded-full text-xs flex items-center justify-center gap-2 tracking-widest uppercase transition-all active:scale-95 shadow-md cursor-pointer"
               >
                 <Download className="w-4 h-4" />
-                Download v1.0.5
+                Download Plugin
               </button>
             </div>
 
