@@ -22,7 +22,7 @@
   </p>
   <br/>
   <a href="https://godseye.digitalhustlerx.com" style="display: inline-block; background: #C4A484; color: #0A0A0A; padding: 12px 36px; border-radius: 999px; font-weight: bold; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; text-decoration: none;">Visit Live Site</a>
-  <a href="https://t.me/wordpressclawofficialbot" style="display: inline-block; background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #F2F2F2; padding: 12px 36px; border-radius: 999px; font-weight: bold; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; text-decoration: none; margin-left: 8px;">Try Telegram Bot</a>
+  <a href="https://t.me/GodseyeXbot" style="display: inline-block; background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #F2F2F2; padding: 12px 36px; border-radius: 999px; font-weight: bold; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; text-decoration: none; margin-left: 8px;">Try Telegram Bot</a>
   <br/><br/><br/>
 </div>
 
@@ -86,7 +86,7 @@
       <td width="10%" style="border: none; text-align: center; color: #C4A484; font-size: 20px; font-family: monospace; vertical-align: top;">02</td>
       <td width="90%" style="border: none; padding: 8px 12px;">
         <p style="color: #F2F2F2; font-weight: 600; margin: 0; font-size: 14px;">💬 Connect via Telegram</p>
-        <p style="color: #9CA3AF; font-size: 12px; margin: 4px 0 0 0;">Send <code style="background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 4px; color: #C4A484; font-size: 11px;">/connect</code> to <code style="background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 4px; color: #C4A484; font-size: 11px;">@wordpressclawofficialbot</code> and follow the prompt.</p>
+        <p style="color: #9CA3AF; font-size: 12px; margin: 4px 0 0 0;">Send <code style="background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 4px; color: #C4A484; font-size: 11px;">/connect</code> to <code style="background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 4px; color: #C4A484; font-size: 11px;">@GodseyeXbot</code> and follow the prompt.</p>
       </td>
     </tr>
     <tr>
@@ -288,7 +288,7 @@ Action types: `CREATE_POST`, `ACTIVATE_PLUGIN`, `DEACTIVATE_PLUGIN`, `WOOCOMMERC
 <div align="center">
   <p>
     <a href="https://godseye.digitalhustlerx.com" style="color: #C4A484;">🌐 Live Site</a> &nbsp;·&nbsp;
-    <a href="https://t.me/wordpressclawofficialbot" style="color: #C4A484;">💬 Telegram Bot</a> &nbsp;·&nbsp;
+    <a href="https://t.me/GodseyeXbot" style="color: #C4A484;">💬 Telegram Bot</a> &nbsp;·&nbsp;
     <a href="https://godseye.digitalhustlerx.com/download" style="color: #C4A484;">📦 Download Plugin</a>
   </p>
   <br/>

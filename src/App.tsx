@@ -240,7 +240,7 @@ export default function App() {
               Buy Credits
             </button>
             <a 
-              href="https://t.me/wordpressclawofficialbot?start=connect" 
+              href="https://t.me/GodseyeXbot?start=connect" 
               target="_blank" 
               rel="noreferrer"
               className="text-[10px] uppercase tracking-widest font-bold bg-[#F2F2F2] hover:bg-white text-[#0A0A0A] px-6 py-3 rounded-full flex items-center gap-1.5 transition-all active:scale-95 shadow-md"
@@ -311,7 +311,7 @@ export default function App() {
                 Buy Credits
               </button>
               <a 
-                href="https://t.me/wordpressclawofficialbot?start=connect" 
+                href="https://t.me/GodseyeXbot?start=connect" 
                 target="_blank" 
                 rel="noreferrer"
                 className="flex-1 text-center text-xs font-semibold bg-indigo-600 text-white py-2.5 rounded-lg"
@@ -548,7 +548,7 @@ export default function App() {
 
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
                   <a 
-                    href="https://t.me/wordpressclawofficialbot?start=connect" 
+                    href="https://t.me/GodseyeXbot?start=connect" 
                     target="_blank" 
                     rel="noreferrer"
                     className="w-full sm:w-auto bg-[#F2F2F2] text-[#0A0A0A] hover:bg-white px-10 py-4 rounded-full font-bold text-xs uppercase tracking-widest transition-all shadow-md text-center cursor-pointer"
@@ -598,7 +598,7 @@ export default function App() {
                     </div>
                     <h3 className="text-sm uppercase tracking-wider font-semibold text-white">💬 Connect via Telegram</h3>
                     <p className="text-xs text-white/60 leading-relaxed font-light">
-                      Send <code className="bg-white/5 px-2 py-1 rounded text-[#C4A484] text-[10px] font-mono border border-white/10">/connect</code> to `@wordpressclawofficialbot` and follow the instant prompt.
+                      Send <code className="bg-white/5 px-2 py-1 rounded text-[#C4A484] text-[10px] font-mono border border-white/10">/connect</code> to `@GodseyeXbot` and follow the instant prompt.
                     </p>
                   </div>
 
@@ -751,7 +751,7 @@ export default function App() {
                       <div className="pt-6 mt-6 border-t border-white/10">
                         {plan.id === 'free' ? (
                           <a
-                            href="https://t.me/wordpressclawofficialbot?start=connect"
+                            href="https://t.me/GodseyeXbot?start=connect"
                             target="_blank"
                             rel="noreferrer"
                             className="block text-center w-full bg-white/5 hover:bg-white/10 text-white border border-white/10 text-[10px] uppercase tracking-widest font-bold py-3.5 rounded-full transition-all"
@@ -878,7 +878,7 @@ export default function App() {
 
                 <div className="pt-3">
                   <a 
-                    href="https://t.me/wordpressclawofficialbot?start=connect" 
+                    href="https://t.me/GodseyeXbot?start=connect" 
                     target="_blank" 
                     rel="noreferrer"
                     className="inline-flex items-center gap-2 bg-[#F2F2F2] text-[#0A0A0A] hover:bg-white px-8 py-4 rounded-full font-bold text-xs uppercase tracking-widest shadow-md transition-all active:scale-95"
@@ -1205,7 +1205,7 @@ export default function App() {
                   <div className="w-7 h-7 rounded-full bg-white/5 text-[#C4A484] border border-white/20 flex items-center justify-center font-mono shrink-0 mt-0.5">04</div>
                   <div>
                     <h4 className="font-bold text-white uppercase tracking-wide">Search Telegram Bot</h4>
-                    <p className="text-white/60 leading-relaxed font-light mt-1">Open your Telegram client and search for `@wordpressclawofficialbot`. Tap "Start".</p>
+                    <p className="text-white/60 leading-relaxed font-light mt-1">Open your Telegram client and search for `@GodseyeXbot`. Tap "Start".</p>
                   </div>
                 </div>
 
@@ -1303,12 +1303,12 @@ export default function App() {
             <div className="space-y-4">
               <h3 className="text-xs font-semibold text-white uppercase tracking-wider font-mono">🚀 Next Steps</h3>
               <p className="text-xs text-white/60 font-light leading-relaxed max-w-sm mx-auto">
-                Open Telegram, send `@wordpressclawofficialbot` the command <code className="bg-white/5 px-2 py-0.5 rounded text-[#C4A484] border border-white/10 font-mono">/credits</code>, and verify your new credit balance!
+                Open Telegram, send `@GodseyeXbot` the command <code className="bg-white/5 px-2 py-0.5 rounded text-[#C4A484] border border-white/10 font-mono">/credits</code>, and verify your new credit balance!
               </p>
               
               <div className="pt-2">
                 <a 
-                  href="https://t.me/wordpressclawofficialbot?start=connect"
+                  href="https://t.me/GodseyeXbot?start=connect"
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex items-center gap-1.5 bg-[#C4A484] hover:bg-[#b59574] text-black font-bold text-xs px-8 py-4 rounded-full shadow-md tracking-widest uppercase transition-all active:scale-95"
@@ -1381,7 +1381,7 @@ export default function App() {
             <h4 className="text-[10px] font-semibold text-[#C4A484] tracking-wider uppercase font-mono">Integrations</h4>
             <ul className="space-y-2 text-xs text-white/50 font-light">
               <li>
-                <a href="https://t.me/wordpressclawofficialbot" target="_blank" rel="noreferrer" className="hover:text-[#C4A484] transition-colors">
+                <a href="https://t.me/GodseyeXbot" target="_blank" rel="noreferrer" className="hover:text-[#C4A484] transition-colors">
                   Telegram Bot
                 </a>
               </li>
