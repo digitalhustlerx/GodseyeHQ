@@ -2,7 +2,7 @@
   <br/>
   <img src="https://img.shields.io/badge/status-live-0A0A0A?style=flat-square&labelColor=C4A484" alt="Status"/>
   <img src="https://img.shields.io/badge/version-2.0.0-0A0A0A?style=flat-square&labelColor=C4A484" alt="Version"/>
-  <img src="https://img.shields.io/badge/license-private-0A0A0A?style=flat-square&labelColor=C4A484" alt="License"/>
+  <img src="https://img.shields.io/badge/license-AGPL--3.0-0A0A0A?style=flat-square&labelColor=C4A484" alt="License"/>
   <br/><br/>
 </div>
 
@@ -290,7 +290,22 @@ Action types: `CREATE_POST`, `ACTIVATE_PLUGIN`, `DEACTIVATE_PLUGIN`, `WOOCOMMERC
     <a href="https://godseye.digitalhustlerx.com" style="color: #C4A484;">🌐 Live Site</a> &nbsp;·&nbsp;
     <a href="https://t.me/GodseyeXbot" style="color: #C4A484;">💬 Telegram Bot</a> &nbsp;·&nbsp;
     <a href="https://godseye.digitalhustlerx.com/download" style="color: #C4A484;">📦 Download Plugin</a>
+  <br/>
+</div>
+
+---
+
+## License
+
+<div align="center">
+  <p style="color: #9CA3AF; font-size: 12px;">
+    <strong>Dual License:</strong> GNU Affero General Public License v3.0 + Commercial
+  </p>
+  <p style="color: #6B7280; font-size: 11px; max-width: 500px;">
+    This software is <a href="LICENSE" style="color: #C4A484;">AGPL-3.0</a> open source. Organizations that cannot comply with AGPL requirements should
+    <a href="COMMERCIAL_LICENSE.md" style="color: #C4A484;">purchase a Commercial License</a>.
+    See <a href="COMMERCIAL_LICENSE.md" style="color: #C4A484;">COMMERCIAL_LICENSE.md</a> for details.
   </p>
   <br/>
-  <p style="color: #6B7280; font-size: 11px;">Private project &nbsp;·&nbsp; All rights reserved</p>
+  <p style="color: #6B7280; font-size: 11px;">© 2026 DigitalHustlerX Labs &nbsp;·&nbsp; <a href="https://github.com/DigitalHustlerX-Labs/GodseyeHQ" style="color: #C4A484;">GitHub</a></p>
 </div>

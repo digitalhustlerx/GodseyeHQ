@@ -179,7 +179,7 @@ export default function LivePlayground({
           </div>
         </div>
         <div className="text-[10px] text-white/40 font-mono">
-          @GodseyeXbot
+          AI Assistant
         </div>
       </div>
 

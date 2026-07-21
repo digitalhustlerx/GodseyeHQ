@@ -92,17 +92,39 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
     }
   });
 
-  // Mock Polar checkouts
+  // Mock Polar checkouts — extended for founder pricing + referral
   app.post("/api/create-checkout", (req, res) => {
-    const { product_id, telegram_id, email } = req.body;
+    const { product_id, telegram_id, email, founder_pricing, referral_code } = req.body;
     if (!telegram_id) {
       return res.status(400).json({ error: "Telegram ID is required" });
     }
-    // Generate a mock checkout ID and return success with url parameter
     const mockCheckoutId = `mock_chk_${Math.random().toString(36).substring(2, 11)}`;
-    res.json({
-      checkout_url: `?checkout_success=true&checkout_id=${mockCheckoutId}&telegram_id=${telegram_id}&product_id=${product_id}&email=${encodeURIComponent(email || "user@example.com")}`
+    const params = new URLSearchParams({
+      checkout_success: "true",
+      checkout_id: mockCheckoutId,
+      telegram_id,
+      product_id: product_id || "starter",
+      email: encodeURIComponent(email || "user@example.com"),
     });
+    if (founder_pricing) params.set("founder_pricing", "true");
+    if (referral_code) params.set("ref", referral_code);
+    res.json({
+      checkout_url: `?${params.toString()}`,
+      founder_pricing_applied: !!founder_pricing,
+      referral_code_applied: referral_code || null,
+      message: founder_pricing
+        ? "🎉 Founder pricing locked in. Your 1 year of 50% off starts now. Credits are in your bot wallet."
+        : undefined
+    });
+  });
+
+  // Polar webhook placeholder — receives payment confirmation
+  app.post("/api/polar-webhook", (req, res) => {
+    const event = req.body;
+    console.log("[Polar Webhook] Received event:", event?.type || "unknown");
+    // TODO: verify webhook signature, write to Supabase payments table,
+    // trigger referral credit allocation, update founder status
+    res.json({ received: true });
   });
 
   // Vite middleware for development

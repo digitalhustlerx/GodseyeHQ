@@ -60,4 +60,20 @@ export interface PricingPlan {
   features: string[];
   polarProductId: string;
   isPopular?: boolean;
+  foundersPrice?: string;
+  foundersExpiresInDays?: number;
+  foundersBadge?: string;
 }
+
+export interface SelfHostPlan {
+  id: string;
+  name: string;
+  setupFee: string;
+  monthlyFee: string;
+  description: string;
+  features: string[];
+  ctaLabel: string;
+  ctaHref: string;
+  isPopular?: boolean;
+}
+

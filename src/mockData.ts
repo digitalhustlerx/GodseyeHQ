@@ -1,4 +1,4 @@
-import { PricingPlan, MockWPState } from "./types";
+import { PricingPlan, MockWPState, SelfHostPlan } from "./types";
 
 export const PRICING_PLANS: PricingPlan[] = [
   {
@@ -32,7 +32,10 @@ export const PRICING_PLANS: PricingPlan[] = [
       "Basic topic suggestions for your niche"
     ],
     polarProductId: "21f41008-1dbf-4d1a-8f1c-96ea518203b3",
-    isPopular: true
+    isPopular: true,
+    foundersPrice: "$4.50",
+    foundersExpiresInDays: 365,
+    foundersBadge: "Founders"
   },
   {
     id: "pro",
@@ -51,7 +54,10 @@ export const PRICING_PLANS: PricingPlan[] = [
       "Weekly content planning templates",
       "Automated daily draft scheduling"
     ],
-    polarProductId: "ff6a89c7-6d4e-4748-a760-3c73179b7b44"
+    polarProductId: "ff6a89c7-6d4e-4748-a760-3c73179b7b44",
+    foundersPrice: "$14.50",
+    foundersExpiresInDays: 365,
+    foundersBadge: "Founders"
   },
   {
     id: "agency",
@@ -69,7 +75,10 @@ export const PRICING_PLANS: PricingPlan[] = [
       "Custom content workflows & automations",
       "Priority support"
     ],
-    polarProductId: "2dadbaf0-24a2-4d45-abd1-5a6e11c4c741"
+    polarProductId: "2dadbaf0-24a2-4d45-abd1-5a6e11c4c741",
+    foundersPrice: "$49.50",
+    foundersExpiresInDays: 365,
+    foundersBadge: "Founders"
   }
 ];
 
@@ -131,6 +140,104 @@ export const INITIAL_WP_STATE: MockWPState = {
   elementorHeroPrice: "$499"
 };
 
+
+export const SELF_HOST_PLANS: SelfHostPlan[] = [
+  {
+    id: "diy",
+    name: "DIY Install",
+    setupFee: "Free",
+    monthlyFee: "$0/mo",
+    description: "BYO VPS. Free install script. Community support only.",
+    features: [
+      "One-command install script",
+      "Comprehensive docs & guides",
+      "Community support via Telegram",
+      "Full AGPL-3.0 open-source access"
+    ],
+    ctaLabel: "View docs",
+    ctaHref: "https://github.com/DigitalHustlerX-Labs/GodseyeHQ#quick-start-local-dev"
+  },
+  {
+    id: "white-glove",
+    name: "White-Glove Setup",
+    setupFee: "$299 setup",
+    monthlyFee: "$49/mo managed",
+    description: "We provision your VPS, install Godseye, configure your WP sites, hand over keys. You own your data.",
+    features: [
+      "Full VPS provisioning & hardening",
+      "Godseye installation & configuration",
+      "WordPress site connections setup",
+      "Ongoing updates, backups & monitoring",
+      "Email support (4h SLA)"
+    ],
+    ctaLabel: "Book a setup call",
+    ctaHref: "mailto:selfhost@godseye.shop?subject=White-Glove%20Setup",
+    isPopular: true
+  },
+  {
+    id: "migration",
+    name: "Migration Package",
+    setupFee: "$599 one-time",
+    monthlyFee: "",
+    description: "We move your existing WP sites from cPanel/Bluehost/HostGator to a self-hosted Godseye VPS. Zero downtime.",
+    features: [
+      "cPanel / Plesk / DirectAdmin migration",
+      "DNS & SSL configuration",
+      "Database transfer & verification",
+      "Godseye integration setup",
+      "Zero-downtime cutover"
+    ],
+    ctaLabel: "Book a migration",
+    ctaHref: "mailto:selfhost@godseye.shop?subject=Migration%20Package"
+  },
+  {
+    id: "storage",
+    name: "Storage Top-Ups",
+    setupFee: "",
+    monthlyFee: "$19 per 100GB/mo",
+    description: "Scale storage as your media library grows. No caps, no throttling.",
+    features: [
+      "Additional 100GB SSD storage",
+      "Auto-scalable — no downtime",
+      "Daily encrypted backups",
+      "Retention up to 30 days"
+    ],
+    ctaLabel: "Add storage",
+    ctaHref: "mailto:selfhost@godseye.shop?subject=Storage%20Top-Up"
+  },
+  {
+    id: "white-label",
+    name: "White-Label (Agencies)",
+    setupFee: "",
+    monthlyFee: "$999/mo",
+    description: "Run Godseye under your own brand for your clients. Powered by Godseye, branded as your agency.",
+    features: [
+      "Custom branding & domain",
+      "Multi-tenant client management",
+      "Billing & usage dashboards",
+      "Priority Slack support",
+      "API access for custom integrations"
+    ],
+    ctaLabel: "Book a discovery call",
+    ctaHref: "mailto:selfhost@godseye.shop?subject=White-Label%20Agency"
+  },
+  {
+    id: "enterprise",
+    name: "Enterprise Self-Host",
+    setupFee: "$2,999 setup",
+    monthlyFee: "$499/mo",
+    description: "Multi-tenant, SSO, dedicated support SLA, custom integrations. For agencies running 50+ WP sites.",
+    features: [
+      "Multi-region high-availability deployment",
+      "SSO (SAML/OIDC) integration",
+      "Dedicated support SLA (1h response)",
+      "Custom integrations & plugins",
+      "Audit logs & compliance reports"
+    ],
+    ctaLabel: "Talk to sales",
+    ctaHref: "mailto:selfhost@godseye.shop?subject=Enterprise%20Self-Host"
+  }
+];
 export const SAMPLE_COMMANDS = [
   "Create draft post 'AI Revolution'",
   "Activate Yoast SEO plugin",

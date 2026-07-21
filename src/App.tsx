@@ -1,6 +1,7 @@
 import { useState, useEffect, FormEvent } from "react";
-import { MockWPState, ActiveView, PricingPlan } from "./types";
-import { INITIAL_WP_STATE, PRICING_PLANS, CREDIT_PACKS } from "./mockData";
+import { MockWPState, ActiveView, PricingPlan, SelfHostPlan } from "./types";
+import { INITIAL_WP_STATE, PRICING_PLANS, CREDIT_PACKS, SELF_HOST_PLANS } from "./mockData";
+import WaitlistModal from "./components/WaitlistModal";
 import WordPressDashboard from "./components/WordPressDashboard";
 import LivePlayground from "./components/LivePlayground";
 import { 
@@ -52,6 +53,20 @@ export default function App() {
 
   // FAQ accordion state
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
+  const [showWaitlistModal, setShowWaitlistModal] = useState(false);
+  const [waitlistSession, setWaitlistSession] = useState<{ email: string; signupDate: string; isFounder: boolean; referralCode?: string } | null>(null);
+
+  // Restore waitlist session from localStorage
+  useEffect(() => {
+    const stored = localStorage.getItem("godseye_waitlist_session");
+    if (stored) {
+      try {
+        setWaitlistSession(JSON.parse(stored));
+      } catch {}
+    }
+  }, []);
+
+  const urlRefParam = new URLSearchParams(window.location.search).get("ref") || undefined;
 
   // Parse checkout success query params from browser URL if simulated
   useEffect(() => {
@@ -211,42 +226,58 @@ export default function App() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-7 text-[11px] uppercase tracking-[0.2em] font-medium text-gray-400">
+            {waitlistSession && (
             <button 
               onClick={() => setActiveView('playground')} 
               className="hover:text-[#C4A484] transition-colors cursor-pointer"
             >
               Sandbox
             </button>
+            )}
+            {waitlistSession && (
             <button 
               onClick={() => setActiveView('dashboard')} 
               className="hover:text-[#C4A484] transition-colors cursor-pointer"
             >
               Dashboard
             </button>
+            )}
             <button 
               onClick={() => setActiveView('waitlist')} 
               className="hover:text-[#C4A484] transition-colors cursor-pointer"
             >
               Waitlist
             </button>
+            <button 
+              onClick={() => { setActiveView('landing'); setTimeout(() => document.getElementById('self-host')?.scrollIntoView({ behavior: 'smooth' }), 50); }} 
+              className="hover:text-[#C4A484] transition-colors cursor-pointer"
+            >
+              Self-Host
+            </button>
           </nav>
 
           {/* Nav CTAs */}
           <div className="hidden md:flex items-center gap-4">
+            {waitlistSession && (
             <button 
               onClick={() => setActiveView('buy')} 
               className={`text-[10px] uppercase tracking-widest font-bold px-5 py-2.5 rounded-full border transition-all cursor-pointer ${activeView === 'buy' ? 'bg-[#C4A484]/10 border-[#C4A484] text-[#C4A484]' : 'border-white/20 hover:border-white/40 text-gray-300'}`}
             >
               Buy Credits
             </button>
-            <a 
-              href="https://t.me/GodseyeXbot?start=connect" 
-              target="_blank" 
-              rel="noreferrer"
+            )}
+            <button
+              onClick={() => {
+                if (!waitlistSession) {
+                  setShowWaitlistModal(true);
+                } else {
+                  window.open("https://t.me/GodseyeXbot?start=connect", "_blank");
+                }
+              }}
               className="text-[10px] uppercase tracking-widest font-bold bg-[#F2F2F2] hover:bg-white text-[#0A0A0A] px-6 py-3 rounded-full flex items-center gap-1.5 transition-all active:scale-95 shadow-md"
             >
               Start Free
-            </a>
+            </button>
           </div>
 
           {/* Mobile Menu Button */}
@@ -261,12 +292,14 @@ export default function App() {
         {/* Mobile Navigation Panel */}
         {mobileMenuOpen && (
           <div className="md:hidden mt-4 pt-4 border-t border-gray-800 space-y-3.5 flex flex-col">
+            {waitlistSession && (
             <button 
               onClick={() => { setMobileMenuOpen(false); setActiveView('landing'); setTimeout(() => document.getElementById('playground')?.scrollIntoView({ behavior: 'smooth' }), 50) }} 
               className="text-xs font-medium text-gray-400 hover:text-white text-left"
             >
               Playground
             </button>
+            )}
             <button 
               onClick={() => { setMobileMenuOpen(false); setActiveView('landing'); setTimeout(() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' }), 50) }} 
               className="text-xs font-medium text-gray-400 hover:text-white text-left"
@@ -286,40 +319,54 @@ export default function App() {
               FAQ
             </button>
             <button 
+              onClick={() => { setMobileMenuOpen(false); setActiveView('landing'); setTimeout(() => document.getElementById('self-host')?.scrollIntoView({ behavior: 'smooth' }), 50) }} 
+              className="text-xs font-medium text-gray-400 hover:text-white text-left"
+            >
+              Self-Host
+            </button>
+            {waitlistSession && (
+            <button 
               onClick={() => { setMobileMenuOpen(false); setActiveView('dashboard'); }} 
               className="text-xs font-medium text-gray-400 hover:text-white text-left"
             >
               Dashboard
             </button>
+            )}
+            {waitlistSession && (
             <button 
               onClick={() => { setMobileMenuOpen(false); setActiveView('playground'); }} 
               className="text-xs font-medium text-gray-400 hover:text-white text-left"
             >
               Sandbox
             </button>
+            )}
             <button 
               onClick={() => { setMobileMenuOpen(false); setActiveView('download'); }} 
               className="text-xs font-medium text-gray-400 hover:text-white text-left flex items-center gap-1.5"
             >
               <Download className="w-4 h-4" /> Download Plugin
             </button>
-            <div className="pt-2 border-t border-gray-900 flex gap-2">
-              <button 
-                onClick={() => { setMobileMenuOpen(false); setActiveView('buy'); }} 
-                className="flex-1 text-center text-xs font-medium bg-[#13131e] border border-gray-800 text-gray-300 py-2.5 rounded-lg"
-              >
-                Buy Credits
-              </button>
-              <a 
-                href="https://t.me/GodseyeXbot?start=connect" 
-                target="_blank" 
-                rel="noreferrer"
-                className="flex-1 text-center text-xs font-semibold bg-indigo-600 text-white py-2.5 rounded-lg"
-              >
-                Start Free
-              </a>
+            {waitlistSession && (
+            <button 
+              onClick={() => { setMobileMenuOpen(false); setActiveView('buy'); }} 
+              className="flex-1 text-center text-xs font-medium bg-[#13131e] border border-gray-800 text-gray-300 py-2.5 rounded-lg"
+            >
+              Buy Credits
+            </button>
+            )}
+            <button
+              onClick={() => {
+                if (!waitlistSession) {
+                  setShowWaitlistModal(true);
+                } else {
+                  window.open("https://t.me/GodseyeXbot?start=connect", "_blank");
+                }
+              }}
+              className="flex-1 text-center text-xs font-semibold bg-indigo-600 text-white py-2.5 rounded-lg"
+            >
+              Start Free
+            </button>
             </div>
-          </div>
         )}
       </header>
 
@@ -547,14 +594,18 @@ export default function App() {
                 </p>
 
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-                  <a 
-                    href="https://t.me/GodseyeXbot?start=connect" 
-                    target="_blank" 
-                    rel="noreferrer"
-                    className="w-full sm:w-auto bg-[#F2F2F2] text-[#0A0A0A] hover:bg-white px-10 py-4 rounded-full font-bold text-xs uppercase tracking-widest transition-all shadow-md text-center cursor-pointer"
-                  >
-                    💬 Start Free — 50 credits/mo
-                  </a>
+                <button
+                  onClick={() => {
+                    if (!waitlistSession) {
+                      setShowWaitlistModal(true);
+                    } else {
+                      window.open("https://t.me/GodseyeXbot?start=connect", "_blank");
+                    }
+                  }}
+                  className="w-full sm:w-auto bg-[#F2F2F2] text-[#0A0A0A] hover:bg-white px-10 py-4 rounded-full font-bold text-xs uppercase tracking-widest transition-all shadow-md text-center cursor-pointer"
+                >
+                  💬 Start Free — 50 credits/mo
+                </button>
                   <button 
                     onClick={() => document.getElementById('how')?.scrollIntoView({ behavior: 'smooth' })}
                     className="w-full sm:w-auto bg-transparent hover:bg-white/5 border border-white/20 text-[#F2F2F2] px-10 py-4 rounded-full font-bold text-xs uppercase tracking-widest transition-all text-center cursor-pointer"
@@ -598,7 +649,7 @@ export default function App() {
                     </div>
                     <h3 className="text-sm uppercase tracking-wider font-semibold text-white">💬 Connect via Telegram</h3>
                     <p className="text-xs text-white/60 leading-relaxed font-light">
-                      Send <code className="bg-white/5 px-2 py-1 rounded text-[#C4A484] text-[10px] font-mono border border-white/10">/connect</code> to `@GodseyeXbot` and follow the instant prompt.
+                      Send <code className="bg-white/5 px-2 py-1 rounded text-[#C4A484] text-[10px] font-mono border border-white/10">/connect</code> to the bot when your invite link arrives.
                     </p>
                   </div>
 
@@ -710,7 +761,12 @@ export default function App() {
               {/* Grid cards */}
               {pricingPeriod === 'monthly' ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-                  {PRICING_PLANS.map((plan) => (
+                  {PRICING_PLANS.map((plan) => {
+                    const showFounder = waitlistSession?.isFounder && plan.foundersPrice && (Date.now() - new Date(waitlistSession.signupDate).getTime() < 14 * 24 * 60 * 60 * 1000);
+                    const founderTimeLeft = waitlistSession?.signupDate ? Math.max(0, 14 * 24 * 60 * 60 * 1000 - (Date.now() - new Date(waitlistSession.signupDate).getTime())) : 0;
+                    const founderDaysLeft = Math.floor(founderTimeLeft / (24 * 60 * 60 * 1000));
+                    const founderHoursLeft = Math.floor((founderTimeLeft % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+                    return (
                     <div 
                       key={plan.id}
                       className={`relative bg-[#121212] rounded-3xl border p-6 flex flex-col justify-between transition-all duration-300 ${plan.isPopular ? 'border-[#C4A484] shadow-lg shadow-[#C4A484]/5 ring-1 ring-[#C4A484]/30 bg-gradient-to-br from-[#0A0A0A] to-[#151515]' : 'border-white/10 hover:border-white/20'}`}
@@ -725,9 +781,26 @@ export default function App() {
                         <div>
                           <h4 className="text-[10px] uppercase tracking-widest font-bold text-white/50 font-mono">{plan.name}</h4>
                           <div className="flex items-baseline gap-1 mt-2">
-                            <span className="text-3xl font-black text-white">{plan.price}</span>
-                            <span className="text-xs text-white/50 font-light">/month</span>
+                            {showFounder ? (
+                              <>
+                                <span className="text-3xl font-black text-[#C4A484]">{plan.foundersPrice}</span>
+                                <span className="text-sm text-white/40 line-through">{plan.price}</span>
+                                <span className="text-xs text-white/50 font-light">/month</span>
+                              </>
+                            ) : (
+                              <>
+                                <span className="text-3xl font-black text-white">{plan.price}</span>
+                                <span className="text-xs text-white/50 font-light">/month</span>
+                              </>
+                            )}
                           </div>
+                          {showFounder && (
+                            <div className="mt-2 flex items-center gap-1.5">
+                              <span className="bg-[#C4A484]/20 text-[#C4A484] text-[9px] font-mono font-bold px-2 py-0.5 rounded-full border border-[#C4A484]/30 uppercase tracking-wider">
+                                {plan.foundersBadge} — {founderDaysLeft}d {founderHoursLeft}h left
+                              </span>
+                            </div>
+                          )}
                         </div>
 
                         <div className="py-3 border-y border-white/10">
@@ -750,25 +823,29 @@ export default function App() {
 
                       <div className="pt-6 mt-6 border-t border-white/10">
                         {plan.id === 'free' ? (
-                          <a
-                            href="https://t.me/GodseyeXbot?start=connect"
-                            target="_blank"
-                            rel="noreferrer"
+                          <button
+                            onClick={() => {
+                              if (!waitlistSession) {
+                                setShowWaitlistModal(true);
+                              } else {
+                                window.open("https://t.me/GodseyeXbot?start=connect", "_blank");
+                              }
+                            }}
                             className="block text-center w-full bg-white/5 hover:bg-white/10 text-white border border-white/10 text-[10px] uppercase tracking-widest font-bold py-3.5 rounded-full transition-all"
                           >
                             Start Free
-                          </a>
+                          </button>
                         ) : (
                           <button
                             onClick={() => handleSelectPlanFromLanding(plan.id, 'monthly')}
                             className="w-full bg-[#C4A484] hover:bg-[#b59574] text-black text-[10px] uppercase tracking-widest font-bold py-3.5 rounded-full transition-all shadow-md active:scale-95 cursor-pointer"
                           >
-                            Get {plan.name} Plan
+                            {showFounder ? "Lock in Founder Pricing" : `Get ${plan.name} Plan`}
                           </button>
                         )}
                       </div>
                     </div>
-                  ))}
+                  )})}
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
@@ -824,6 +901,59 @@ export default function App() {
               )}
             </section>
 
+            {/* Self-Host Section */}
+            <section id="self-host" className="px-4 max-w-7xl mx-auto space-y-12 scroll-mt-24">
+              <div className="text-center max-w-2xl mx-auto space-y-3">
+                <span className="text-[10px] uppercase tracking-widest text-[#C4A484] font-semibold font-mono">Self-Host</span>
+                <h2 className="text-3xl md:text-5xl font-light tracking-tighter text-[#F2F2F2]" style={{ fontFamily: "'Georgia', serif" }}>
+                  Run GodsEye on your own infrastructure
+                </h2>
+                <p className="text-xs md:text-sm text-white/60 font-light">
+                  From free DIY to white-glove enterprise. You keep full control of your data.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+                {SELF_HOST_PLANS.map((plan) => (
+                  <div key={plan.id} className={`relative bg-[#121212] rounded-3xl border p-6 flex flex-col justify-between transition-all duration-300 ${plan.isPopular ? 'border-[#C4A484] shadow-lg shadow-[#C4A484]/5 ring-1 ring-[#C4A484]/30 bg-gradient-to-br from-[#0A0A0A] to-[#151515]' : 'border-white/10 hover:border-white/20'}`}>
+                    {plan.isPopular && (
+                      <span className="absolute top-0 right-1/2 translate-x-1/2 -translate-y-1/2 bg-[#C4A484] text-black font-mono uppercase text-[9px] font-bold px-3 py-1 rounded-full tracking-wider border border-[#b29373]">
+                        Recommended
+                      </span>
+                    )}
+                    <div className="space-y-4">
+                      <div>
+                        <h4 className="text-[10px] uppercase tracking-widest font-bold text-white/50 font-mono">{plan.name}</h4>
+                        <div className="flex items-baseline gap-1 mt-2">
+                          <span className="text-3xl font-black text-white">{plan.setupFee}</span>
+                          {plan.monthlyFee && plan.monthlyFee !== "$0/mo" && (
+                            <span className="text-xs text-white/50 font-light">{plan.monthlyFee}</span>
+                          )}
+                        </div>
+                      </div>
+                      <p className="text-xs text-white/60 font-light leading-relaxed">{plan.description}</p>
+                      <ul className="space-y-2 text-[11px] text-white/75 font-light">
+                        {plan.features.map((feature, idx) => (
+                          <li key={idx} className="flex items-start gap-2">
+                            <Check className="w-3.5 h-3.5 text-[#C4A484] shrink-0 mt-0.5" />
+                            <span>{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div className="pt-6 mt-6 border-t border-white/10">
+                      <a
+                        href={plan.ctaHref}
+                        className="block text-center w-full bg-[#C4A484] hover:bg-[#b59574] text-black text-[10px] uppercase tracking-widest font-bold py-3.5 rounded-full transition-all shadow-md active:scale-95"
+                      >
+                        {plan.ctaLabel}
+                      </a>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
             {/* FAQ Accordion Section */}
             <section id="faq" className="px-4 max-w-4xl mx-auto space-y-12 scroll-mt-24">
               <div className="text-center space-y-3">
@@ -877,14 +1007,18 @@ export default function App() {
                 </p>
 
                 <div className="pt-3">
-                  <a 
-                    href="https://t.me/GodseyeXbot?start=connect" 
-                    target="_blank" 
-                    rel="noreferrer"
+                  <button
+                    onClick={() => {
+                      if (!waitlistSession) {
+                        setShowWaitlistModal(true);
+                      } else {
+                        window.open("https://t.me/GodseyeXbot?start=connect", "_blank");
+                      }
+                    }}
                     className="inline-flex items-center gap-2 bg-[#F2F2F2] text-[#0A0A0A] hover:bg-white px-8 py-4 rounded-full font-bold text-xs uppercase tracking-widest shadow-md transition-all active:scale-95"
                   >
                     💬 Start Free on Telegram
-                  </a>
+                  </button>
                 </div>
                 
                 <div className="flex justify-center gap-6 pt-4 text-[10px] text-white/40 font-mono uppercase tracking-wider">
@@ -1205,7 +1339,7 @@ export default function App() {
                   <div className="w-7 h-7 rounded-full bg-white/5 text-[#C4A484] border border-white/20 flex items-center justify-center font-mono shrink-0 mt-0.5">04</div>
                   <div>
                     <h4 className="font-bold text-white uppercase tracking-wide">Search Telegram Bot</h4>
-                    <p className="text-white/60 leading-relaxed font-light mt-1">Open your Telegram client and search for `@GodseyeXbot`. Tap "Start".</p>
+                    <p className="text-white/60 leading-relaxed font-light mt-1">Open your invite link in Telegram to start chatting with the bot.</p>
                   </div>
                 </div>
 
@@ -1303,19 +1437,23 @@ export default function App() {
             <div className="space-y-4">
               <h3 className="text-xs font-semibold text-white uppercase tracking-wider font-mono">🚀 Next Steps</h3>
               <p className="text-xs text-white/60 font-light leading-relaxed max-w-sm mx-auto">
-                Open Telegram, send `@GodseyeXbot` the command <code className="bg-white/5 px-2 py-0.5 rounded text-[#C4A484] border border-white/10 font-mono">/credits</code>, and verify your new credit balance!
+                Open Telegram and send the bot the command <code className="bg-white/5 px-2 py-0.5 rounded text-[#C4A484] border border-white/10 font-mono">/credits</code>, and verify your new credit balance!
               </p>
               
               <div className="pt-2">
-                <a 
-                  href="https://t.me/GodseyeXbot?start=connect"
-                  target="_blank"
-                  rel="noreferrer"
+                <button
+                  onClick={() => {
+                    if (!waitlistSession) {
+                      setShowWaitlistModal(true);
+                    } else {
+                      window.open("https://t.me/GodseyeXbot?start=connect", "_blank");
+                    }
+                  }}
                   className="inline-flex items-center gap-1.5 bg-[#C4A484] hover:bg-[#b59574] text-black font-bold text-xs px-8 py-4 rounded-full shadow-md tracking-widest uppercase transition-all active:scale-95"
                 >
                   Start Chatting on Telegram
                   <ArrowRight className="w-3.5 h-3.5" />
-                </a>
+                </button>
               </div>
             </div>
 
@@ -1381,9 +1519,18 @@ export default function App() {
             <h4 className="text-[10px] font-semibold text-[#C4A484] tracking-wider uppercase font-mono">Integrations</h4>
             <ul className="space-y-2 text-xs text-white/50 font-light">
               <li>
-                <a href="https://t.me/GodseyeXbot" target="_blank" rel="noreferrer" className="hover:text-[#C4A484] transition-colors">
+                <button
+                  onClick={() => {
+                    if (!waitlistSession) {
+                      setShowWaitlistModal(true);
+                    } else {
+                      window.open("https://t.me/GodseyeXbot?start=connect", "_blank");
+                    }
+                  }}
+                  className="hover:text-[#C4A484] transition-colors text-left cursor-pointer"
+                >
                   Telegram Bot
-                </a>
+                </button>
               </li>
               <li>
                 <span className="text-white/40 font-mono text-[11px]">Caddy Reverse Proxy Live</span>
@@ -1411,6 +1558,17 @@ export default function App() {
           </div>
         </div>
       </footer>
+
+      <WaitlistModal
+        open={showWaitlistModal}
+        onClose={() => setShowWaitlistModal(false)}
+        onSuccess={(session) => {
+          setWaitlistSession(session);
+          localStorage.setItem("godseye_waitlist_session", JSON.stringify(session));
+          setShowWaitlistModal(false);
+        }}
+        referralParam={urlRefParam}
+      />
     </div>
   );
 }
