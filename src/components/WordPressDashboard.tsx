@@ -447,7 +447,7 @@ export default function WordPressDashboard({
                 </blockquote>
 
                 <p>
-                  GodsEye acts as a full-time, direct publishing sub-agent for self-hosted instances. We drafted this content, generated the structured metadata, and validated index configurations in seconds using sovereign background commands—allowing you to publish directly without typing a single line of standard dashboard configuration.
+                  GodsEye drafts content, generates metadata, and validates configurations in seconds—allowing you to publish directly without typing a single line of dashboard configuration.
                 </p>
 
                 <p className="font-mono text-[10px] text-[#C4A484] pt-2">
