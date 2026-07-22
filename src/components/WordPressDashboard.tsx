@@ -335,7 +335,7 @@ export default function WordPressDashboard({
                   </div>
                 </div>
                 <div className="bg-[#161616] p-3 rounded-lg border border-white/5">
-                  <div className="text-[10px] text-white/40 uppercase">OpenClaw Gateway</div>
+                  <div className="text-[10px] text-white/40 uppercase">GodsEye Gateway</div>
                   <div className="text-xs font-semibold text-[#C4A484] mt-1 flex items-center gap-1">
                     <CheckCircle className="w-3.5 h-3.5" />
                     Port 18790 Live

@@ -155,7 +155,7 @@ export default function LivePlayground({
         {
           id: `err_${Date.now()}`,
           sender: "agent",
-          text: "⚠️ Sorry, there was an issue processing that command through the OpenClaw gateway. Please try again.",
+          text: "⚠️ Sorry, there was an issue processing that command through the GodsEye gateway. Please try again.",
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         }
       ]);

@@ -68,7 +68,7 @@ export const PRICING_PLANS: PricingPlan[] = [
     features: [
       "Everything in Pro",
       "Up to 10 Connected Sites",
-      "Dedicated OpenClaw Node",
+      "Dedicated GodsEye Node",
       "Dedicated Slack/Telegram Support",
       "Custom Workflow Automation",
       "All Pro features, unlimited usage",
