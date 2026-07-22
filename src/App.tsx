@@ -1170,29 +1170,7 @@ export default function App() {
                       </div>
                     </div>
                   ))
-                ) : (
-                  CREDIT_PACKS.map((pack) => (
-                    <div 
-                      key={pack.id}
-                      onClick={() => setSelectedPlanId(pack.id)}
-                      className={`p-4 rounded-xl border-2 transition-all cursor-pointer flex items-center justify-between ${selectedPlanId === pack.id ? 'bg-white/5 border-[#C4A484]' : 'bg-[#151515] border-white/10 hover:border-white/20'}`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${selectedPlanId === pack.id ? 'border-[#C4A484]' : 'border-white/20'}`}>
-                          {selectedPlanId === pack.id && <div className="w-2 h-2 rounded-full bg-[#C4A484]"></div>}
-                        </div>
-                        <div>
-                          <div className="text-xs font-bold text-white">{pack.name}</div>
-                          <p className="text-[10px] text-white/50 mt-0.5 font-light">{pack.credits} One-Time Credits • {pack.description}</p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <span className="text-sm font-black text-white">{pack.price}</span>
-                        <span className="text-[10px] text-white/40 font-mono block">one-time</span>
-                      </div>
-                    </div>
-                  ))
-                )}
+                ) : null}
               </div>
 
               {/* Checkout Form */}
