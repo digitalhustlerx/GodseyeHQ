@@ -1,12 +1,10 @@
 import { useState, useEffect, FormEvent } from "react";
-import { MockWPState, ActiveView, PricingPlan, SelfHostPlan } from "./types";
-import { INITIAL_WP_STATE, PRICING_PLANS, CREDIT_PACKS, SELF_HOST_PLANS } from "./mockData";
+import { MockWPState, ActiveView } from "./types";
+import { INITIAL_WP_STATE, PRICING_PLANS } from "./mockData";
 import WaitlistModal from "./components/WaitlistModal";
 import WordPressDashboard from "./components/WordPressDashboard";
 import LivePlayground from "./components/LivePlayground";
 import { 
-  Sparkles, 
-  Zap, 
   Download, 
   CreditCard, 
   ArrowRight, 
@@ -14,16 +12,10 @@ import {
   Menu, 
   X, 
   ShieldCheck, 
-  HelpCircle, 
   RefreshCw, 
-  Play, 
-  Heart,
   ChevronDown,
   ChevronUp,
-  Terminal,
-  Globe,
-  Coins,
-  Cpu
+  Coins
 } from "lucide-react";
 
 export default function App() {
@@ -34,22 +26,14 @@ export default function App() {
   const [waitlistEmail, setWaitlistEmail] = useState("");
   const [waitlistSubmitted, setWaitlistSubmitted] = useState(false);
 
-  // Pricing tab toggles
-  const [pricingPeriod, setPricingPeriod] = useState<'monthly' | 'one-time'>('monthly');
-  const [selectedPlanId, setSelectedPlanId] = useState<string>("starter");
-
-  // Buy view state
-  const [checkTelegramId, setCheckTelegramId] = useState("");
-  const [checkedBalance, setCheckedBalance] = useState<{ balance: number; total: number } | null>(null);
-  const [balanceError, setBalanceError] = useState<string | null>(null);
-  const [isCheckingBalance, setIsCheckingBalance] = useState(false);
-  
-  const [paymentTelegramId, setPaymentTelegramId] = useState("");
-  const [paymentEmail, setPaymentEmail] = useState("");
+  // Checkout modal state
+  const [showCheckoutModal, setShowCheckoutModal] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<typeof PRICING_PLANS[0] | null>(null);
+  const [checkoutEmail, setCheckoutEmail] = useState("");
   const [checkoutLoading, setCheckoutLoading] = useState(false);
 
   // Success state from query params
-  const [successInfo, setSuccessInfo] = useState<{ checkoutId: string; telegramId: string; productName: string } | null>(null);
+  const [successInfo, setSuccessInfo] = useState<{ checkoutId: string; productName: string } | null>(null);
 
   // FAQ accordion state
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
@@ -73,15 +57,9 @@ export default function App() {
     const params = new URLSearchParams(window.location.search);
     if (params.get("checkout_success") === "true") {
       const checkoutId = params.get("checkout_id") || "MOCK-1002";
-      const telegramId = params.get("telegram_id") || "1234567";
-      const productId = params.get("product_id") || "starter";
+      let productName = "Selected Plan";
       
-      let productName = "Starter Subscription Plan";
-      if (productId === "ff6a89c7-6d4e-4748-a760-3c73179b7b44") productName = "Pro Subscription Plan";
-      else if (productId === "2dadbaf0-24a2-4d45-abd1-5a6e11c4c741") productName = "Agency Subscription Plan";
-      else if (productId === "d3d4aea6-d6f1-4092-b815-675a52cbcee2") productName = "Wallet Top-Up (100 credits)";
-
-      setSuccessInfo({ checkoutId, telegramId, productName });
+      setSuccessInfo({ checkoutId, productName });
       setActiveView('success');
       
       // Clean up search parameters without full reload
@@ -89,37 +67,12 @@ export default function App() {
     }
   }, []);
 
-  const handleCheckBalance = async (e: FormEvent) => {
-    e.preventDefault();
-    if (!checkTelegramId) return;
-    setIsCheckingBalance(true);
-    setCheckedBalance(null);
-    setBalanceError(null);
-    try {
-      const res = await fetch(`/api/balance/${checkTelegramId}`);
-      const data = await res.json();
-      if (res.ok) {
-        setCheckedBalance({ balance: data.balance, total: data.total });
-      } else {
-        setBalanceError(data.error || "User record not found.");
-      }
-    } catch {
-      setBalanceError("Unable to reach user database. Please try again.");
-    } finally {
-      setIsCheckingBalance(false);
-    }
-  };
-
   const handleCreateCheckout = async (e: FormEvent) => {
     e.preventDefault();
-    if (!paymentTelegramId) return;
+    if (!selectedPlan) return;
     setCheckoutLoading(true);
 
-    const productObj = pricingPeriod === 'monthly' 
-      ? PRICING_PLANS.find(p => p.id === selectedPlanId)
-      : CREDIT_PACKS.find(c => c.id === selectedPlanId);
-
-    const productId = productObj?.polarProductId || "starter";
+    const productId = selectedPlan.polarProductId;
 
     try {
       const res = await fetch("/api/create-checkout", {
@@ -127,19 +80,17 @@ export default function App() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           product_id: productId,
-          telegram_id: paymentTelegramId,
-          email: paymentEmail
+          email: checkoutEmail
         })
       });
       const data = await res.json();
       if (data.checkout_url) {
-        // Redirect to success simulator route parameters
         window.location.href = data.checkout_url;
       }
     } catch (err) {
       console.error(err);
       // Fallback checkout simulation
-      window.location.href = `?checkout_success=true&checkout_id=sim_err_${Date.now()}&telegram_id=${paymentTelegramId}&product_id=${productId}`;
+      window.location.href = `?checkout_success=true&checkout_id=sim_err_${Date.now()}&product_id=${selectedPlan.id}`;
     } finally {
       setCheckoutLoading(false);
     }
@@ -149,12 +100,10 @@ export default function App() {
     setExpandedFaq(expandedFaq === index ? null : index);
   };
 
-  const handleSelectPlanFromLanding = (planId: string, period: 'monthly' | 'one-time') => {
-    setSelectedPlanId(planId);
-    setPricingPeriod(period);
-    setActiveView('buy');
-    
-    // Scroll to top
+  const handleOpenCheckout = (plan: typeof PRICING_PLANS[0]) => {
+    setSelectedPlan(plan);
+    setCheckoutEmail("");
+    setShowCheckoutModal(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -246,24 +195,10 @@ export default function App() {
             >
               Pricing
             </button>
-            <button 
-              onClick={() => { setActiveView('landing'); setTimeout(() => document.getElementById('self-host')?.scrollIntoView({ behavior: 'smooth' }), 50); }} 
-              className="hover:text-[#C4A484] transition-colors cursor-pointer"
-            >
-              Self-Host
-            </button>
           </nav>
 
           {/* Nav CTAs */}
           <div className="hidden md:flex items-center gap-4">
-            {waitlistSession && (
-            <button 
-              onClick={() => setActiveView('buy')} 
-              className={`text-[10px] uppercase tracking-widest font-bold px-5 py-2.5 rounded-full border transition-all cursor-pointer ${activeView === 'buy' ? 'bg-[#C4A484]/10 border-[#C4A484] text-[#C4A484]' : 'border-white/20 hover:border-white/40 text-gray-300'}`}
-            >
-              Buy Credits
-            </button>
-            )}
             <button
               onClick={() => {
                 if (!waitlistSession) {
@@ -316,12 +251,6 @@ export default function App() {
             >
               FAQ
             </button>
-            <button 
-              onClick={() => { setMobileMenuOpen(false); setActiveView('landing'); setTimeout(() => document.getElementById('self-host')?.scrollIntoView({ behavior: 'smooth' }), 50) }} 
-              className="text-xs font-medium text-gray-400 hover:text-white text-left"
-            >
-              Self-Host
-            </button>
             {waitlistSession && (
             <button 
               onClick={() => { setMobileMenuOpen(false); setActiveView('dashboard'); }} 
@@ -346,10 +275,10 @@ export default function App() {
             </button>
             {waitlistSession && (
             <button 
-              onClick={() => { setMobileMenuOpen(false); setActiveView('buy'); }} 
+              onClick={() => { setMobileMenuOpen(false); setActiveView('landing'); setTimeout(() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' }), 50) }} 
               className="flex-1 text-center text-xs font-medium bg-[#13131e] border border-gray-800 text-gray-300 py-2.5 rounded-lg"
             >
-              Buy Credits
+              Plans
             </button>
             )}
             <button
@@ -602,7 +531,7 @@ export default function App() {
                   }}
                   className="w-full sm:w-auto bg-[#F2F2F2] text-[#0A0A0A] hover:bg-white px-10 py-4 rounded-full font-bold text-xs uppercase tracking-widest transition-all shadow-md text-center cursor-pointer"
                 >
-                  💬 Start Free — 50 credits/mo
+                  💬 Start Free
                 </button>
                   <button 
                     onClick={() => document.getElementById('how')?.scrollIntoView({ behavior: 'smooth' })}
@@ -736,201 +665,60 @@ export default function App() {
                   Flexible plans for any scale
                 </h2>
                 <p className="text-xs md:text-sm text-white/60 font-light">
-                  Choose a monthly subscription plan with automatic renews, or top up your wallet with one-time credit packs when needed.
+                  Monthly subscription. Cancel anytime. All plans include full access to every feature.
                 </p>
-
-                {/* Period Selector Tabs */}
-                <div className="inline-flex bg-white/5 border border-white/10 p-1 rounded-full select-none mt-2">
-                  <button
-                    onClick={() => setPricingPeriod('monthly')}
-                    className={`px-5 py-2 rounded-full text-[10px] uppercase tracking-wider font-bold transition-all cursor-pointer ${pricingPeriod === 'monthly' ? 'bg-[#C4A484] text-black shadow-md' : 'text-gray-400 hover:text-white'}`}
-                  >
-                    Monthly Subscription
-                  </button>
-                  <button
-                    onClick={() => setPricingPeriod('one-time')}
-                    className={`px-5 py-2 rounded-full text-[10px] uppercase tracking-wider font-bold transition-all cursor-pointer ${pricingPeriod === 'one-time' ? 'bg-[#C4A484] text-black shadow-md' : 'text-gray-400 hover:text-white'}`}
-                  >
-                    One-Time Credit Packs
-                  </button>
-                </div>
               </div>
 
               {/* Grid cards */}
-              {pricingPeriod === 'monthly' ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-                  {PRICING_PLANS.map((plan) => {
-                    const showFounder = waitlistSession?.isFounder && plan.foundersPrice && (Date.now() - new Date(waitlistSession.signupDate).getTime() < 14 * 24 * 60 * 60 * 1000);
-                    const founderTimeLeft = waitlistSession?.signupDate ? Math.max(0, 14 * 24 * 60 * 60 * 1000 - (Date.now() - new Date(waitlistSession.signupDate).getTime())) : 0;
-                    const founderDaysLeft = Math.floor(founderTimeLeft / (24 * 60 * 60 * 1000));
-                    const founderHoursLeft = Math.floor((founderTimeLeft % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
-                    return (
-                    <div 
-                      key={plan.id}
-                      className={`relative bg-[#121212] rounded-3xl border p-6 flex flex-col justify-between transition-all duration-300 ${plan.isPopular ? 'border-[#C4A484] shadow-lg shadow-[#C4A484]/5 ring-1 ring-[#C4A484]/30 bg-gradient-to-br from-[#0A0A0A] to-[#151515]' : 'border-white/10 hover:border-white/20'}`}
-                    >
-                      {plan.isPopular && (
-                        <span className="absolute top-0 right-1/2 translate-x-1/2 -translate-y-1/2 bg-[#C4A484] text-black font-mono uppercase text-[9px] font-bold px-3 py-1 rounded-full tracking-wider border border-[#b29373]">
-                          Most Popular
-                        </span>
-                      )}
-                      
-                      <div className="space-y-4">
-                        <div>
-                          <h4 className="text-[10px] uppercase tracking-widest font-bold text-white/50 font-mono">{plan.name}</h4>
-                          <div className="flex items-baseline gap-1 mt-2">
-                            {showFounder ? (
-                              <>
-                                <span className="text-3xl font-black text-[#C4A484]">{plan.foundersPrice}</span>
-                                <span className="text-sm text-white/40 line-through">{plan.price}</span>
-                                <span className="text-xs text-white/50 font-light">/month</span>
-                              </>
-                            ) : (
-                              <>
-                                <span className="text-3xl font-black text-white">{plan.price}</span>
-                                <span className="text-xs text-white/50 font-light">/month</span>
-                              </>
-                            )}
-                          </div>
-                          {showFounder && (
-                            <div className="mt-2 flex items-center gap-1.5">
-                              <span className="bg-[#C4A484]/20 text-[#C4A484] text-[9px] font-mono font-bold px-2 py-0.5 rounded-full border border-[#C4A484]/30 uppercase tracking-wider">
-                                {plan.foundersBadge} — {founderDaysLeft}d {founderHoursLeft}h left
-                              </span>
-                            </div>
-                          )}
-                        </div>
-
-                        <div className="py-3 border-y border-white/10">
-                          <div className="text-[#C4A484] font-bold text-xs flex items-center gap-1 uppercase tracking-wider">
-                            <Coins className="w-3.5 h-3.5" />
-                            {plan.credits} Credits / mo
-                          </div>
-                          <div className="text-[11px] text-white/60 font-light mt-1">Allows {plan.sites}</div>
-                        </div>
-
-                        <ul className="space-y-2.5 pt-1 text-[11px] text-white/75 font-light">
-                          {plan.features.map((feature, idx) => (
-                            <li key={idx} className="flex items-start gap-2">
-                              <Check className="w-3.5 h-3.5 text-[#C4A484] shrink-0 mt-0.5" />
-                              <span>{feature}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-
-                      <div className="pt-6 mt-6 border-t border-white/10">
-                        {plan.id === 'free' ? (
-                          <button
-                            onClick={() => {
-                              if (!waitlistSession) {
-                                setShowWaitlistModal(true);
-                              } else {
-                                window.open("https://t.me/GodseyeXbot?start=connect", "_blank");
-                              }
-                            }}
-                            className="block text-center w-full bg-white/5 hover:bg-white/10 text-white border border-white/10 text-[10px] uppercase tracking-widest font-bold py-3.5 rounded-full transition-all"
-                          >
-                            Start Free
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => handleSelectPlanFromLanding(plan.id, 'monthly')}
-                            className="w-full bg-[#C4A484] hover:bg-[#b59574] text-black text-[10px] uppercase tracking-widest font-bold py-3.5 rounded-full transition-all shadow-md active:scale-95 cursor-pointer"
-                          >
-                            {showFounder ? "Lock in Founder Pricing" : `Get ${plan.name} Plan`}
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  )})}
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-                  {CREDIT_PACKS.map((pack) => (
-                    <div 
-                      key={pack.id}
-                      className="bg-[#121212] rounded-3xl border border-white/10 hover:border-white/20 p-6 flex flex-col justify-between transition-all duration-300"
-                    >
-                      <div className="space-y-4">
-                        <div>
-                          <h4 className="text-[10px] uppercase tracking-widest font-bold text-white/50 font-mono">{pack.name}</h4>
-                          <div className="flex items-baseline gap-1 mt-2">
-                            <span className="text-3xl font-black text-white">{pack.price}</span>
-                            <span className="text-xs text-white/50 font-light">one-time</span>
-                          </div>
-                        </div>
-
-                        <div className="py-3 border-y border-white/10">
-                          <div className="text-[#C4A484] font-bold text-xs flex items-center gap-1 uppercase tracking-wider">
-                            <Coins className="w-3.5 h-3.5" />
-                            {pack.credits} Credits granted
-                          </div>
-                          <p className="text-[11px] text-white/60 leading-relaxed font-light mt-1.5">{pack.description}</p>
-                        </div>
-
-                        <ul className="space-y-2.5 pt-1 text-[11px] text-white/75 font-light">
-                          <li className="flex items-center gap-2">
-                            <Check className="w-3.5 h-3.5 text-[#C4A484]" />
-                            <span>Credits never expire</span>
-                          </li>
-                          <li className="flex items-center gap-2">
-                            <Check className="w-3.5 h-3.5 text-[#C4A484]" />
-                            <span>Same complete feature access</span>
-                          </li>
-                          <li className="flex items-center gap-2">
-                            <Check className="w-3.5 h-3.5 text-[#C4A484]" />
-                            <span>No monthly renewal commit</span>
-                          </li>
-                        </ul>
-                      </div>
-
-                      <div className="pt-6 mt-6 border-t border-white/10">
-                        <button
-                          onClick={() => handleSelectPlanFromLanding(pack.id, 'one-time')}
-                          className="w-full bg-[#C4A484] hover:bg-[#b59574] text-black text-[10px] uppercase tracking-widest font-bold py-3.5 rounded-full transition-all shadow-md active:scale-95 cursor-pointer"
-                        >
-                          Buy {pack.credits} Credits
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </section>
-
-            {/* Self-Host Section */}
-            <section id="self-host" className="px-4 max-w-7xl mx-auto space-y-12 scroll-mt-24">
-              <div className="text-center max-w-2xl mx-auto space-y-3">
-                <span className="text-[10px] uppercase tracking-widest text-[#C4A484] font-semibold font-mono">Self-Host</span>
-                <h2 className="text-3xl md:text-5xl font-light tracking-tighter text-[#F2F2F2]" style={{ fontFamily: "'Georgia', serif" }}>
-                  Run GodsEye on your own infrastructure
-                </h2>
-                <p className="text-xs md:text-sm text-white/60 font-light">
-                  From free DIY to white-glove enterprise. You keep full control of your data.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-                {SELF_HOST_PLANS.map((plan) => (
-                  <div key={plan.id} className={`relative bg-[#121212] rounded-3xl border p-6 flex flex-col justify-between transition-all duration-300 ${plan.isPopular ? 'border-[#C4A484] shadow-lg shadow-[#C4A484]/5 ring-1 ring-[#C4A484]/30 bg-gradient-to-br from-[#0A0A0A] to-[#151515]' : 'border-white/10 hover:border-white/20'}`}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                {PRICING_PLANS.filter(p => p.id !== 'free').map((plan) => {
+                  const showFounder = waitlistSession?.isFounder && plan.foundersPrice;
+                  return (
+                  <div 
+                    key={plan.id}
+                    className={`relative bg-[#121212] rounded-3xl border p-6 flex flex-col justify-between transition-all duration-300 ${plan.isPopular ? 'border-[#C4A484] shadow-lg shadow-[#C4A484]/5 ring-1 ring-[#C4A484]/30 bg-gradient-to-br from-[#0A0A0A] to-[#151515]' : 'border-white/10 hover:border-white/20'}`}
+                  >
                     {plan.isPopular && (
                       <span className="absolute top-0 right-1/2 translate-x-1/2 -translate-y-1/2 bg-[#C4A484] text-black font-mono uppercase text-[9px] font-bold px-3 py-1 rounded-full tracking-wider border border-[#b29373]">
-                        Recommended
+                        Most Popular
                       </span>
                     )}
+                    
                     <div className="space-y-4">
                       <div>
                         <h4 className="text-[10px] uppercase tracking-widest font-bold text-white/50 font-mono">{plan.name}</h4>
                         <div className="flex items-baseline gap-1 mt-2">
-                          <span className="text-3xl font-black text-white">{plan.setupFee}</span>
-                          {plan.monthlyFee && plan.monthlyFee !== "$0/mo" && (
-                            <span className="text-xs text-white/50 font-light">{plan.monthlyFee}</span>
+                          {showFounder ? (
+                            <>
+                              <span className="text-3xl font-black text-[#C4A484]">{plan.foundersPrice}</span>
+                              <span className="text-sm text-white/40 line-through">{plan.price}</span>
+                              <span className="text-xs text-white/50 font-light">/month</span>
+                            </>
+                          ) : (
+                            <>
+                              <span className="text-3xl font-black text-white">{plan.price}</span>
+                              <span className="text-xs text-white/50 font-light">/month</span>
+                            </>
                           )}
                         </div>
+                        {showFounder && (
+                          <div className="mt-2">
+                            <span className="bg-[#C4A484]/20 text-[#C4A484] text-[9px] font-mono font-bold px-2 py-0.5 rounded-full border border-[#C4A484]/30 uppercase tracking-wider">
+                              {plan.foundersBadge} — 50% off for 1 year
+                            </span>
+                          </div>
+                        )}
                       </div>
-                      <p className="text-xs text-white/60 font-light leading-relaxed">{plan.description}</p>
-                      <ul className="space-y-2 text-[11px] text-white/75 font-light">
+
+                      <div className="py-3 border-y border-white/10">
+                        <div className="text-[#C4A484] font-bold text-xs flex items-center gap-1 uppercase tracking-wider">
+                          <Coins className="w-3.5 h-3.5" />
+                          {plan.credits} Credits / mo
+                        </div>
+                        <div className="text-[11px] text-white/60 font-light mt-1">Allows {plan.sites}</div>
+                      </div>
+
+                      <ul className="space-y-2.5 pt-1 text-[11px] text-white/75 font-light">
                         {plan.features.map((feature, idx) => (
                           <li key={idx} className="flex items-start gap-2">
                             <Check className="w-3.5 h-3.5 text-[#C4A484] shrink-0 mt-0.5" />
@@ -939,16 +727,17 @@ export default function App() {
                         ))}
                       </ul>
                     </div>
+
                     <div className="pt-6 mt-6 border-t border-white/10">
-                      <a
-                        href={plan.ctaHref}
-                        className="block text-center w-full bg-[#C4A484] hover:bg-[#b59574] text-black text-[10px] uppercase tracking-widest font-bold py-3.5 rounded-full transition-all shadow-md active:scale-95"
+                      <button
+                        onClick={() => handleOpenCheckout(plan)}
+                        className="w-full bg-[#C4A484] hover:bg-[#b59574] text-black text-[10px] uppercase tracking-widest font-bold py-3.5 rounded-full transition-all shadow-md active:scale-95 cursor-pointer"
                       >
-                        {plan.ctaLabel}
-                      </a>
+                        {showFounder ? "Lock in Founder Pricing" : `Get ${plan.name}`}
+                      </button>
                     </div>
                   </div>
-                ))}
+                )})}
               </div>
             </section>
 
@@ -1026,212 +815,6 @@ export default function App() {
                 </div>
               </div>
             </section>
-          </div>
-        )}
-
-
-        {/* VIEW 2: BUY PAGE */}
-        {activeView === 'buy' && (
-          <div className="max-w-3xl mx-auto px-4 py-12 space-y-12">
-            
-            {/* Header */}
-            <div className="text-center space-y-3">
-              <div className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center font-display text-xl mx-auto shadow-md">
-                👁️
-              </div>
-              <h2 className="text-3xl md:text-5xl font-light text-white tracking-tighter" style={{ fontFamily: "'Georgia', serif" }}>
-                GodsEye — Credits & Plans
-              </h2>
-              <p className="text-xs md:text-sm text-white/60 max-w-lg mx-auto font-light">
-                Subscribe monthly for recurring credits or buy top-ups. Zero locked contracts, cancel or shift at any time.
-              </p>
-            </div>
-
-            {/* Check Balance Panel */}
-            <div className="bg-[#121212] border border-white/10 rounded-2xl p-6">
-              <h3 className="text-sm font-semibold text-white flex items-center gap-2 mb-3.5">
-                <Coins className="w-4 h-4 text-[#C4A484]" />
-                💰 Check Your Telegram Balance
-              </h3>
-              
-              <form onSubmit={handleCheckBalance} className="flex gap-2">
-                <input 
-                  type="text"
-                  value={checkTelegramId}
-                  onChange={(e) => setCheckTelegramId(e.target.value)}
-                  placeholder="Enter Telegram numerical ID (e.g., 5829104)"
-                  className="flex-1 bg-white/5 border border-white/10 rounded-full px-5 py-3 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-[#C4A484]/40 transition-colors"
-                />
-                <button
-                  type="submit"
-                  disabled={isCheckingBalance || !checkTelegramId}
-                  className="bg-[#C4A484] hover:bg-[#b59574] text-black text-xs font-bold px-6 py-3 rounded-full transition-all active:scale-95 disabled:opacity-40 uppercase tracking-widest"
-                >
-                  {isCheckingBalance ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : "Check"}
-                </button>
-              </form>
-
-              {checkedBalance && (
-                <div className="mt-4 p-4 bg-green-500/5 border border-green-500/20 rounded-xl flex items-center justify-between animate-fadeIn">
-                  <div>
-                    <span className="text-[10px] text-green-400 font-mono font-medium">CONNECTED ACCOUNT STATUS</span>
-                    <div className="text-sm font-semibold text-white mt-0.5">ID: {checkTelegramId}</div>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-[10px] text-white/40 font-mono">CURRENT CREDITS</span>
-                    <div className="text-lg font-black text-[#C4A484] mt-0.5">{checkedBalance.balance} / {checkedBalance.total}</div>
-                  </div>
-                </div>
-              )}
-
-              {balanceError && (
-                <div className="mt-4 p-4 bg-red-500/5 border border-red-500/20 rounded-xl text-left animate-fadeIn">
-                  <div className="text-[10px] text-red-400 font-mono font-medium">ACCOUNT NOT VERIFIED</div>
-                  <div className="text-xs text-white/80 font-light mt-1">{balanceError}</div>
-                  <div className="text-[10px] text-[#C4A484] mt-2 font-mono">
-                    💡 Try clicking any Sandbox demo ID below to simulate:
-                  </div>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {["5829104", "1234567", "9876543", "2026719"].map((id) => (
-                      <button
-                        key={id}
-                        type="button"
-                        onClick={() => {
-                          setCheckTelegramId(id);
-                          setBalanceError(null);
-                        }}
-                        className="bg-white/5 hover:bg-white/10 text-[10px] text-white/70 px-2.5 py-1 rounded border border-white/10 font-mono"
-                      >
-                        {id}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-              
-              <div className="mt-4 flex flex-col md:flex-row justify-between gap-2 text-[10px] text-white/40 font-mono border-t border-white/5 pt-3">
-                <span>Don't know your Telegram user ID? Send any message to <code className="text-[#C4A484]">@userinfobot</code> in Telegram.</span>
-                <span className="text-[#C4A484] font-medium">Demo Registered IDs: 5829104, 1234567, 9876543, 2026719</span>
-              </div>
-            </div>
-
-            {/* Select product section */}
-            <div className="bg-[#121212] border border-white/10 rounded-2xl p-6 space-y-6">
-              <div>
-                <h3 className="text-sm font-semibold text-white flex items-center gap-2">
-                  <CreditCard className="w-4 h-4 text-[#C4A484]" />
-                  🛒 Choose Subscription Plan or Pack
-                </h3>
-                <p className="text-[11px] text-white/60 mt-1 font-light">
-                  Select your targeted upgrade below. Your Telegram ID is required to credit your account immediately after purchase.
-                </p>
-              </div>
-
-              {/* Toggle periods */}
-              <div className="flex border-b border-white/10 pb-1">
-                <button
-                  onClick={() => { setPricingPeriod('monthly'); setSelectedPlanId('starter') }}
-                  className={`px-4 py-2.5 text-xs font-semibold tracking-wide transition-colors border-b-2 cursor-pointer ${pricingPeriod === 'monthly' ? 'text-[#C4A484] border-[#C4A484] font-bold' : 'text-gray-400 border-transparent hover:text-white'}`}
-                >
-                  Monthly Subscriptions
-                </button>
-                <button
-                  onClick={() => { setPricingPeriod('one-time'); setSelectedPlanId('topup') }}
-                  className={`px-4 py-2.5 text-xs font-semibold tracking-wide transition-colors border-b-2 cursor-pointer ${pricingPeriod === 'one-time' ? 'text-[#C4A484] border-[#C4A484] font-bold' : 'text-gray-400 border-transparent hover:text-white'}`}
-                >
-                  One-Time Top-Ups
-                </button>
-              </div>
-
-              {/* Items List */}
-              <div className="space-y-3">
-                {pricingPeriod === 'monthly' ? (
-                  PRICING_PLANS.filter(p => p.id !== 'free').map((plan) => (
-                    <div 
-                      key={plan.id}
-                      onClick={() => setSelectedPlanId(plan.id)}
-                      className={`p-4 rounded-xl border-2 transition-all cursor-pointer flex items-center justify-between ${selectedPlanId === plan.id ? 'bg-white/5 border-[#C4A484]' : 'bg-[#151515] border-white/10 hover:border-white/20'}`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${selectedPlanId === plan.id ? 'border-[#C4A484]' : 'border-white/20'}`}>
-                          {selectedPlanId === plan.id && <div className="w-2 h-2 rounded-full bg-[#C4A484]"></div>}
-                        </div>
-                        <div>
-                          <div className="text-xs font-bold text-white flex items-center gap-2">
-                            {plan.name} Plan
-                            {plan.isPopular && <span className="bg-[#C4A484]/10 text-[#C4A484] text-[8px] font-mono font-semibold px-2 py-0.5 rounded border border-[#C4A484]/40">MOST POPULAR</span>}
-                          </div>
-                          <p className="text-[10px] text-white/50 mt-0.5 font-light">{plan.credits} Credits/mo • Up to {plan.sites}</p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <span className="text-sm font-black text-white">{plan.price}</span>
-                        <span className="text-[10px] text-white/40 font-mono block">/month</span>
-                      </div>
-                    </div>
-                  ))
-                ) : null}
-              </div>
-
-              {/* Checkout Form */}
-              <form onSubmit={handleCreateCheckout} className="pt-4 border-t border-white/10 space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-[10px] text-[#C4A484] font-mono uppercase font-bold mb-1.5">Your Telegram ID *</label>
-                    <input 
-                      type="text"
-                      required
-                      value={paymentTelegramId}
-                      onChange={(e) => setPaymentTelegramId(e.target.value)}
-                      placeholder="e.g., 5829104"
-                      className="w-full bg-white/5 border border-white/10 rounded-full px-5 py-3 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-[#C4A484]/40"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] text-[#C4A484] font-mono uppercase font-bold mb-1.5">Email Address (Optional)</label>
-                    <input 
-                      type="email"
-                      value={paymentEmail}
-                      onChange={(e) => setPaymentEmail(e.target.value)}
-                      placeholder="email@example.com"
-                      className="w-full bg-white/5 border border-white/10 rounded-full px-5 py-3 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-[#C4A484]/40"
-                    />
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={checkoutLoading || !paymentTelegramId}
-                  className="w-full bg-[#C4A484] hover:bg-[#b59574] disabled:opacity-40 text-black font-bold py-4 rounded-full text-xs tracking-widest transition-all active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 uppercase"
-                >
-                  {checkoutLoading ? (
-                    <RefreshCw className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <>
-                      Proceed to Secure Checkout via Polar
-                      <ArrowRight className="w-4 h-4" />
-                    </>
-                  )}
-                </button>
-              </form>
-
-              <div className="p-4 bg-white/5 border border-white/10 rounded-2xl flex items-center gap-3">
-                <ShieldCheck className="w-5 h-5 text-green-400 shrink-0" />
-                <p className="text-[10px] text-white/50 leading-relaxed font-light">
-                  Payments are managed securely by <strong>Polar.sh</strong>. Upon complete payment, the GodsEye gateway updates credit records immediately.
-                </p>
-              </div>
-            </div>
-
-            {/* Back Button */}
-            <div className="text-center">
-              <button 
-                onClick={() => setActiveView('landing')}
-                className="text-xs text-[#C4A484] hover:text-[#b59574] font-semibold cursor-pointer underline uppercase tracking-wider"
-              >
-                ← Back to Landing Page
-              </button>
-            </div>
           </div>
         )}
 
@@ -1340,7 +923,6 @@ export default function App() {
             {/* Model Context Protocol (MCP) Setup Box */}
             <div className="bg-[#121212] border border-white/10 rounded-2xl p-6 space-y-4">
               <h3 className="text-sm font-semibold text-[#C4A484] flex items-center gap-2 uppercase tracking-wide">
-                <Cpu className="w-4 h-4" />
                 ⚙️ Model Context Protocol (MCP) Setup
               </h3>
               <p className="text-xs text-white/60 leading-relaxed font-light">
@@ -1398,10 +980,6 @@ export default function App() {
               <div className="flex justify-between pb-2 border-b border-white/5">
                 <span className="text-white/40">ORDER TRACKING ID:</span>
                 <span className="text-white/80">{successInfo.checkoutId}</span>
-              </div>
-              <div className="flex justify-between pb-2 border-b border-white/5">
-                <span className="text-white/40">TELEGRAM WALLET SYNC:</span>
-                <span className="text-green-400 font-bold">ACTIVE ID #{successInfo.telegramId}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-white/40">GATEWAY SYNC STATUS:</span>
@@ -1483,8 +1061,8 @@ export default function App() {
                 </button>
               </li>
               <li>
-                <button onClick={() => setActiveView('buy')} className="hover:text-[#C4A484] transition-colors cursor-pointer">
-                  Buy Credit Wallet
+                <button onClick={() => { setActiveView('landing'); document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' }); }} className="hover:text-[#C4A484] transition-colors cursor-pointer">
+                  View Plans
                 </button>
               </li>
             </ul>
@@ -1545,6 +1123,73 @@ export default function App() {
         }}
         referralParam={urlRefParam}
       />
+
+      {/* Checkout Modal */}
+      {showCheckoutModal && selectedPlan && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={(e) => { if (e.target === e.currentTarget) { setShowCheckoutModal(false); setCheckoutEmail(""); }}}>
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+          <div className="relative w-full max-w-md rounded-2xl border border-white/10 bg-[#0A0A0A] p-6 md:p-8 shadow-2xl">
+            <button
+              onClick={() => { setShowCheckoutModal(false); setCheckoutEmail(""); }}
+              className="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <div className="text-center space-y-4 mb-6">
+              <div className="w-10 h-10 rounded-full bg-[#C4A484]/20 flex items-center justify-center mx-auto">
+                <Coins className="w-5 h-5 text-[#C4A484]" />
+              </div>
+              <h2 className="text-xl font-light text-[#F2F2F2]" style={{ fontFamily: "'Georgia', serif" }}>
+                <span className="text-[#C4A484]">{selectedPlan.name}</span> Plan
+              </h2>
+              <div>
+                <span className="text-3xl font-black text-white">{selectedPlan.price}</span>
+                <span className="text-xs text-white/50 font-light ml-1">/month</span>
+              </div>
+              {waitlistSession?.isFounder && selectedPlan.foundersPrice && (
+                <div className="inline-block bg-[#C4A484]/20 text-[#C4A484] text-[9px] font-mono font-bold px-3 py-1 rounded-full border border-[#C4A484]/30 uppercase tracking-wider">
+                  Founder — 50% off: {selectedPlan.foundersPrice}/mo
+                </div>
+              )}
+              <p className="text-[11px] text-white/60 font-light">{selectedPlan.credits} credits/mo · {selectedPlan.sites}</p>
+            </div>
+
+            <form onSubmit={handleCreateCheckout} className="space-y-4">
+              <div>
+                <label className="block text-[10px] text-[#C4A484] font-mono uppercase font-bold mb-1.5">Email Address</label>
+                <input
+                  type="email"
+                  required
+                  value={checkoutEmail}
+                  onChange={(e) => setCheckoutEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#C4A484]/50 transition-all"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={checkoutLoading || !checkoutEmail}
+                className="w-full bg-[#C4A484] hover:bg-[#b59574] disabled:opacity-40 text-black font-bold py-3.5 rounded-xl text-xs uppercase tracking-widest transition-all active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
+              >
+                {checkoutLoading ? (
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                ) : (
+                  <>
+                    Pay with Polar
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
+              </button>
+
+              <p className="text-[10px] text-white/40 text-center font-light">
+                Secure payment via Polar.sh. No account needed. You'll get a receipt by email.
+              </p>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -48,7 +48,7 @@ export default function WaitlistModal({ open, onClose, onSuccess, referralParam 
       const body: Record<string, string> = { email: trimmed };
       if (referralParam) body.referredBy = referralParam;
 
-      const res = await fetch("https://godseye.shop/api/waitlist", {
+      const res = await fetch("/api/waitlist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),

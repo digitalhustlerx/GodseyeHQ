@@ -127,6 +127,23 @@ radius: rounded-2xl (cards), rounded-full (buttons)
 
 ---
 
+## 💬 Telegram: GodseyeHQ Forum Topics
+
+| Topic | Thread ID | Purpose |
+|-------|-----------|---------|
+| 🏠 Landing Page | 462 | Hero copy, design, CTAs, A/B tests, conversion |
+| 💰 Pricing & Credits | 463 | Credit packs, tiers, checkout, Polar.sh, revenue |
+| 📊 Data Flow & Architecture | 464 | Auth, sessions, WP connections, Supabase, bot API |
+| 🚀 Marketing & Growth | 465 | Launch, social distribution, community, analytics |
+| 🔧 Dev & Git | 466 | Code changes, builds, deploys, git operations |
+| 💼 Business & Strategy | 467 | Revenue model, licensing, roadmap, competitors |
+
+**Chat ID:** `-1004450820767` (forum-enabled supergroup)
+**Bot:** @dantewslopenclawbot (Djini 🧞‍♂️) via Composio
+**Rules:** Each topic stays scoped. Create temporary topics for branches, close when done. No cross-topic noise.
+
+---
+
 ## 🌐 Domain & Nginx
 
 | URL | Config File | Root |

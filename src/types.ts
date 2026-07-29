@@ -1,4 +1,4 @@
-export type ActiveView = 'landing' | 'buy' | 'download' | 'success';
+export type ActiveView = 'landing' | 'download' | 'success';
 
 export interface WordPressPost {
   id: number;

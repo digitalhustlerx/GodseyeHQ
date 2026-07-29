@@ -1,0 +1,148 @@
+{
+  "communities": {
+    "0": [
+      "src_app",
+      "src_app_app",
+      "src_components_wordpressdashboard",
+      "src_components_wordpressdashboard_wordpressdashboard",
+      "src_components_wordpressdashboard_wordpressdashboardprops",
+      "src_main",
+      "src_mockdata_initial_wp_state",
+      "src_mockdata_pricing_plans",
+      "src_types_activeview",
+      "src_types_mockwpstate"
+    ],
+    "1": [
+      "src_components_liveplayground",
+      "src_components_liveplayground_liveplayground",
+      "src_components_liveplayground_liveplaygroundprops",
+      "src_mockdata_sample_commands",
+      "src_types",
+      "src_types_playgroundmessage",
+      "src_types_woocommerceorder",
+      "src_types_wordpressmedia",
+      "src_types_wordpressplugin",
+      "src_types_wordpresspost"
+    ],
+    "2": [
+      "components_ui_prisma_hero",
+      "components_ui_prisma_hero_navitems",
+      "components_ui_prisma_hero_prismahero",
+      "components_ui_prisma_hero_segment",
+      "components_ui_prisma_hero_wordspullup",
+      "components_ui_prisma_hero_wordspullupmultistyle",
+      "components_ui_prisma_hero_wordspullupmultistyleprops",
+      "components_ui_prisma_hero_wordspullupprops"
+    ],
+    "3": [
+      "src_mockdata",
+      "src_mockdata_credit_packs",
+      "src_mockdata_self_host_plans",
+      "src_types_pricingplan",
+      "src_types_selfhostplan"
+    ],
+    "4": [
+      "src_components_waitlistmodal",
+      "src_components_waitlistmodal_waitlistmodal",
+      "src_components_waitlistmodal_waitlistmodalprops",
+      "src_components_waitlistmodal_waitlistsession"
+    ],
+    "5": [
+      "server",
+      "server_ai",
+      "server_startserver"
+    ],
+    "6": [
+      "vite_config"
+    ]
+  },
+  "cohesion": {
+    "0": 0.28888888888888886,
+    "1": 0.26666666666666666,
+    "2": 0.25,
+    "3": 0.4,
+    "4": 0.5,
+    "5": 0.6666666666666666,
+    "6": 1.0
+  },
+  "gods": [
+    {
+      "id": "src_types_mockwpstate",
+      "label": "MockWPState",
+      "degree": 7
+    },
+    {
+      "id": "src_types_activeview",
+      "label": "ActiveView",
+      "degree": 3
+    },
+    {
+      "id": "src_components_liveplayground_liveplaygroundprops",
+      "label": "LivePlaygroundProps",
+      "degree": 2
+    },
+    {
+      "id": "src_components_wordpressdashboard_wordpressdashboardprops",
+      "label": "WordPressDashboardProps",
+      "degree": 2
+    },
+    {
+      "id": "src_components_wordpressdashboard_wordpressdashboard",
+      "label": "WordPressDashboard()",
+      "degree": 2
+    },
+    {
+      "id": "src_mockdata_pricing_plans",
+      "label": "PRICING_PLANS",
+      "degree": 2
+    },
+    {
+      "id": "src_mockdata_initial_wp_state",
+      "label": "INITIAL_WP_STATE",
+      "degree": 2
+    },
+    {
+      "id": "src_mockdata_sample_commands",
+      "label": "SAMPLE_COMMANDS",
+      "degree": 2
+    },
+    {
+      "id": "src_types_wordpresspost",
+      "label": "WordPressPost",
+      "degree": 2
+    },
+    {
+      "id": "src_types_wordpressplugin",
+      "label": "WordPressPlugin",
+      "degree": 2
+    }
+  ],
+  "surprises": [
+    {
+      "source": "LivePlaygroundProps",
+      "target": "MockWPState",
+      "source_files": [
+        "src/components/LivePlayground.tsx",
+        "src/types.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "bridges separate communities; peripheral node `LivePlaygroundProps` unexpectedly reaches hub `MockWPState`"
+    },
+    {
+      "source": "WordPressDashboardProps",
+      "target": "MockWPState",
+      "source_files": [
+        "src/components/WordPressDashboard.tsx",
+        "src/types.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "peripheral node `WordPressDashboardProps` unexpectedly reaches hub `MockWPState`"
+    }
+  ],
+  "tokens": {
+    "input": 0,
+    "output": 0
+  }
+}

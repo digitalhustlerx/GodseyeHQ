@@ -14,7 +14,7 @@ export const PRICING_PLANS: PricingPlan[] = [
       "Telegram Bot Access",
       "Standard Response Time"
     ],
-    polarProductId: "free-plan-placeholder"
+    polarProductId: "free"
   },
   {
     id: "starter",
@@ -31,7 +31,7 @@ export const PRICING_PLANS: PricingPlan[] = [
       "5 competitor analysis reports per day",
       "Basic topic suggestions for your niche"
     ],
-    polarProductId: "21f41008-1dbf-4d1a-8f1c-96ea518203b3",
+    polarProductId: "bc746111-be41-4f7e-8e75-ed3d7eb1e7e3",
     isPopular: true,
     foundersPrice: "$4.50",
     foundersExpiresInDays: 365,
@@ -54,7 +54,7 @@ export const PRICING_PLANS: PricingPlan[] = [
       "Weekly content planning templates",
       "Automated daily draft scheduling"
     ],
-    polarProductId: "ff6a89c7-6d4e-4748-a760-3c73179b7b44",
+    polarProductId: "a31bba8d-5ef6-4033-93c4-24acdb46a30f",
     foundersPrice: "$14.50",
     foundersExpiresInDays: 365,
     foundersBadge: "Founders"
@@ -75,7 +75,7 @@ export const PRICING_PLANS: PricingPlan[] = [
       "Custom content workflows & automations",
       "Priority support"
     ],
-    polarProductId: "2dadbaf0-24a2-4d45-abd1-5a6e11c4c741",
+    polarProductId: "b13480b8-f4ae-4051-aa1c-36ac31303ce7",
     foundersPrice: "$49.50",
     foundersExpiresInDays: 365,
     foundersBadge: "Founders"
@@ -89,7 +89,7 @@ export const CREDIT_PACKS = [
     price: "$10",
     credits: "100",
     description: "Perfect for quick overages, credits never expire.",
-    polarProductId: "d3d4aea6-d6f1-4092-b815-675a52cbcee2"
+    polarProductId: "873e9805-d7ea-4f1d-a344-832896cf0ac9"
   },
   {
     id: "pack-starter",
@@ -97,7 +97,7 @@ export const CREDIT_PACKS = [
     price: "$9",
     credits: "500",
     description: "Great value pack to keep running for weeks.",
-    polarProductId: "21f41008-1dbf-4d1a-8f1c-96ea518203b3"
+    polarProductId: "28aef4c4-4cf3-4128-8d61-8212c9057afd"
   },
   {
     id: "pack-pro",
@@ -105,7 +105,7 @@ export const CREDIT_PACKS = [
     price: "$29",
     credits: "2,000",
     description: "Heavy usage option for active bloggers.",
-    polarProductId: "ff6a89c7-6d4e-4748-a760-3c73179b7b44"
+    polarProductId: "a758d371-2b37-4f12-9c10-4a9402995b0e"
   }
 ];
 
