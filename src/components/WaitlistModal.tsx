@@ -60,7 +60,7 @@ export default function WaitlistModal({ open, onClose, onSuccess, referralParam 
       // Fetch waitlist count for founder status
       let count = 0;
       try {
-        const countRes = await fetch("https://godseye.shop/api/waitlist");
+        const countRes = await fetch("/api/waitlist");
         const countData = await countRes.json();
         count = countData.count ?? 0;
       } catch {}

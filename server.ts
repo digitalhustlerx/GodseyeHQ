@@ -2,6 +2,8 @@ import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
+import Database from "better-sqlite3";
+import fs from "fs";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -9,6 +11,19 @@ dotenv.config();
 const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY || "",
 });
+
+// Initialize SQLite for waitlist
+const DATA_DIR = path.join(process.cwd(), "data");
+if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+const db = new Database(path.join(DATA_DIR, "godseye.db"));
+db.pragma("journal_mode = WAL");
+db.exec(`CREATE TABLE IF NOT EXISTS waitlist (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  email TEXT UNIQUE NOT NULL,
+  referred_by TEXT,
+  referral_code TEXT,
+  created_at TEXT DEFAULT (datetime('now'))
+)`);
 
 async function startServer() {
   const app = express();
@@ -67,6 +82,32 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
       console.error("Gemini API Error:", error);
       res.status(500).json({ error: error.message || "Failed to generate simulation" });
     }
+  });
+
+  // ===== Waitlist API (SQLite) =====
+  app.post("/api/waitlist", (req, res) => {
+    const { email, referredBy } = req.body;
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(400).json({ error: "Valid email required" });
+    }
+    const referralCode = Buffer.from(email).toString("base64").replace(/[^a-zA-Z0-9]/g, "").slice(0, 8).toLowerCase();
+
+    try {
+      const stmt = db.prepare("INSERT INTO waitlist (email, referred_by, referral_code) VALUES (?, ?, ?)");
+      stmt.run(email.toLowerCase(), referredBy || null, referralCode);
+    } catch (err: any) {
+      if (err.message?.includes("UNIQUE")) {
+        return res.json({ message: "Already on the waitlist!", referral_code: referralCode });
+      }
+      return res.status(500).json({ error: "Could not register. Try again." });
+    }
+
+    res.json({ message: "You're on the list!", referral_code: referralCode });
+  });
+
+  app.get("/api/waitlist", (req, res) => {
+    const row = db.prepare("SELECT COUNT(*) as count FROM waitlist").get() as { count: number };
+    res.json({ count: row.count });
   });
 
   // Mock balance check API
