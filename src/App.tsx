@@ -118,7 +118,7 @@ export default function App() {
     },
     {
       q: "What operations can the AI Agent perform?",
-      a: "You can manage posts & pages (create, edit drafts, publish), manage installed plugins (activate/deactivate), monitor WooCommerce e-commerce orders, edit basic Elementor visual content blocks (like updating headers and pricing fields), check overall site health, and browse or upload media files directly through your Telegram interface!"
+      a: "Everything you'd do in wp-admin, plus things no plugin can do: write content, analyze your store data, monitor security, set up automations, suggest improvements, and build features on request. If you can describe it, GodsEye can probably do it."
     },
     {
       q: "What counts as a credit?",
@@ -138,11 +138,11 @@ export default function App() {
     },
     {
       q: "Where do I retrieve my Telegram User ID?",
-      a: "Simply open Telegram, search for the user info bot `@userinfobot` or `@RawDataBot`, and send any message. It will immediately reply with your unique numerical Telegram User ID (e.g., `5829104`). Enter this ID in our checkout screen to instantly sync your subscription credits."
+      a: "When you sign up, your Telegram account is linked automatically. No need to find your ID manually — just start the bot and follow the prompts."
     },
     {
       q: "Can I cancel my subscription at any time?",
-      a: "Yes. You can manage or cancel your subscription instantly through our Polar.sh billing panel. If you cancel, your remaining credits will remain in your Telegram wallet and will not be lost."
+      a: "Yes. You can manage or cancel your subscription anytime from your account dashboard. If you cancel, your remaining credits will remain in your wallet and will not be lost."
     },
     {
       q: "What happens if the Agent can't fulfill a complex request?",
@@ -155,7 +155,7 @@ export default function App() {
       
       {/* Top Banner Warning for Development SSL Restoration */}
       <div className="bg-white/5 border-b border-white/10 text-center py-2.5 px-4 text-xs font-mono text-[#C4A484] uppercase tracking-widest">
-        👁️ GodsEye v2.0 Operational Environment • Payments Securely Powered by Polar.sh
+        👁️ GodsEye v2.0 — From Private Beta to Public Release
       </div>
 
       {/* Navigation Header */}
@@ -195,17 +195,19 @@ export default function App() {
             >
               Pricing
             </button>
+            <button 
+              onClick={() => setActiveView('blog')} 
+              className="hover:text-[#C4A484] transition-colors cursor-pointer"
+            >
+              Blog
+            </button>
           </nav>
 
           {/* Nav CTAs */}
           <div className="hidden md:flex items-center gap-4">
             <button
               onClick={() => {
-                if (!waitlistSession) {
-                  setShowWaitlistModal(true);
-                } else {
-                  window.open("https://t.me/GodseyeXbot?start=connect", "_blank");
-                }
+                window.open("https://t.me/GodseyeXbot?start=connect", "_blank");
               }}
               className="text-[10px] uppercase tracking-widest font-bold bg-[#F2F2F2] hover:bg-white text-[#0A0A0A] px-6 py-3 rounded-full flex items-center gap-1.5 transition-all active:scale-95 shadow-md"
             >
@@ -251,9 +253,15 @@ export default function App() {
             >
               FAQ
             </button>
+            <button 
+              onClick={() => { setMobileMenuOpen(false); setActiveView('blog'); }} 
+              className="text-xs font-medium text-gray-400 hover:text-white text-left"
+            >
+              Blog
+            </button>
             {waitlistSession && (
             <button 
-              onClick={() => { setMobileMenuOpen(false); setActiveView('dashboard'); }} 
+              onClick={() => { setMobileMenuOpen(false); setActiveView('dashboard'); }}
               className="text-xs font-medium text-gray-400 hover:text-white text-left"
             >
               Dashboard
@@ -283,11 +291,7 @@ export default function App() {
             )}
             <button
               onClick={() => {
-                if (!waitlistSession) {
-                  setShowWaitlistModal(true);
-                } else {
-                  window.open("https://t.me/GodseyeXbot?start=connect", "_blank");
-                }
+                window.open("https://t.me/GodseyeXbot?start=connect", "_blank");
               }}
               className="flex-1 text-center text-xs font-semibold bg-indigo-600 text-white py-2.5 rounded-lg"
             >
@@ -307,7 +311,7 @@ export default function App() {
             <div className="flex justify-center">
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-[#C4A484]/30 rounded-full text-[10px] uppercase tracking-widest text-[#C4A484] font-medium font-mono">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#C4A484] animate-pulse"></span>
-                Tested in Private Discord Beta &bull; Launching Telegram V2
+                Tested in Private Beta &bull; Now Public on Telegram
               </div>
             </div>
 
@@ -426,7 +430,7 @@ export default function App() {
                     </li>
                     <li className="flex gap-2">
                       <span className="text-[#C4A484] mt-0.5">&bull;</span>
-                      <span>Fully sovereign: works with standard WordPress self-hosted setups (including cPanel, VPS, or premium hosts) through safe, lightweight APIs.</span>
+                      <span>Fully independent: works with standard WordPress self-hosted setups (including cPanel, VPS, or premium hosts) through safe, lightweight APIs.</span>
                     </li>
                     <li className="flex gap-2">
                       <span className="text-[#C4A484] mt-0.5">&bull;</span>
@@ -444,24 +448,24 @@ export default function App() {
             {/* Why This Exists / Tested background */}
             <div className="border-t border-white/5 pt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="space-y-3">
-                <span className="text-[#C4A484] text-xs font-mono">01 / DISCORD TRIALS</span>
+                <span className="text-[#C4A484] text-xs font-mono">01 / PRIVATE BETA</span>
                 <h4 className="text-base font-medium text-[#F2F2F2]">Proven in the wild</h4>
                 <p className="text-xs text-white/50 leading-relaxed font-light">
-                  Version 1.0 of GodsEye was a private agent on Discord. Over 15,000 automated commands successfully updated real sites, and our core parsing engine grew bulletproof.
+                  Version 1.0 of GodsEye ran as a private agent. Over 15,000 automated commands successfully updated real sites, and our core engine grew battle-tested.
                 </p>
               </div>
               <div className="space-y-3">
-                <span className="text-[#C4A484] text-xs font-mono">02 / TELEGRAM PORTABILITY</span>
+                <span className="text-[#C4A484] text-xs font-mono">02 / PUBLIC RELEASE</span>
                 <h4 className="text-base font-medium text-[#F2F2F2]">Built for real builders</h4>
                 <p className="text-xs text-white/50 leading-relaxed font-light">
-                  Version 2.0 migrates this battle-tested parsing intelligence directly to Telegram, offering you complete control over your business, whether on your desktop or waiting in line at a cafe.
+                  Version 2.0 brings this battle-tested intelligence to everyone. Full control over your business, whether on your desktop or waiting in line at a cafe.
                 </p>
               </div>
               <div className="space-y-3">
-                <span className="text-[#C4A484] text-xs font-mono">03 / SOVEREIGN AUTONOMY</span>
-                <h4 className="text-base font-medium text-[#F2F2F2]">Sovereign WordPress Hosting</h4>
+                <span className="text-[#C4A484] text-xs font-mono">03 / FULL CONTROL</span>
+                <h4 className="text-base font-medium text-[#F2F2F2]">Your Data, Your Rules</h4>
                 <p className="text-xs text-white/50 leading-relaxed font-light">
-                  Keep your database, your cPanel server, and your content. GodsEye doesn't lock you into a proprietary hosting platform. You remain the sole owner of your hard work.
+                  Keep your database, your server, and your content. GodsEye doesn't lock you in. Go Pro and bring your own VPS, your own API keys, and your own rules.
                 </p>
               </div>
             </div>
@@ -508,26 +512,22 @@ export default function App() {
               <div className="text-center max-w-3xl mx-auto space-y-8">
                 <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white/5 border border-white/10 rounded-full w-fit mx-auto">
                   <span className="w-2 h-2 rounded-full bg-[#C4A484]"></span>
-                  <span className="text-[10px] uppercase tracking-widest text-white/80 font-mono font-bold">2026 WordPress Orchestration Engine</span>
+                  <span className="text-[10px] uppercase tracking-widest text-white/80 font-mono font-bold">From Private Beta to Public Release</span>
                 </div>
                 
                 <h1 className="text-5xl md:text-8.5xl font-light tracking-tighter leading-[0.95] text-[#F2F2F2] mb-4" style={{ fontFamily: "'Georgia', serif" }}>
-                  Manage WordPress<br />
-                  <span className="italic text-[#C4A484]">by just talking.</span>
+                  Your site's AI agent.<br />
+                  <span className="italic text-[#C4A484]">Everything, by just talking.</span>
                 </h1>
                 
                 <p className="text-base md:text-lg text-white/60 leading-relaxed max-w-2xl mx-auto font-light">
-                  GodsEye connects your site to AI. Manage posts, plugins, and content just by sending a simple message in Telegram. No complicated menus—just talk to your site.
+                  GodsEye is an all-in-one agent for your WordPress site. Content creation, store management, security monitoring, automations — all through conversation in Telegram. Instead of buying another plugin, just ask.
                 </p>
 
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
                 <button
                   onClick={() => {
-                    if (!waitlistSession) {
-                      setShowWaitlistModal(true);
-                    } else {
-                      window.open("https://t.me/GodseyeXbot?start=connect", "_blank");
-                    }
+                    window.open("https://t.me/GodseyeXbot?start=connect", "_blank");
                   }}
                   className="w-full sm:w-auto bg-[#F2F2F2] text-[#0A0A0A] hover:bg-white px-10 py-4 rounded-full font-bold text-xs uppercase tracking-widest transition-all shadow-md text-center cursor-pointer"
                 >
@@ -542,7 +542,7 @@ export default function App() {
                 </div>
                 
                 <p className="text-[10px] uppercase tracking-wider text-white/40 font-semibold font-mono">
-                  Instantly activated inside Telegram • No credit card required • No setup fees
+                  No credit card required • 50 free credits every month • Cancel anytime
                 </p>
               </div>
             </section>
@@ -599,59 +599,59 @@ export default function App() {
               <div className="text-center max-w-2xl mx-auto space-y-3">
                 <span className="text-[10px] uppercase tracking-widest text-[#C4A484] font-semibold font-mono">Capabilities</span>
                 <h2 className="text-3xl md:text-5xl font-light tracking-tighter text-[#F2F2F2]" style={{ fontFamily: "'Georgia', serif" }}>
-                  Real REST API integrations, not mockups
+                  One agent. Everything your site needs.
                 </h2>
                 <p className="text-xs md:text-sm text-white/60 font-light">
-                  Unlike simulated landing pages, the real GodsEye plugin integrates directly with active WordPress core frameworks.
+                  GodsEye replaces a dozen plugins and tools. Content, commerce, security, automations — all handled by one agent that never sleeps.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div className="p-6 bg-[#121212] border border-white/10 rounded-2xl space-y-3.5 transition-all hover:bg-white/5">
-                  <div className="text-xl">📝</div>
-                  <h4 className="text-sm font-semibold text-white">Posts & Pages</h4>
+                  <div className="text-xl">🧠</div>
+                  <h4 className="text-sm font-semibold text-white">Content Creator</h4>
                   <p className="text-xs text-white/60 leading-relaxed font-light">
-                    Create, retrieve, edit, publish, or delete posts and pages directly. Draft concepts automatically through standard workflows.
-                  </p>
-                </div>
-
-                <div className="p-6 bg-[#121212] border border-white/10 rounded-2xl space-y-3.5 transition-all hover:bg-white/5">
-                  <div className="text-xl">🔌</div>
-                  <h4 className="text-sm font-semibold text-white">Plugin Management</h4>
-                  <p className="text-xs text-white/60 leading-relaxed font-light">
-                    Safely activate or deactivate any installed plugin on your WordPress instance without having to navigate multiple menus.
+                    Give it a topic — it writes the post, formats it, and schedules it. Blog posts, product descriptions, landing page copy. No blank page, no writer's block.
                   </p>
                 </div>
 
                 <div className="p-6 bg-[#121212] border border-white/10 rounded-2xl space-y-3.5 transition-all hover:bg-white/5">
                   <div className="text-xl">🛒</div>
-                  <h4 className="text-sm font-semibold text-white">WooCommerce Support</h4>
+                  <h4 className="text-sm font-semibold text-white">Store Manager</h4>
                   <p className="text-xs text-white/60 leading-relaxed font-light">
-                    Monitor product inventory, look up order statuses, query transaction summaries, or generate coupon discounts.
+                    Check orders, update products, adjust prices, generate coupons. Run your entire WooCommerce store through conversation.
+                  </p>
+                </div>
+
+                <div className="p-6 bg-[#121212] border border-white/10 rounded-2xl space-y-3.5 transition-all hover:bg-white/5">
+                  <div className="text-xl">🛡️</div>
+                  <h4 className="text-sm font-semibold text-white">Proactive Security</h4>
+                  <p className="text-xs text-white/60 leading-relaxed font-light">
+                    Monitors your site health 24/7. Catches broken pages, plugin conflicts, and slowdowns before they cost you sales. Recalibrates automatically to keep things running.
+                  </p>
+                </div>
+
+                <div className="p-6 bg-[#121212] border border-white/10 rounded-2xl space-y-3.5 transition-all hover:bg-white/5">
+                  <div className="text-xl">⚡</div>
+                  <h4 className="text-sm font-semibold text-white">Automations</h4>
+                  <p className="text-xs text-white/60 leading-relaxed font-light">
+                    Set recurring tasks in plain English. "Every Monday morning, draft a roundup post." "Alert me when stock drops below 10." Your site runs itself.
+                  </p>
+                </div>
+
+                <div className="p-6 bg-[#121212] border border-white/10 rounded-2xl space-y-3.5 transition-all hover:bg-white/5">
+                  <div className="text-xl">📊</div>
+                  <h4 className="text-sm font-semibold text-white">Business Analyst</h4>
+                  <p className="text-xs text-white/60 leading-relaxed font-light">
+                    Ask "How's my store doing?" and get a real answer. GodsEye synthesizes your dashboard data into plain-English insights and recommendations.
                   </p>
                 </div>
 
                 <div className="p-6 bg-[#121212] border border-white/10 rounded-2xl space-y-3.5 transition-all hover:bg-white/5">
                   <div className="text-xl">🎨</div>
-                  <h4 className="text-sm font-semibold text-white">Elementor Block Edits</h4>
+                  <h4 className="text-sm font-semibold text-white">Visual Editor</h4>
                   <p className="text-xs text-white/60 leading-relaxed font-light">
-                    Instantly update key visual strings on your Elementor builder block, edit product pricing lines, or clone page designs.
-                  </p>
-                </div>
-
-                <div className="p-6 bg-[#121212] border border-white/10 rounded-2xl space-y-3.5 transition-all hover:bg-white/5">
-                  <div className="text-xl">🩺</div>
-                  <h4 className="text-sm font-semibold text-white">Site Health Check</h4>
-                  <p className="text-xs text-white/60 leading-relaxed font-light">
-                    Query underlying PHP parameters, core WordPress version updates, active plugin lists, SSL security, and gateway latencies.
-                  </p>
-                </div>
-
-                <div className="p-6 bg-[#121212] border border-white/10 rounded-2xl space-y-3.5 transition-all hover:bg-white/5">
-                  <div className="text-xl">📸</div>
-                  <h4 className="text-sm font-semibold text-white">Media Library Sync</h4>
-                  <p className="text-xs text-white/60 leading-relaxed font-light">
-                    Query existing asset parameters or upload new images directly from your Telegram client into the WordPress media database.
+                    Change prices, update text, swap images on your landing pages. No builder UI, no clicking through menus. Just tell it what to change.
                   </p>
                 </div>
               </div>
@@ -672,7 +672,6 @@ export default function App() {
               {/* Grid cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
                 {PRICING_PLANS.filter(p => p.id !== 'free').map((plan) => {
-                  const showFounder = waitlistSession?.isFounder && plan.foundersPrice;
                   return (
                   <div 
                     key={plan.id}
@@ -688,26 +687,9 @@ export default function App() {
                       <div>
                         <h4 className="text-[10px] uppercase tracking-widest font-bold text-white/50 font-mono">{plan.name}</h4>
                         <div className="flex items-baseline gap-1 mt-2">
-                          {showFounder ? (
-                            <>
-                              <span className="text-3xl font-black text-[#C4A484]">{plan.foundersPrice}</span>
-                              <span className="text-sm text-white/40 line-through">{plan.price}</span>
-                              <span className="text-xs text-white/50 font-light">/month</span>
-                            </>
-                          ) : (
-                            <>
-                              <span className="text-3xl font-black text-white">{plan.price}</span>
-                              <span className="text-xs text-white/50 font-light">/month</span>
-                            </>
-                          )}
+                          <span className="text-3xl font-black text-white">{plan.price}</span>
+                          <span className="text-xs text-white/50 font-light">/month</span>
                         </div>
-                        {showFounder && (
-                          <div className="mt-2">
-                            <span className="bg-[#C4A484]/20 text-[#C4A484] text-[9px] font-mono font-bold px-2 py-0.5 rounded-full border border-[#C4A484]/30 uppercase tracking-wider">
-                              {plan.foundersBadge} — 50% off for 1 year
-                            </span>
-                          </div>
-                        )}
                       </div>
 
                       <div className="py-3 border-y border-white/10">
@@ -715,7 +697,7 @@ export default function App() {
                           <Coins className="w-3.5 h-3.5" />
                           {plan.credits} Credits / mo
                         </div>
-                        <div className="text-[11px] text-white/60 font-light mt-1">Allows {plan.sites}</div>
+                        <div className="text-[11px] text-white/60 font-light mt-1">{plan.sites}</div>
                       </div>
 
                       <ul className="space-y-2.5 pt-1 text-[11px] text-white/75 font-light">
@@ -733,7 +715,7 @@ export default function App() {
                         onClick={() => handleOpenCheckout(plan)}
                         className="w-full bg-[#C4A484] hover:bg-[#b59574] text-black text-[10px] uppercase tracking-widest font-bold py-3.5 rounded-full transition-all shadow-md active:scale-95 cursor-pointer"
                       >
-                        {showFounder ? "Lock in Founder Pricing" : `Get ${plan.name}`}
+                        Get {plan.name}
                       </button>
                     </div>
                   </div>
@@ -796,11 +778,7 @@ export default function App() {
                 <div className="pt-3">
                   <button
                     onClick={() => {
-                      if (!waitlistSession) {
-                        setShowWaitlistModal(true);
-                      } else {
-                        window.open("https://t.me/GodseyeXbot?start=connect", "_blank");
-                      }
+                      window.open("https://t.me/GodseyeXbot?start=connect", "_blank");
                     }}
                     className="inline-flex items-center gap-2 bg-[#F2F2F2] text-[#0A0A0A] hover:bg-white px-8 py-4 rounded-full font-bold text-xs uppercase tracking-widest shadow-md transition-all active:scale-95"
                   >
@@ -809,7 +787,7 @@ export default function App() {
                 </div>
                 
                 <div className="flex justify-center gap-6 pt-4 text-[10px] text-white/40 font-mono uppercase tracking-wider">
-                  <span>Payments processed securely by Polar.sh</span>
+                  <span>Secure payment • Cancel anytime</span>
                   <span>•</span>
                   <span>Unused credits roll over</span>
                 </div>
@@ -818,8 +796,137 @@ export default function App() {
           </div>
         )}
 
+        {/* VIEW: BLOG PAGE */}
+        {activeView === 'blog' && (
+          <div className="max-w-5xl mx-auto px-4 py-16 md:py-24 space-y-16">
+            
+            {/* Blog Header */}
+            <div className="text-center space-y-4">
+              <h1 className="text-4xl md:text-6xl font-light tracking-tighter text-[#F2F2F2]" style={{ fontFamily: "'Georgia', serif" }}>
+                GodsEye <span className="italic text-[#C4A484]">Blog</span>
+              </h1>
+              <p className="text-sm md:text-base text-white/60 font-light max-w-2xl mx-auto leading-relaxed">
+                Insights on WordPress automation, AI-powered site management, and the future of conversational CMS.
+              </p>
+            </div>
 
-        {/* VIEW 3: DOWNLOAD PAGE */}
+            {/* Blog Posts Grid */}
+            <div className="space-y-10">
+              {/* Post 1 */}
+              <article className="bg-[#121212] border border-white/10 rounded-3xl p-6 md:p-8 space-y-4 hover:border-white/20 transition-all">
+                <div className="flex items-center gap-3 text-[10px] uppercase tracking-wider text-[#C4A484] font-mono font-semibold">
+                  <span>Jul 20, 2026</span>
+                  <span className="text-white/20">•</span>
+                  <span>Product</span>
+                </div>
+                <h2 className="text-2xl md:text-3xl font-light text-[#F2F2F2] tracking-tight" style={{ fontFamily: "'Georgia', serif" }}>
+                  Why Managing WordPress Should Feel Like a Conversation
+                </h2>
+                <p className="text-sm text-white/60 font-light leading-relaxed">
+                  The WordPress admin dashboard hasn't changed in a decade. Hundreds of menu items, nested submenus, 
+                  and page builders that require a developer to operate. GodsEye reimagines this by letting you 
+                  manage your site the same way you communicate with your team — through natural conversation. 
+                  No more sifting through cluttered menus just to update a single paragraph or toggle a plugin.
+                </p>
+                <div className="pt-2 text-xs text-[#C4A484] font-mono uppercase tracking-wider opacity-70">
+                  ← 5 min read
+                </div>
+              </article>
+
+              {/* Post 2 */}
+              <article className="bg-[#121212] border border-white/10 rounded-3xl p-6 md:p-8 space-y-4 hover:border-white/20 transition-all">
+                <div className="flex items-center gap-3 text-[10px] uppercase tracking-wider text-[#C4A484] font-mono font-semibold">
+                  <span>Jul 15, 2026</span>
+                  <span className="text-white/20">•</span>
+                  <span>Engineering</span>
+                </div>
+                <h2 className="text-2xl md:text-3xl font-light text-[#F2F2F2] tracking-tight" style={{ fontFamily: "'Georgia', serif" }}>
+                  How We Built a Secure Bridge Between Telegram and WordPress REST API
+                </h2>
+                <p className="text-sm text-white/60 font-light leading-relaxed">
+                  Security is the number one concern when connecting any external service to a WordPress site. 
+                  GodsEye uses WordPress Application Passwords — a built-in authentication mechanism that 
+                  never exposes your main admin credentials. Every command runs through the WordPress REST API 
+                  with over 20 security filters, ensuring that only permitted actions are executed. 
+                  Here's a deep dive into the architecture that makes this possible.
+                </p>
+                <div className="pt-2 text-xs text-[#C4A484] font-mono uppercase tracking-wider opacity-70">
+                  ← 7 min read
+                </div>
+              </article>
+
+              {/* Post 3 */}
+              <article className="bg-[#121212] border border-white/10 rounded-3xl p-6 md:p-8 space-y-4 hover:border-white/20 transition-all">
+                <div className="flex items-center gap-3 text-[10px] uppercase tracking-wider text-[#C4A484] font-mono font-semibold">
+                  <span>Jul 8, 2026</span>
+                  <span className="text-white/20">•</span>
+                  <span>Guides</span>
+                </div>
+                <h2 className="text-2xl md:text-3xl font-light text-[#F2F2F2] tracking-tight" style={{ fontFamily: "'Georgia', serif" }}>
+                  The Solopreneur's Guide to Automating WordPress Without a Developer
+                </h2>
+                <p className="text-sm text-white/60 font-light leading-relaxed">
+                  As a solopreneur, every hour you spend clicking through menus is an hour not spent on 
+                  growing your business. Hiring a WordPress developer costs $50–$150/hour for even basic 
+                  tasks like updating plugins or editing page copy. This guide shows you how GodsEye 
+                  eliminates that overhead, giving you an AI-powered assistant that works 24/7 for a 
+                  fraction of the cost. From auto-drafting blog posts to monitoring WooCommerce orders.
+                </p>
+                <div className="pt-2 text-xs text-[#C4A484] font-mono uppercase tracking-wider opacity-70">
+                  ← 6 min read
+                </div>
+              </article>
+
+              {/* Post 4 */}
+              <article className="bg-[#121212] border border-white/10 rounded-3xl p-6 md:p-8 space-y-4 hover:border-white/20 transition-all">
+                <div className="flex items-center gap-3 text-[10px] uppercase tracking-wider text-[#C4A484] font-mono font-semibold">
+                  <span>Jun 28, 2026</span>
+                  <span className="text-white/20">•</span>
+                  <span>Comparison</span>
+                </div>
+                <h2 className="text-2xl md:text-3xl font-light text-[#F2F2F2] tracking-tight" style={{ fontFamily: "'Georgia', serif" }}>
+                  GodsEye vs Traditional WordPress Management: A Side-by-Side Comparison
+                </h2>
+                <p className="text-sm text-white/60 font-light leading-relaxed">
+                  How does managing a WordPress site with GodsEye compare to the traditional approach? 
+                  We break down time-to-complete, cost, and complexity across 10 common tasks — 
+                  from creating a blog post to updating WooCommerce prices. The results speak for themselves: 
+                  tasks that take 15+ minutes in wp-admin are done in under 10 seconds with a single message.
+                </p>
+                <div className="pt-2 text-xs text-[#C4A484] font-mono uppercase tracking-wider opacity-70">
+                  ← 4 min read
+                </div>
+              </article>
+            </div>
+
+            {/* Newsletter CTA */}
+            <div className="bg-gradient-to-br from-[#0A0A0A] to-[#121212] border border-white/10 rounded-3xl p-8 md:p-12 text-center space-y-5">
+              <h3 className="text-2xl md:text-3xl font-light text-[#F2F2F2] tracking-tight" style={{ fontFamily: "'Georgia', serif" }}>
+                Get notified when we publish
+              </h3>
+              <p className="text-sm text-white/60 font-light max-w-md mx-auto">
+                Stay ahead of the curve with the latest in WordPress AI automation and conversational CMS.
+              </p>
+              <form 
+                onSubmit={(e) => { e.preventDefault(); alert('You\'ve been subscribed! (Demo — backend coming soon)'); }}
+                className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto"
+              >
+                <input 
+                  type="email" 
+                  placeholder="your@email.com" 
+                  required
+                  className="flex-1 bg-white/5 border border-white/10 rounded-full px-5 py-3.5 text-xs text-white placeholder-white/30 focus:outline-none focus:border-[#C4A484]/50 font-light"
+                />
+                <button type="submit" className="bg-[#C4A484] hover:bg-[#b59574] text-black font-bold px-6 py-3.5 rounded-full text-[10px] uppercase tracking-widest transition-all active:scale-95 whitespace-nowrap">
+                  Subscribe
+                </button>
+              </form>
+            </div>
+
+          </div>
+        )}
+
+
         {activeView === 'download' && (
           <div className="max-w-3xl mx-auto px-4 py-12 space-y-12">
             
@@ -967,7 +1074,7 @@ export default function App() {
                 Purchase Successful!
               </h2>
               <p className="text-xs md:text-sm text-white/60 font-light leading-relaxed">
-                Thank you for upgrading! Your transaction was processed via Polar.sh and your credit wallet has been topped up instantly on the GodsEye network.
+                Your account is now active. Your credits have been added to your wallet instantly.
               </p>
             </div>
 
@@ -997,11 +1104,7 @@ export default function App() {
               <div className="pt-2">
                 <button
                   onClick={() => {
-                    if (!waitlistSession) {
-                      setShowWaitlistModal(true);
-                    } else {
-                      window.open("https://t.me/GodseyeXbot?start=connect", "_blank");
-                    }
+                    window.open("https://t.me/GodseyeXbot?start=connect", "_blank");
                   }}
                   className="inline-flex items-center gap-1.5 bg-[#C4A484] hover:bg-[#b59574] text-black font-bold text-xs px-8 py-4 rounded-full shadow-md tracking-widest uppercase transition-all active:scale-95"
                 >
@@ -1039,7 +1142,7 @@ export default function App() {
               </span>
             </div>
             <p className="text-xs text-white/50 font-light leading-relaxed">
-              GodsEye AI assistant integration for standard WordPress site REST API networks. Secure, credit-driven, and lightning fast.
+              Your all-in-one AI agent for WordPress. Content, commerce, security, and automations — all through conversation.
             </p>
             <div className="text-[10px] text-white/40 font-mono">
               © 2026 GodsEye. All rights reserved.
@@ -1065,32 +1168,34 @@ export default function App() {
                   View Plans
                 </button>
               </li>
+              <li>
+                <button onClick={() => setActiveView('blog')} className="hover:text-[#C4A484] transition-colors cursor-pointer">
+                  Blog
+                </button>
+              </li>
             </ul>
           </div>
 
-          {/* Core Integrations */}
+          {/* Works With */}
           <div className="space-y-3.5 text-left">
-            <h4 className="text-[10px] font-semibold text-[#C4A484] tracking-wider uppercase font-mono">Integrations</h4>
+            <h4 className="text-[10px] font-semibold text-[#C4A484] tracking-wider uppercase font-mono">Works With</h4>
             <ul className="space-y-2 text-xs text-white/50 font-light">
               <li>
+                <span className="text-white/40">WordPress</span>
+              </li>
+              <li>
+                <span className="text-white/40">WooCommerce</span>
+              </li>
+              <li>
+                <span className="text-white/40">Elementor</span>
+              </li>
+              <li>
                 <button
-                  onClick={() => {
-                    if (!waitlistSession) {
-                      setShowWaitlistModal(true);
-                    } else {
-                      window.open("https://t.me/GodseyeXbot?start=connect", "_blank");
-                    }
-                  }}
+                  onClick={() => window.open("https://t.me/GodseyeXbot?start=connect", "_blank")}
                   className="hover:text-[#C4A484] transition-colors text-left cursor-pointer"
                 >
-                  Telegram Bot
+                  Telegram
                 </button>
-              </li>
-              <li>
-                <span className="text-white/40 font-mono text-[11px]">Caddy Reverse Proxy Live</span>
-              </li>
-              <li>
-                <span className="text-white/40 font-mono text-[11px]">Polar.sh Sandbox Billing</span>
               </li>
             </ul>
           </div>
@@ -1100,13 +1205,13 @@ export default function App() {
             <h4 className="text-[10px] font-semibold text-[#C4A484] tracking-wider uppercase font-mono">Security & Compliance</h4>
             <ul className="space-y-2 text-xs text-white/50 font-light">
               <li>
-                <span className="text-white/40">No admin password access</span>
+                <span className="text-white/40">Application Passwords (no admin access)</span>
               </li>
               <li>
-                <span className="text-white/40">Model Context Protocol active</span>
+                <span className="text-white/40">Real-time site monitoring</span>
               </li>
               <li>
-                <span className="text-white/40">Deduplicated billing channels</span>
+                <span className="text-white/40">Model Context Protocol support</span>
               </li>
             </ul>
           </div>
@@ -1147,11 +1252,6 @@ export default function App() {
                 <span className="text-3xl font-black text-white">{selectedPlan.price}</span>
                 <span className="text-xs text-white/50 font-light ml-1">/month</span>
               </div>
-              {waitlistSession?.isFounder && selectedPlan.foundersPrice && (
-                <div className="inline-block bg-[#C4A484]/20 text-[#C4A484] text-[9px] font-mono font-bold px-3 py-1 rounded-full border border-[#C4A484]/30 uppercase tracking-wider">
-                  Founder — 50% off: {selectedPlan.foundersPrice}/mo
-                </div>
-              )}
               <p className="text-[11px] text-white/60 font-light">{selectedPlan.credits} credits/mo · {selectedPlan.sites}</p>
             </div>
 
@@ -1177,14 +1277,14 @@ export default function App() {
                   <RefreshCw className="w-4 h-4 animate-spin" />
                 ) : (
                   <>
-                    Pay with Polar
+                    Pay Now
                     <ArrowRight className="w-4 h-4" />
                   </>
                 )}
               </button>
 
               <p className="text-[10px] text-white/40 text-center font-light">
-                Secure payment via Polar.sh. No account needed. You'll get a receipt by email.
+                Secure checkout. You'll get a receipt by email.
               </p>
             </form>
           </div>

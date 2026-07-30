@@ -8,11 +8,11 @@ export const PRICING_PLANS: PricingPlan[] = [
     credits: "50",
     sites: "1 WordPress Site",
     features: [
-      "Manage Posts & Pages",
-      "Plugin Status Toggles",
-      "Basic Site Health Checks",
-      "Telegram Bot Access",
-      "Standard Response Time"
+      "50 Credits / Month",
+      "1 WordPress Site",
+      "Content & Post Management",
+      "Store Monitoring",
+      "Telegram Bot Access"
     ],
     polarProductId: "free"
   },
@@ -24,18 +24,14 @@ export const PRICING_PLANS: PricingPlan[] = [
     sites: "1 WordPress Site",
     features: [
       "Everything in Free",
-      "WooCommerce Orders & Products",
-      "Elementor Price/Text Edits",
-      "E-mail Support (24h)",
-      "Unused Credits Carry Over",
-      "5 competitor analysis reports per day",
-      "Basic topic suggestions for your niche"
+      "Full WooCommerce Management",
+      "Content Creation & Drafting",
+      "Proactive Security Monitoring",
+      "Email Support (24h)",
+      "Unused Credits Roll Over"
     ],
     polarProductId: "bc746111-be41-4f7e-8e75-ed3d7eb1e7e3",
-    isPopular: true,
-    foundersPrice: "$4.50",
-    foundersExpiresInDays: 365,
-    foundersBadge: "Founders"
+    isPopular: true
   },
   {
     id: "pro",
@@ -45,40 +41,31 @@ export const PRICING_PLANS: PricingPlan[] = [
     sites: "3 WordPress Sites",
     features: [
       "Everything in Starter",
-      "Multi-Site Management",
-      "Media Upload Actions",
-      "Priority Email Support (4h)",
-      "Dedicated Gateway Access",
-      "Unlimited competitor analysis & market research",
-      "Advanced topic suggestions with content ideas",
-      "Weekly content planning templates",
-      "Automated daily draft scheduling"
+      "Multi-Site Management (3 Sites)",
+      "Automations & Recurring Tasks",
+      "Business Analytics & Insights",
+      "Priority Support (4h)",
+      "Unused Credits Roll Over"
     ],
-    polarProductId: "a31bba8d-5ef6-4033-93c4-24acdb46a30f",
-    foundersPrice: "$14.50",
-    foundersExpiresInDays: 365,
-    foundersBadge: "Founders"
+    polarProductId: "a31bba8d-5ef6-4033-93c4-24acdb46a30f"
   },
   {
-    id: "agency",
-    name: "Agency",
+    id: "godmode",
+    name: "God Mode",
     price: "$99",
     credits: "10,000",
     sites: "10 WordPress Sites",
     features: [
       "Everything in Pro",
-      "Up to 10 Connected Sites",
-      "Dedicated GodsEye Node",
-      "Dedicated Slack/Telegram Support",
-      "Custom Workflow Automation",
-      "All Pro features, unlimited usage",
-      "Custom content workflows & automations",
-      "Priority support"
+      "Unlimited Everything — No Rate Limits",
+      "Dedicated VPS Included",
+      "Bring Your Own API Keys",
+      "Full Server Architecture Control",
+      "Multi-Site Management (10 Sites)",
+      "Dedicated Support Channel",
+      "Unused Credits Roll Over"
     ],
-    polarProductId: "b13480b8-f4ae-4051-aa1c-36ac31303ce7",
-    foundersPrice: "$49.50",
-    foundersExpiresInDays: 365,
-    foundersBadge: "Founders"
+    polarProductId: "b13480b8-f4ae-4051-aa1c-36ac31303ce7"
   }
 ];
 
