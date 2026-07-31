@@ -10,9 +10,10 @@ export const PRICING_PLANS: PricingPlan[] = [
     features: [
       "50 Credits / Month",
       "1 WordPress Site",
-      "Content & Post Management",
-      "Store Monitoring",
-      "Telegram Bot Access"
+      "Post & Page Management",
+      "Store Overview (read-only)",
+      "Telegram Bot Access",
+      "Standard Response Rate"
     ],
     polarProductId: "free"
   },
@@ -23,10 +24,11 @@ export const PRICING_PLANS: PricingPlan[] = [
     credits: "500",
     sites: "1 WordPress Site",
     features: [
-      "Everything in Free",
+      "Everything in Free, plus:",
       "Full WooCommerce Management",
+      "Visual Editor (Elementor edits)",
       "Content Creation & Drafting",
-      "Proactive Security Monitoring",
+      "Media Upload & Management",
       "Email Support (24h)",
       "Unused Credits Roll Over"
     ],
@@ -40,10 +42,12 @@ export const PRICING_PLANS: PricingPlan[] = [
     credits: "2,000",
     sites: "3 WordPress Sites",
     features: [
-      "Everything in Starter",
-      "Multi-Site Management (3 Sites)",
+      "Everything in Starter, plus:",
+      "Proactive Security Monitoring",
       "Automations & Recurring Tasks",
       "Business Analytics & Insights",
+      "Social Media Analytics",
+      "Multi-Site Management (3 Sites)",
       "Priority Support (4h)",
       "Unused Credits Roll Over"
     ],
