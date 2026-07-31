@@ -54,44 +54,49 @@ const godsEyeWay = [
   'One agent replaces a dozen plugins. Save $1,200+/yr.',
 ];
 
-export default function FeaturesPage() {
-  const headingStyle = { fontFamily: "'Georgia', serif" } as const;
+const stats = [
+  { label: 'Plugins', value: '15+', suffix: 'tools replaced', gold: false },
+  { label: 'Hours saved', value: '40+', suffix: 'hrs/month', gold: false },
+  { label: 'Cost', value: '$9', suffix: '/mo instead of $1,200+/yr', gold: true },
+];
 
+export default function FeaturesPage() {
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-[#F2F2F2]">
+    <div className="min-h-screen bg-[#0A0A0A]">
       {/* HERO */}
-      <section className="px-4 py-16 max-w-7xl mx-auto text-center">
-        <span className="inline-block px-3 py-1 text-xs tracking-widest uppercase border border-[#C4A484]/40 text-[#C4A484] rounded-full">
-          Capabilities
-        </span>
-        <h1
-          style={headingStyle}
-          className="mt-6 text-4xl md:text-5xl lg:text-6xl font-bold leading-tight"
-        >
-          One agent. Everything your site needs.
+      <section className="px-4 py-20 max-w-7xl mx-auto text-center">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white/5 border border-white/10 rounded-full w-fit mx-auto">
+          <span className="w-2 h-2 rounded-full bg-[#C4A484]"></span>
+          <span className="text-[10px] uppercase tracking-widest text-white/80 font-mono font-bold">
+            Capabilities
+          </span>
+        </div>
+
+        <h1 className="font-display mt-8 text-5xl md:text-7xl lg:text-8xl font-light tracking-tighter leading-[0.95] text-[#F2F2F2]">
+          One agent.
+          <br />
+          <span className="italic text-[#C4A484]">Everything your site needs.</span>
         </h1>
-        <p className="mt-6 max-w-2xl mx-auto text-lg text-white/70">
+
+        <p className="mt-6 max-w-2xl mx-auto text-lg text-white/60 leading-relaxed font-light">
           GodsEye replaces a dozen plugins and tools. Content, commerce,
           security, automations — all handled by one agent that never sleeps.
         </p>
       </section>
 
       {/* FEATURE GRID */}
-      <section className="px-4 py-16 max-w-7xl mx-auto">
+      <section className="px-4 py-20 max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((feature) => (
             <div
               key={feature.title}
-              className="bg-[#121212] border border-white/10 rounded-2xl p-8 transition-colors hover:border-[#C4A484]/40"
+              className="bg-[#121212] border border-white/10 rounded-2xl p-6 transition-colors hover:border-white/20"
             >
               <div className="text-4xl mb-4">{feature.emoji}</div>
-              <h3
-                style={headingStyle}
-                className="text-xl font-semibold text-[#C4A484]"
-              >
+              <h3 className="font-display text-xl font-semibold text-[#C4A484]">
                 {feature.title}
               </h3>
-              <p className="mt-3 text-white/70 leading-relaxed">
+              <p className="mt-3 text-white/60 leading-relaxed">
                 {feature.description}
               </p>
             </div>
@@ -99,33 +104,37 @@ export default function FeaturesPage() {
         </div>
       </section>
 
-      {/* PARADIGM SHIFT SECTION */}
-      <section className="px-4 py-16 max-w-7xl mx-auto">
+      {/* PARADIGM SHIFT */}
+      <section className="px-4 py-20 max-w-7xl mx-auto">
+        <div className="text-center mb-12">
+          <span className="text-[10px] uppercase tracking-widest font-semibold font-mono text-white/40">
+            Why switch?
+          </span>
+          <h2 className="font-display mt-4 text-4xl md:text-5xl font-light tracking-tighter leading-tight text-[#F2F2F2]">
+            Old tools vs.{' '}
+            <span className="italic text-[#C4A484]">one conversation</span>
+          </h2>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Old Way */}
           <div className="bg-[#121212] border border-red-500/30 rounded-2xl p-8">
-            <h3
-              style={headingStyle}
-              className="text-2xl font-semibold text-red-400 mb-6"
-            >
+            <h3 className="font-display text-2xl font-semibold text-red-400 mb-6">
               The Old Way
             </h3>
             <ul className="space-y-4">
               {oldWay.map((item) => (
                 <li key={item} className="flex items-start gap-3">
                   <span className="text-red-400 mt-1 shrink-0">✕</span>
-                  <span className="text-white/70">{item}</span>
+                  <span className="text-white/60">{item}</span>
                 </li>
               ))}
             </ul>
           </div>
 
           {/* GodsEye Way */}
-          <div className="bg-[#121212] border border-[#C4A484]/40 rounded-2xl p-8">
-            <h3
-              style={headingStyle}
-              className="text-2xl font-semibold text-[#C4A484] mb-6"
-            >
+          <div className="bg-[#121212] border border-white/10 hover:border-white/20 rounded-2xl p-8 transition-colors">
+            <h3 className="font-display text-2xl font-semibold text-[#C4A484] mb-6">
               The GodsEye Way
             </h3>
             <ul className="space-y-4">
@@ -140,61 +149,64 @@ export default function FeaturesPage() {
         </div>
       </section>
 
-      {/* COST SAVINGS SECTION */}
-      <section className="px-4 py-16 max-w-7xl mx-auto">
+      {/* COST SAVINGS */}
+      <section className="px-4 py-20 max-w-7xl mx-auto">
         <div className="text-center max-w-3xl mx-auto">
-          <h2
-            style={headingStyle}
-            className="text-3xl md:text-4xl font-bold text-[#C4A484]"
-          >
-            One tool. Zero plugins to buy.
+          <span className="text-[10px] uppercase tracking-widest font-semibold font-mono text-white/40">
+            cost comparison
+          </span>
+          <h2 className="font-display mt-4 text-4xl md:text-5xl font-light tracking-tighter leading-tight text-[#F2F2F2]">
+            One tool.{' '}
+            <span className="italic text-[#C4A484]">Zero plugins to buy.</span>
           </h2>
-          <p className="mt-6 text-lg text-white/70 leading-relaxed">
-            The average WordPress site runs 15+ plugins at $50-200/year each.
-            SEO tools, form builders, analytics dashboards, automation plugins —
-            GodsEye replaces them all. Instead of buying a feature, just ask for
-            it.
+          <p className="mt-6 text-lg text-white/60 leading-relaxed font-light">
+            The average WordPress site runs 15+ plugins at $50–200/year each.
+            SEO tools, form builders, analytics dashboards, automation plugins —{' '}
+            GodsEye replaces them all. Instead of buying a feature, just ask for it.
           </p>
         </div>
 
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-          <div className="bg-[#121212] border border-white/10 rounded-2xl p-8 text-center">
-            <p className="text-sm uppercase tracking-widest text-white/50">
-              Plugins
-            </p>
-            <p className="mt-3 text-4xl md:text-5xl font-bold text-red-400">
-              $1,200+
-            </p>
-            <p className="mt-2 text-white/60">/yr saved vs buying individual plugins</p>
-          </div>
-          <div className="bg-[#121212] border border-[#C4A484]/40 rounded-2xl p-8 text-center">
-            <p className="text-sm uppercase tracking-widest text-[#C4A484]">
-              GodsEye
-            </p>
-            <p
-              style={headingStyle}
-              className="mt-3 text-4xl md:text-5xl font-bold text-[#C4A484]"
+        <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+          {stats.map((stat) => (
+            <div
+              key={stat.label}
+              className={`bg-[#121212] border rounded-2xl p-8 text-center transition-colors ${
+                stat.gold
+                  ? 'border-[#C4A484]/40'
+                  : 'border-white/10 hover:border-white/20'
+              }`}
             >
-              $9
-            </p>
-            <p className="mt-2 text-white/60">/mo GodsEye</p>
-          </div>
+              <p className="text-[10px] uppercase tracking-widest font-semibold font-mono text-white/40">
+                {stat.label}
+              </p>
+              <p
+                className={`mt-3 text-5xl md:text-6xl font-bold tracking-tight ${
+                  stat.gold ? 'text-[#C4A484]' : 'text-[#F2F2F2]'
+                }`}
+              >
+                {stat.value}
+              </p>
+              <p className="mt-2 text-white/50 text-sm">{stat.suffix}</p>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* SOCIAL MEDIA ANALYTICS SECTION */}
-      <section className="px-4 py-16 max-w-7xl mx-auto">
+      {/* SOCIAL MEDIA ANALYTICS */}
+      <section className="px-4 py-20 max-w-7xl mx-auto">
         <div className="bg-[#121212] border border-white/10 rounded-2xl p-8 md:p-12">
-          <div className="flex items-center gap-3 mb-4">
-            <TrendingUp className="w-7 h-7 text-[#C4A484]" />
-            <h3
-              style={headingStyle}
-              className="text-2xl md:text-3xl font-semibold text-[#C4A484]"
-            >
-              Social Media Analytics (Pro)
-            </h3>
+          <div className="flex flex-col md:flex-row md:items-center gap-4 mb-6">
+            <div className="flex items-center gap-3">
+              <TrendingUp className="w-7 h-7 text-[#C4A484]" />
+              <h3 className="font-display text-2xl md:text-3xl font-semibold text-[#C4A484]">
+                Social Media Analytics
+              </h3>
+            </div>
+            <span className="w-fit px-3 py-1 bg-[#C4A484]/10 text-[#C4A484] text-[10px] uppercase tracking-widest font-semibold font-mono rounded-full border border-[#C4A484]/20">
+              Pro
+            </span>
           </div>
-          <p className="text-white/70 leading-relaxed max-w-3xl">
+          <p className="text-white/60 leading-relaxed max-w-3xl">
             Connect your social accounts through our managed integrations. Get
             cross-platform analytics, content performance insights, and trending
             topics for your niche — all through conversation. No developer keys
@@ -203,20 +215,29 @@ export default function FeaturesPage() {
         </div>
       </section>
 
-      {/* CTA SECTION */}
-      <section className="px-4 py-16 max-w-7xl mx-auto text-center">
-        <h2
-          style={headingStyle}
-          className="text-3xl md:text-5xl font-bold text-[#F2F2F2]"
-        >
-          Ready to replace your plugin stack?
+      {/* CTA */}
+      <section className="px-4 py-20 max-w-7xl mx-auto text-center">
+        <h2 className="font-display text-4xl md:text-6xl font-light tracking-tighter leading-tight text-[#F2F2F2]">
+          Ready to replace{' '}
+          <span className="italic text-[#C4A484]">your plugin stack?</span>
         </h2>
-        <Link
-          to="/pricing"
-          className="inline-block mt-8 px-8 py-4 bg-[#C4A484] text-[#0A0A0A] font-semibold rounded-full transition-colors hover:bg-[#D4B494]"
-        >
-          View Plans
-        </Link>
+        <p className="mt-6 text-lg text-white/60 leading-relaxed font-light max-w-xl mx-auto">
+          Pick a plan that fits your site. No lock-in. Cancel anytime.
+        </p>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-10">
+          <Link
+            to="/pricing"
+            className="w-full sm:w-auto bg-[#C4A484] hover:bg-[#b59574] text-black px-10 py-4 rounded-full font-bold text-xs uppercase tracking-widest transition-all text-center"
+          >
+            View Plans
+          </Link>
+          <Link
+            to="/start"
+            className="w-full sm:w-auto bg-white/5 hover:bg-white/10 border border-white/10 text-[#F2F2F2] px-10 py-4 rounded-full font-bold text-xs uppercase tracking-widest transition-all text-center"
+          >
+            Try Free
+          </Link>
+        </div>
       </section>
     </div>
   );

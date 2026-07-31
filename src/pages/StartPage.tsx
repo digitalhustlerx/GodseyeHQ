@@ -18,12 +18,12 @@ export default function StartPage() {
                 "GodsEye Plugin v1.0.5 — download coming soon. For now, ask @GodseyeXbot for the latest build."
               )
             }
-            className="inline-flex items-center gap-2 bg-[#C4A484] hover:bg-[#b59574] text-black font-bold px-5 py-3 rounded-full text-[11px] uppercase tracking-widest transition-all active:scale-95 cursor-pointer shadow-md"
+            className="inline-flex items-center gap-2 bg-[#C4A484] hover:bg-[#b59574] text-black text-[10px] uppercase tracking-widest font-bold py-3.5 rounded-full px-5 transition-all active:scale-95 cursor-pointer shadow-md"
           >
             <Download className="w-4 h-4" />
             Download Plugin v1.0.5
           </button>
-          <p className="mt-3 text-[10px] text-white/40 font-mono">
+          <p className="mt-3 font-mono text-[10px] uppercase tracking-widest text-white/40">
             Size: 64 KB &middot; Requires PHP 7.4+ / WP 5.0+
           </p>
         </>
@@ -31,7 +31,7 @@ export default function StartPage() {
     },
     {
       num: "02",
-      title: "Connect via Telegram",
+      title: "Connect Telegram",
       body: (
         <>
           <p className="text-sm text-white/70 font-light leading-relaxed mb-5">
@@ -44,7 +44,7 @@ export default function StartPage() {
             href="https://t.me/GodseyeXbot?start=connect"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 bg-[#F2F2F2] hover:bg-white text-[#0A0A0A] font-bold px-5 py-3 rounded-full text-[11px] uppercase tracking-widest transition-all active:scale-95 shadow-md"
+            className="inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 text-white border border-white/10 text-[10px] uppercase tracking-widest font-bold py-3.5 rounded-full px-5 transition-all active:scale-95"
           >
             Open Telegram Bot
           </a>
@@ -67,7 +67,7 @@ export default function StartPage() {
               "Change the hero price to $399",
             ].map((cmd) => (
               <li key={cmd}>
-                <code className="block w-full bg-white/5 border border-white/10 px-3 py-2 rounded-lg font-mono text-[11px] text-[#C4A484]">
+                <code className="block w-full bg-black/40 font-mono text-[11px] text-[#C4A484] border border-white/10 rounded px-3 py-2">
                   {cmd}
                 </code>
               </li>
@@ -79,19 +79,16 @@ export default function StartPage() {
   ];
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-16 md:py-24 space-y-16">
+    <div className="px-4 py-16 max-w-7xl mx-auto space-y-16">
       {/* HEADER */}
       <div className="text-center max-w-3xl mx-auto space-y-5">
         <div className="flex justify-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-[#C4A484]/30 rounded-full text-[10px] uppercase tracking-widest text-[#C4A484] font-medium font-mono">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-[#C4A484]/30 rounded-full font-mono text-[10px] uppercase tracking-widest text-[#C4A484] font-medium">
             <span className="w-1.5 h-1.5 rounded-full bg-[#C4A484] animate-pulse"></span>
             Get Started
           </div>
         </div>
-        <h1
-          className="text-4xl md:text-6xl font-light tracking-tighter text-[#F2F2F2] leading-tight"
-          style={{ fontFamily: "'Georgia', serif" }}
-        >
+        <h1 className="text-4xl md:text-6xl font-display font-light tracking-tighter text-[#F2F2F2] leading-tight">
           Set up in under <span className="italic text-[#C4A484]">60 seconds.</span>
         </h1>
         <p className="text-sm md:text-base text-white/70 font-light max-w-2xl mx-auto leading-relaxed">
@@ -104,14 +101,14 @@ export default function StartPage() {
         {steps.map((step) => (
           <div
             key={step.num}
-            className="bg-[#121212] border border-white/10 rounded-2xl p-6 md:p-8 relative overflow-hidden"
+            className="bg-[#121212] border border-white/10 rounded-2xl p-6 relative overflow-hidden"
           >
             <div className="flex flex-col md:flex-row gap-6">
               <div className="md:w-32 shrink-0">
-                <span className="text-[10px] uppercase tracking-widest text-[#C4A484] font-mono">
+                <span className="font-mono text-[10px] uppercase tracking-widest text-white/40">
                   Step
                 </span>
-                <div className="text-3xl font-light text-[#C4A484]" style={{ fontFamily: "'Georgia', serif" }}>
+                <div className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center text-lg font-display font-light text-[#C4A484]">
                   {step.num}
                 </div>
               </div>
@@ -126,8 +123,8 @@ export default function StartPage() {
         ))}
       </div>
 
-      {/* APP PASSWORD HELP BOX */}
-      <div className="bg-white/[0.02] border border-[#C4A484]/20 rounded-2xl p-6 md:p-8">
+      {/* APP PASSWORD HELP CARD */}
+      <div className="bg-[#121212] border border-white/10 rounded-2xl p-6">
         <div className="flex items-center gap-3 mb-3">
           <div className="w-8 h-8 rounded-full bg-[#C4A484]/10 flex items-center justify-center">
             <span className="text-[#C4A484] text-xs">★</span>
@@ -154,9 +151,9 @@ export default function StartPage() {
         <p className="text-sm text-white/50 font-light">Prefer to see it first?</p>
         <Link
           to="/features"
-          className="inline-flex items-center gap-2 text-[#C4A484] hover:text-[#d9c4af] text-[11px] uppercase tracking-widest font-bold transition-colors"
+          className="inline-flex items-center gap-2 text-[#C4A484] hover:text-[#d9c4af] text-[10px] uppercase tracking-widest font-bold transition-colors"
         >
-          Explore Features →
+          Explore Features &rarr;
         </Link>
       </div>
     </div>

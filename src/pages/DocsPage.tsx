@@ -56,19 +56,16 @@ export default function DocsPage() {
 }`;
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-16 md:py-24 space-y-20">
+    <div className="px-4 py-16 max-w-7xl mx-auto space-y-20">
       {/* HEADER */}
       <div className="text-center max-w-3xl mx-auto space-y-5">
         <div className="flex justify-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-[#C4A484]/30 rounded-full text-[10px] uppercase tracking-widest text-[#C4A484] font-medium font-mono">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-[#C4A484]/30 rounded-full font-mono text-[10px] uppercase tracking-widest text-[#C4A484] font-medium">
             <span className="w-1.5 h-1.5 rounded-full bg-[#C4A484] animate-pulse"></span>
-            Documentation
+            DOCUMENTATION
           </div>
         </div>
-        <h1
-          className="text-4xl md:text-6xl font-light tracking-tighter text-[#F2F2F2] leading-tight"
-          style={{ fontFamily: "'Georgia', serif" }}
-        >
+        <h1 className="text-4xl md:text-6xl font-display font-light tracking-tighter text-[#F2F2F2] leading-tight">
           Guides &amp; <span className="italic text-[#C4A484]">References.</span>
         </h1>
         <p className="text-sm md:text-base text-white/70 font-light max-w-2xl mx-auto leading-relaxed">
@@ -80,7 +77,7 @@ export default function DocsPage() {
       <section className="space-y-8">
         <div className="flex items-center gap-3">
           <Download className="w-5 h-5 text-[#C4A484]" />
-          <h2 className="text-2xl md:text-3xl font-light text-[#F2F2F2]" style={{ fontFamily: "'Georgia', serif" }}>
+          <h2 className="text-2xl md:text-3xl font-display font-light text-[#F2F2F2]">
             Installation Guide
           </h2>
         </div>
@@ -88,11 +85,16 @@ export default function DocsPage() {
           {installSteps.map((step) => (
             <div
               key={step.num}
-              className="bg-[#121212] border border-white/10 rounded-2xl p-5 md:p-6 flex gap-4"
+              className="bg-[#121212] border border-white/10 rounded-2xl p-6 flex gap-4"
             >
-              <span className="text-[10px] uppercase tracking-widest text-[#C4A484] font-mono shrink-0 mt-1">
-                {step.num}
-              </span>
+              <div className="flex flex-col items-center shrink-0">
+                <span className="font-mono text-[10px] uppercase tracking-widest text-white/40">
+                  Step
+                </span>
+                <div className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center font-display font-light text-sm text-[#C4A484]">
+                  {step.num}
+                </div>
+              </div>
               <div className="space-y-1.5">
                 <h3 className="text-sm font-semibold text-[#F2F2F2]">{step.title}</h3>
                 <p className="text-xs text-white/60 font-light leading-relaxed">
@@ -106,7 +108,7 @@ export default function DocsPage() {
 
       {/* COMMANDS REFERENCE */}
       <section className="space-y-8">
-        <h2 className="text-2xl md:text-3xl font-light text-[#F2F2F2]" style={{ fontFamily: "'Georgia', serif" }}>
+        <h2 className="text-2xl md:text-3xl font-display font-light text-[#F2F2F2]">
           Commands You Can Use
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -115,14 +117,14 @@ export default function DocsPage() {
               key={group.category}
               className="bg-[#121212] border border-white/10 rounded-2xl p-6 space-y-4"
             >
-              <h3 className="text-[10px] uppercase tracking-widest text-[#C4A484] font-bold font-mono">
+              <h3 className="font-mono text-[10px] uppercase tracking-widest text-[#C4A484] font-bold">
                 {group.category}
               </h3>
               <div className="space-y-2.5">
                 {group.commands.map((cmd) => (
                   <div
                     key={cmd}
-                    className="bg-black/40 border border-white/10 rounded-lg px-3 py-2 font-mono text-[11px] text-[#C4A484]"
+                    className="bg-black/40 font-mono text-[11px] text-[#C4A484] border border-white/10 rounded px-3 py-2"
                   >
                     {cmd}
                   </div>
@@ -137,7 +139,7 @@ export default function DocsPage() {
       <section className="space-y-6">
         <div className="flex items-center gap-3">
           <Terminal className="w-5 h-5 text-[#C4A484]" />
-          <h2 className="text-2xl md:text-3xl font-light text-[#F2F2F2]" style={{ fontFamily: "'Georgia', serif" }}>
+          <h2 className="text-2xl md:text-3xl font-display font-light text-[#F2F2F2]">
             Model Context Protocol (MCP)
           </h2>
         </div>
@@ -146,7 +148,7 @@ export default function DocsPage() {
           an MCP Server. Connect it directly to Claude Desktop, Cursor, or
           ChatGPT.
         </p>
-        <pre className="bg-black/40 border border-white/10 rounded-2xl p-5 md:p-6 overflow-x-auto text-[12px] leading-relaxed font-mono text-[#C4A484]">
+        <pre className="bg-black/40 font-mono text-[11px] text-[#C4A484] border border-white/10 rounded p-5 md:p-6 overflow-x-auto leading-relaxed">
           <code>{mcpConfig}</code>
         </pre>
       </section>
@@ -156,9 +158,9 @@ export default function DocsPage() {
         <p className="text-sm text-white/50 font-light">Ready to start?</p>
         <Link
           to="/start"
-          className="inline-flex items-center gap-2 bg-[#C4A484] hover:bg-[#b59574] text-black font-bold px-6 py-3 rounded-full text-[11px] uppercase tracking-widest transition-all active:scale-95 shadow-md"
+          className="inline-flex items-center gap-2 bg-[#C4A484] hover:bg-[#b59574] text-black text-[10px] uppercase tracking-widest font-bold py-3.5 rounded-full px-5 transition-all active:scale-95 shadow-md"
         >
-          Get Started →
+          Get Started &rarr;
         </Link>
       </div>
     </div>

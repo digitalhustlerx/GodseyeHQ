@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Check, Coins } from 'lucide-react';
+import { Check, Coins, ChevronDown, ChevronUp } from 'lucide-react';
 import { PRICING_PLANS } from '../mockData';
 
 const FAQ = [
@@ -65,18 +65,24 @@ function renderCell(cell: Cell) {
 function FAQItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="border-b border-white/10">
+    <div className="bg-[#121212] border border-white/10 rounded-2xl mb-3 overflow-hidden">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center justify-between py-5 text-left"
+        className="flex w-full items-center justify-between px-6 py-5 text-left"
       >
         <span className="text-base font-medium text-[#F2F2F2]">{q}</span>
-        <span className={`text-[#C4A484] transition-transform ${open ? 'rotate-45' : ''}`}>
-          +
-        </span>
+        {open ? (
+          <ChevronUp className="h-5 w-5 text-[#C4A484] flex-shrink-0 ml-4" />
+        ) : (
+          <ChevronDown className="h-5 w-5 text-[#C4A484] flex-shrink-0 ml-4" />
+        )}
       </button>
-      {open && <p className="pb-5 text-sm text-white/60 leading-relaxed">{a}</p>}
+      {open && (
+        <div className="px-6 pb-5">
+          <p className="text-sm text-white/60 leading-relaxed">{a}</p>
+        </div>
+      )}
     </div>
   );
 }
@@ -89,10 +95,10 @@ export default function PricingPage() {
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
         {/* HEADER */}
         <div className="text-center">
-          <span className="inline-block rounded-full border border-[#C4A484]/30 bg-[#C4A484]/10 px-4 py-1 text-xs font-semibold uppercase tracking-wider text-[#C4A484]">
+          <span className="font-mono text-[10px] uppercase tracking-widest inline-block rounded-full border border-[#C4A484]/30 bg-[#C4A484]/10 px-4 py-1 text-[#C4A484]">
             Simple Billing
           </span>
-          <h1 className="mt-6 text-4xl font-bold tracking-tight sm:text-5xl">
+          <h1 className="font-display mt-6 text-4xl font-bold tracking-tight sm:text-5xl">
             Plans for every stage.
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-white/60">
@@ -105,12 +111,12 @@ export default function PricingPage() {
           {paidPlans.map((plan) => (
             <div
               key={plan.id}
-              className={`relative flex flex-col rounded-2xl border bg-[#121212] p-8 ${
+              className={`relative flex flex-col bg-[#121212] border rounded-3xl p-8 ${
                 plan.isPopular ? 'border-[#C4A484]' : 'border-white/10'
               }`}
             >
               {plan.isPopular && (
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-[#C4A484] px-3 py-1 text-xs font-semibold text-[#0A0A0A]">
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-[#C4A484] px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-[#0A0A0A] font-bold">
                   Most Popular
                 </span>
               )}
@@ -134,10 +140,10 @@ export default function PricingPage() {
               <button
                 type="button"
                 onClick={() => (window as any).godseyeCheckout(plan)}
-                className={`mt-8 w-full rounded-lg px-4 py-3 text-sm font-semibold transition ${
+                className={`mt-8 w-full ${
                   plan.isPopular
-                    ? 'bg-[#C4A484] text-[#0A0A0A] hover:bg-[#B39574]'
-                    : 'border border-[#C4A484] text-[#C4A484] hover:bg-[#C4A484]/10'
+                    ? 'bg-[#C4A484] hover:bg-[#b59574] text-black text-[10px] uppercase tracking-widest font-bold py-3.5 rounded-full'
+                    : 'bg-white/5 hover:bg-white/10 text-white border border-white/10 py-3.5 rounded-full text-[10px] uppercase tracking-widest font-bold'
                 }`}
               >
                 Get {plan.name}
@@ -148,16 +154,16 @@ export default function PricingPage() {
 
         {/* FEATURE COMPARISON TABLE */}
         <div className="mt-24">
-          <h2 className="text-center text-3xl font-bold">Compare Plans</h2>
+          <h2 className="font-display text-center text-3xl font-bold">Compare Plans</h2>
           <div className="mt-8 overflow-x-auto">
             <table className="w-full min-w-[700px] border-collapse overflow-hidden rounded-xl bg-[#121212] text-sm">
               <thead>
                 <tr className="border-b border-white/10">
-                  <th className="px-4 py-4 text-left font-semibold text-white/70">Feature</th>
-                  <th className="px-4 py-4 text-center font-semibold text-white/70">Free</th>
-                  <th className="px-4 py-4 text-center font-semibold text-white/70">Starter</th>
-                  <th className="px-4 py-4 text-center font-semibold text-white/70">Pro</th>
-                  <th className="px-4 py-4 text-center font-semibold text-[#C4A484]">God Mode</th>
+                  <th className="font-mono text-[10px] uppercase tracking-widest px-4 py-4 text-left font-semibold text-white/70">Feature</th>
+                  <th className="font-mono text-[10px] uppercase tracking-widest px-4 py-4 text-center font-semibold text-white/70">Free</th>
+                  <th className="font-mono text-[10px] uppercase tracking-widest px-4 py-4 text-center font-semibold text-white/70">Starter</th>
+                  <th className="font-mono text-[10px] uppercase tracking-widest px-4 py-4 text-center font-semibold text-white/70">Pro</th>
+                  <th className="font-mono text-[10px] uppercase tracking-widest px-4 py-4 text-center font-semibold text-[#C4A484]">God Mode</th>
                 </tr>
               </thead>
               <tbody>
@@ -185,7 +191,7 @@ export default function PricingPage() {
             {CREDIT_PACKS.map((pack) => (
               <div
                 key={pack.name}
-                className="flex flex-col items-center rounded-2xl border border-white/10 bg-[#121212] p-8 text-center"
+                className="flex flex-col items-center bg-[#121212] border border-white/10 rounded-3xl p-8 text-center"
               >
                 <Coins className="h-8 w-8 text-[#C4A484]" />
                 <p className="mt-4 text-3xl font-bold">{pack.price}</p>
@@ -199,7 +205,7 @@ export default function PricingPage() {
                       credits: pack.credits,
                     })
                   }
-                  className="mt-6 w-full rounded-lg border border-[#C4A484] px-4 py-2.5 text-sm font-semibold text-[#C4A484] transition hover:bg-[#C4A484]/10"
+                  className="mt-6 w-full bg-white/5 hover:bg-white/10 text-white border border-white/10 py-3.5 rounded-full text-[10px] uppercase tracking-widest font-bold"
                 >
                   Buy {pack.name}
                 </button>
@@ -210,7 +216,7 @@ export default function PricingPage() {
 
         {/* FAQ SECTION */}
         <div className="mt-24">
-          <h2 className="text-center text-3xl font-bold">Frequently Asked Questions</h2>
+          <h2 className="font-display text-center text-3xl font-bold">Frequently Asked Questions</h2>
           <div className="mx-auto mt-8 max-w-2xl">
             {FAQ.map((item, i) => (
               <div key={i}>

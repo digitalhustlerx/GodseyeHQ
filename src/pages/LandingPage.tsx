@@ -1,10 +1,43 @@
 import { Link } from "react-router-dom";
 import { Check, ChevronDown, ChevronUp } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { PRICING_PLANS } from "../mockData";
+
+const HERO_SLIDES = [
+  {
+    badge: "From Private Beta to Public Release",
+    h1: <>Your site's AI agent.<br /><span className="italic text-[#C4A484]">Everything, by just talking.</span></>,
+    p: "GodsEye is an all-in-one agent for your WordPress site. Content creation, store management, security monitoring, automations — all through conversation in Telegram. Instead of buying another plugin, just ask."
+  },
+  {
+    badge: "Stop Buying Plugins. Just Ask.",
+    h1: <>One agent replaces<br /><span className="italic text-[#C4A484]">a dozen tools.</span></>,
+    p: "SEO tools, form builders, analytics dashboards, automation plugins — GodsEye replaces them all. The average WordPress site spends $1,200+/yr on plugins. You just need one."
+  },
+  {
+    badge: "Proactive, Not Reactive",
+    h1: <>Your site heals itself<br /><span className="italic text-[#C4A484]">before you know it's broken.</span></>,
+    p: "Real-time security monitoring catches broken pages, plugin conflicts, and slowdowns before they cost you customers. While others react to problems, you're already ahead."
+  }
+];
 
 export default function LandingPage() {
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  const nextSlide = useCallback(() => {
+    setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
+  }, []);
+
+  const prevSlide = useCallback(() => {
+    setCurrentSlide((prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length);
+  }, []);
+
+  // Auto-advance every 6 seconds
+  useEffect(() => {
+    const timer = setInterval(nextSlide, 6000);
+    return () => clearInterval(timer);
+  }, [nextSlide]);
 
   const FAQS = [
     {
@@ -43,41 +76,57 @@ export default function LandingPage() {
 
   return (
     <div className="space-y-24 pb-20">
-      {/* Hero */}
-      <section className="px-4 pt-16 md:pt-24 max-w-7xl mx-auto">
-        <div className="text-center max-w-3xl mx-auto space-y-8">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white/5 border border-white/10 rounded-full w-fit mx-auto">
-            <span className="w-2 h-2 rounded-full bg-[#C4A484]"></span>
-            <span className="text-[10px] uppercase tracking-widest text-white/80 font-mono font-bold">From Private Beta to Public Release</span>
+      {/* Hero Slider */}
+      <section className="px-4 pt-16 md:pt-24 max-w-7xl mx-auto relative">
+        <div className="text-center max-w-3xl mx-auto">
+          {/* Current Slide with fade transition */}
+          <div key={currentSlide} className="space-y-8 animate-fadeIn">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white/5 border border-white/10 rounded-full w-fit mx-auto">
+              <span className="w-2 h-2 rounded-full bg-[#C4A484]"></span>
+              <span className="text-[10px] uppercase tracking-widest text-white/80 font-mono font-bold">{HERO_SLIDES[currentSlide].badge}</span>
+            </div>
+
+            <h1 className="text-5xl md:text-8xl font-light tracking-tighter leading-[0.95] text-[#F2F2F2] mb-4 font-display">
+              {HERO_SLIDES[currentSlide].h1}
+            </h1>
+
+            <p className="text-base md:text-lg text-white/60 leading-relaxed max-w-2xl mx-auto font-light">
+              {HERO_SLIDES[currentSlide].p}
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+              <Link
+                to="/start"
+                className="w-full sm:w-auto bg-[#F2F2F2] text-[#0A0A0A] hover:bg-white px-10 py-4 rounded-full font-bold text-xs uppercase tracking-widest transition-all shadow-md text-center"
+              >
+                💬 Start Free
+              </Link>
+              <Link
+                to="/features"
+                className="w-full sm:w-auto bg-transparent hover:bg-white/5 border border-white/20 text-[#F2F2F2] px-10 py-4 rounded-full font-bold text-xs uppercase tracking-widest transition-all text-center"
+              >
+                See How It Works
+              </Link>
+            </div>
+
+            <p className="text-[10px] uppercase tracking-wider text-white/40 font-semibold font-mono">
+              No credit card required • 50 free credits every month • Cancel anytime
+            </p>
           </div>
 
-          <h1 className="text-5xl md:text-8xl font-light tracking-tighter leading-[0.95] text-[#F2F2F2] mb-4" style={{ fontFamily: "'Georgia', serif" }}>
-            Your site's AI agent.<br />
-            <span className="italic text-[#C4A484]">Everything, by just talking.</span>
-          </h1>
-
-          <p className="text-base md:text-lg text-white/60 leading-relaxed max-w-2xl mx-auto font-light">
-            GodsEye is an all-in-one agent for your WordPress site. Content creation, store management, security monitoring, automations — all through conversation in Telegram. Instead of buying another plugin, just ask.
-          </p>
-
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-            <Link
-              to="/start"
-              className="w-full sm:w-auto bg-[#F2F2F2] text-[#0A0A0A] hover:bg-white px-10 py-4 rounded-full font-bold text-xs uppercase tracking-widest transition-all shadow-md text-center"
-            >
-              💬 Start Free
-            </Link>
-            <Link
-              to="/features"
-              className="w-full sm:w-auto bg-transparent hover:bg-white/5 border border-white/20 text-[#F2F2F2] px-10 py-4 rounded-full font-bold text-xs uppercase tracking-widest transition-all text-center"
-            >
-              See How It Works
-            </Link>
+          {/* Slide Navigation Dots */}
+          <div className="flex items-center justify-center gap-3 mt-10">
+            {HERO_SLIDES.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setCurrentSlide(idx)}
+                className={`h-1.5 rounded-full transition-all duration-500 cursor-pointer ${
+                  idx === currentSlide ? "w-8 bg-[#C4A484]" : "w-3 bg-white/20 hover:bg-white/40"
+                }`}
+                aria-label={`Slide ${idx + 1}`}
+              />
+            ))}
           </div>
-
-          <p className="text-[10px] uppercase tracking-wider text-white/40 font-semibold font-mono">
-            No credit card required • 50 free credits every month • Cancel anytime
-          </p>
         </div>
       </section>
 
