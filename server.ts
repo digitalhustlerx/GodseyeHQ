@@ -133,30 +133,63 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
     }
   });
 
-  // Mock Polar checkouts — extended for founder pricing + referral
-  app.post("/api/create-checkout", (req, res) => {
-    const { product_id, telegram_id, email, founder_pricing, referral_code } = req.body;
-    if (!telegram_id) {
-      return res.status(400).json({ error: "Telegram ID is required" });
+  // ===== Flutterwave Checkout =====
+  app.post("/api/create-checkout", async (req, res) => {
+    try {
+      const { email, plan_name, price, plan_id } = req.body;
+      if (!email || !plan_name || !price || !plan_id) {
+        return res.status(400).json({ error: "Missing required fields: email, plan_name, price, plan_id" });
+      }
+
+      const flwSecretKey = process.env.FLW_SECRET_KEY;
+      if (!flwSecretKey) {
+        console.error("FLW_SECRET_KEY not set in environment");
+        return res.status(500).json({ error: "Payment provider not configured" });
+      }
+
+      const tx_ref = `godseye-${plan_id}-${Date.now()}`;
+      const numericPrice = parseFloat(String(price).replace(/[^0-9.]/g, ""));
+      const redirect_url = "https://godseye.digitalhustlerx.com/start?success=true";
+
+      const response = await fetch("https://api.flutterwave.com/v3/payments", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${flwSecretKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          tx_ref,
+          amount: numericPrice,
+          currency: "USD",
+          redirect_url,
+          customer: { email },
+          customizations: {
+            title: "GodsEye",
+            description: `${plan_name} Plan — $${numericPrice}/month`,
+          },
+          meta: {
+            plan_id,
+            plan_name,
+          },
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || data.status === "error") {
+        console.error("[Flutterwave] Payment link creation failed:", data);
+        return res.status(500).json({ error: data.message || "Failed to create payment link" });
+      }
+
+      res.json({
+        checkout_url: data.data.link,
+        tx_ref,
+        plan_id,
+      });
+    } catch (error: any) {
+      console.error("[Flutterwave] Error:", error);
+      res.status(500).json({ error: error.message || "Failed to create checkout" });
     }
-    const mockCheckoutId = `mock_chk_${Math.random().toString(36).substring(2, 11)}`;
-    const params = new URLSearchParams({
-      checkout_success: "true",
-      checkout_id: mockCheckoutId,
-      telegram_id,
-      product_id: product_id || "starter",
-      email: encodeURIComponent(email || "user@example.com"),
-    });
-    if (founder_pricing) params.set("founder_pricing", "true");
-    if (referral_code) params.set("ref", referral_code);
-    res.json({
-      checkout_url: `?${params.toString()}`,
-      founder_pricing_applied: !!founder_pricing,
-      referral_code_applied: referral_code || null,
-      message: founder_pricing
-        ? "🎉 Founder pricing locked in. Your 1 year of 50% off starts now. Credits are in your bot wallet."
-        : undefined
-    });
   });
 
   // Polar webhook placeholder — receives payment confirmation

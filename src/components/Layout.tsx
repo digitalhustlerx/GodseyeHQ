@@ -21,13 +21,30 @@ export default function Layout({ children }: { children: ReactNode }) {
     e.preventDefault();
     if (!selectedPlan || !checkoutEmail) return;
     setCheckoutLoading(true);
-    // TODO: Wire to Flutterwave via Composio
-    setTimeout(() => {
+    try {
+      const priceNum = parseFloat(String(selectedPlan.price).replace(/[^0-9.]/g, ""));
+      const res = await fetch("/api/create-checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: checkoutEmail,
+          plan_name: selectedPlan.name,
+          price: priceNum,
+          plan_id: selectedPlan.id,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Checkout failed");
+      }
       setCheckoutLoading(false);
       setShowCheckoutModal(false);
       setCheckoutEmail("");
-      window.location.href = `/start?upgraded=${selectedPlan.id}`;
-    }, 1500);
+      window.location.href = data.checkout_url;
+    } catch (err: any) {
+      setCheckoutLoading(false);
+      alert(err.message || "Something went wrong. Please try again.");
+    }
   };
 
   // Expose checkout handler globally so page components can trigger it
