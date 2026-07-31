@@ -65,22 +65,22 @@ function renderCell(cell: Cell) {
 function FAQItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="bg-[#121212] border border-white/10 rounded-2xl mb-3 overflow-hidden">
+    <div>
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center justify-between px-6 py-5 text-left"
+        className="w-full px-5 py-4.5 flex items-center justify-between text-left cursor-pointer"
       >
-        <span className="text-base font-medium text-[#F2F2F2]">{q}</span>
+        <span className="text-xs md:text-sm font-semibold text-white/90 tracking-tight pr-4">{q}</span>
         {open ? (
-          <ChevronUp className="h-5 w-5 text-[#C4A484] flex-shrink-0 ml-4" />
+          <ChevronUp className="w-4 h-4 text-[#C4A484] shrink-0" />
         ) : (
-          <ChevronDown className="h-5 w-5 text-[#C4A484] flex-shrink-0 ml-4" />
+          <ChevronDown className="w-4 h-4 text-white/40 shrink-0" />
         )}
       </button>
       {open && (
-        <div className="px-6 pb-5">
-          <p className="text-sm text-white/60 leading-relaxed">{a}</p>
+        <div className="px-5 pb-5 pt-1 text-xs text-white/60 leading-relaxed font-light border-t border-white/10">
+          {a}
         </div>
       )}
     </div>
@@ -91,13 +91,16 @@ export default function PricingPage() {
   const paidPlans = PRICING_PLANS.filter((p) => p.id !== 'free');
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-[#F2F2F2]">
-      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
+    <div className="bg-[#0A0A0A] text-[#F2F2F2]">
+      <div className="mx-auto max-w-7xl px-4 py-16">
         {/* HEADER */}
-        <div className="text-center">
-          <span className="font-mono text-[10px] uppercase tracking-widest inline-block rounded-full border border-[#C4A484]/30 bg-[#C4A484]/10 px-4 py-1 text-[#C4A484]">
-            Simple Billing
-          </span>
+        <div className="text-center space-y-4">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white/5 border border-white/10 rounded-full w-fit mx-auto">
+            <span className="w-2 h-2 rounded-full bg-[#C4A484]"></span>
+            <span className="font-mono text-[10px] uppercase tracking-widest text-white/80 font-bold">
+              Simple Billing
+            </span>
+          </div>
           <h1 className="font-display mt-6 text-4xl font-bold tracking-tight sm:text-5xl">
             Plans for every stage.
           </h1>
@@ -128,10 +131,10 @@ export default function PricingPage() {
               <p className="mt-2 text-sm text-[#C4A484]">{plan.credits} Credits/mo</p>
               <p className="mt-1 text-sm text-white/50">{plan.sites}</p>
 
-              <ul className="mt-6 flex-1 space-y-3">
+              <ul className="mt-6 flex-1 space-y-2.5">
                 {plan.features.map((feature, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm text-white/80">
-                    <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#C4A484]" />
+                  <li key={i} className="flex items-start gap-2 text-[11px] text-white/75 font-light">
+                    <Check className="mt-0.5 w-3.5 h-3.5 flex-shrink-0 text-[#C4A484]" />
                     <span>{feature}</span>
                   </li>
                 ))}
@@ -154,7 +157,7 @@ export default function PricingPage() {
 
         {/* FEATURE COMPARISON TABLE */}
         <div className="mt-24">
-          <h2 className="font-display text-center text-3xl font-bold">Compare Plans</h2>
+          <h2 className="font-display text-center text-3xl md:text-5xl font-light tracking-tighter text-[#F2F2F2]">Compare Plans</h2>
           <div className="mt-8 overflow-x-auto">
             <table className="w-full min-w-[700px] border-collapse overflow-hidden rounded-xl bg-[#121212] text-sm">
               <thead>
@@ -185,7 +188,7 @@ export default function PricingPage() {
         <div className="mt-24">
           <div className="flex items-center justify-center gap-2">
             <Coins className="h-6 w-6 text-[#C4A484]" />
-            <h3 className="text-2xl font-bold">Need more credits? Top up anytime.</h3>
+            <h3 className="font-display text-2xl md:text-3xl font-light tracking-tighter text-[#F2F2F2]">Need more credits? Top up anytime.</h3>
           </div>
           <div className="mt-8 grid gap-6 md:grid-cols-3">
             {CREDIT_PACKS.map((pack) => (
@@ -216,10 +219,10 @@ export default function PricingPage() {
 
         {/* FAQ SECTION */}
         <div className="mt-24">
-          <h2 className="font-display text-center text-3xl font-bold">Frequently Asked Questions</h2>
-          <div className="mx-auto mt-8 max-w-2xl">
+          <h2 className="font-display text-center text-3xl md:text-5xl font-light tracking-tighter text-[#F2F2F2]">Frequently Asked Questions</h2>
+          <div className="mx-auto mt-8 max-w-2xl space-y-3">
             {FAQ.map((item, i) => (
-              <div key={i}>
+              <div key={i} className="bg-[#121212] border border-white/10 rounded-2xl overflow-hidden transition-colors hover:border-white/20">
                 <FAQItem q={item.q} a={item.a} />
               </div>
             ))}
@@ -227,11 +230,11 @@ export default function PricingPage() {
         </div>
 
         {/* CTA */}
-        <div className="mt-24 border-t border-white/10 pt-12 text-center">
-          <p className="text-lg text-white/60">Still have questions?</p>
+        <div className="mt-24 border-t border-white/10 pt-12 text-center space-y-3">
+          <p className="text-xs text-white/50 font-light">Still have questions?</p>
           <Link
             to="/docs"
-            className="mt-3 inline-block text-[#C4A484] underline-offset-4 hover:underline"
+            className="text-xs text-[#C4A484] hover:text-[#b59574] font-semibold uppercase tracking-wider"
           >
             Read the docs →
           </Link>

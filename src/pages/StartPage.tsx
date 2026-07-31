@@ -14,17 +14,14 @@ export default function StartPage() {
           </p>
           <button
             onClick={() =>
-              alert(
-                "GodsEye Plugin v1.0.5 — download coming soon. For now, ask @GodseyeXbot for the latest build."
-              )
+              window.open("https://t.me/GodseyeXbot?start=connect", "_blank")
             }
-            className="inline-flex items-center gap-2 bg-[#C4A484] hover:bg-[#b59574] text-black text-[10px] uppercase tracking-widest font-bold py-3.5 rounded-full px-5 transition-all active:scale-95 cursor-pointer shadow-md"
+            className="inline-flex items-center gap-2 bg-[#C4A484] hover:bg-[#b59574] text-black text-[10px] uppercase tracking-widest font-bold py-3.5 rounded-full px-5 transition-all active:scale-95 shadow-md"
           >
-            <Download className="w-4 h-4" />
-            Download Plugin v1.0.5
+            Message @GodseyeXbot →
           </button>
           <p className="mt-3 font-mono text-[10px] uppercase tracking-widest text-white/40">
-            Size: 64 KB &middot; Requires PHP 7.4+ / WP 5.0+
+            The bot will send you the plugin directly
           </p>
         </>
       ),
@@ -44,9 +41,9 @@ export default function StartPage() {
             href="https://t.me/GodseyeXbot?start=connect"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 text-white border border-white/10 text-[10px] uppercase tracking-widest font-bold py-3.5 rounded-full px-5 transition-all active:scale-95"
+            className="w-full sm:w-auto bg-white/5 hover:bg-white/10 border border-white/10 text-[#F2F2F2] text-[10px] uppercase tracking-widest font-bold px-8 py-3.5 rounded-full transition-all inline-block text-center"
           >
-            Open Telegram Bot
+            Message @GodseyeXbot
           </a>
         </>
       ),
