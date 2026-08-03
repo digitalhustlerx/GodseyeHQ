@@ -43,7 +43,7 @@ Given a user command, simulate how GodsEye would execute it and respond via Tele
 Also, output the precise action to be visually represented on a mock WordPress dashboard.
 
 You MUST respond ONLY with a JSON object containing:
-- telegramResponse (string): A helpful, polite, Telegram-formatted response (you can use emojis like 🧞‍♂️, ✅, 🔌). Keep it descriptive and concise.
+- telegramResponse (string): A helpful, polite, Telegram-formatted response (you can use emojis like ✅, ⚙️, 🔌). Keep it descriptive and concise.
 - wordpressAction (object):
   - type (string): "CREATE_POST" | "ACTIVATE_PLUGIN" | "DEACTIVATE_PLUGIN" | "WOOCOMMERCE_ORDER" | "SITE_HEALTH" | "ELEMENTOR_EDIT" | "MEDIA_UPLOAD" | "UNKNOWN"
   - title (string): A short label for the resource (e.g. the post title, plugin name, order ID, etc.)
@@ -54,7 +54,7 @@ Example inputs and outputs:
 Input: "Activate Yoast SEO plugin"
 Output:
 {
-  "telegramResponse": "🧞‍♂️ I have successfully activated the **Yoast SEO** plugin on your site! Site SEO features are now live. Let me know if you want me to write an SEO-optimized post.",
+  "telegramResponse": "✅ I have successfully activated the **Yoast SEO** plugin on your site! Site SEO features are now live. Let me know if you want me to write an SEO-optimized post.",
   "wordpressAction": {
     "type": "ACTIVATE_PLUGIN",
     "title": "Yoast SEO",
@@ -133,61 +133,65 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
     }
   });
 
-  // ===== Flutterwave Checkout =====
+  // ===== Polar Checkout (PRIMARY payment) =====
+  // Maps plan/product id -> Polar PRODUCT id (from polar-config.json, verified live/public).
+  // Polar's /checkouts/custom/ takes `products: [<product_id>]` and picks the default price.
+  const POLAR_PRODUCT_IDS: Record<string, string> = {
+    starter: "bc746111-be41-4f7e-8e75-ed3d7eb1e7e3",
+    pro: "a31bba8d-5ef6-4033-93c4-24acdb46a30f",
+    godmode: "b13480b8-f4ae-4051-aa1c-36ac31303ce7",
+    topup: "873e9805-d7ea-4f1d-a344-832896cf0ac9",
+    "pack-starter": "28aef4c4-4cf3-4128-8d61-8212c9057afd",
+    "pack-pro": "a758d371-2b37-4f12-9c10-4a9402995b0e",
+  };
   app.post("/api/create-checkout", async (req, res) => {
     try {
-      const { email, plan_name, price, plan_id } = req.body;
-      if (!email || !plan_name || !price || !plan_id) {
-        return res.status(400).json({ error: "Missing required fields: email, plan_name, price, plan_id" });
+      const { email, plan_name, plan_id } = req.body;
+      if (!email || !plan_id) {
+        return res.status(400).json({ error: "Missing required fields: email, plan_id" });
       }
 
-      const flwSecretKey = process.env.FLW_SECRET_KEY;
-      if (!flwSecretKey) {
-        console.error("FLW_SECRET_KEY not set in environment");
+      const polarKey = process.env.POLAR_ACCESS_TOKEN;
+      if (!polarKey) {
+        console.error("POLAR_ACCESS_TOKEN not set in environment");
         return res.status(500).json({ error: "Payment provider not configured" });
       }
 
-      const tx_ref = `godseye-${plan_id}-${Date.now()}`;
-      const numericPrice = parseFloat(String(price).replace(/[^0-9.]/g, ""));
-      const redirect_url = "https://godseye.digitalhustlerx.com/start?success=true";
+      const productId = POLAR_PRODUCT_IDS[plan_id];
+      if (!productId) {
+        console.error("Unknown plan_id:", plan_id);
+        return res.status(400).json({ error: `Unknown plan: ${plan_id}` });
+      }
 
-      const response = await fetch("https://api.flutterwave.com/v3/payments", {
+      // Prepare a Polar checkout (creates the hosted checkout page — no card is charged here)
+      const response = await fetch("https://api.polar.sh/api/v1/checkouts/", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${flwSecretKey}`,
+          Authorization: `Bearer ${polarKey}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          tx_ref,
-          amount: numericPrice,
-          currency: "USD",
-          redirect_url,
-          customer: { email },
-          customizations: {
-            title: "GodsEye",
-            description: `${plan_name} Plan — $${numericPrice}/month`,
-          },
-          meta: {
-            plan_id,
-            plan_name,
-          },
+          product_id: productId,
+          success_url: "https://godseye.digitalhustlerx.com/success",
+          customer_email: email,
+          metadata: { plan_id, plan_name: plan_name || plan_id },
         }),
       });
 
       const data = await response.json();
 
-      if (!response.ok || data.status === "error") {
-        console.error("[Flutterwave] Payment link creation failed:", data);
-        return res.status(500).json({ error: data.message || "Failed to create payment link" });
+      if (!response.ok) {
+        console.error("[Polar] Checkout creation failed:", data);
+        return res.status(500).json({ error: data.detail || "Failed to create Polar checkout" });
       }
 
       res.json({
-        checkout_url: data.data.link,
-        tx_ref,
+        checkout_url: data.url,
+        checkout_id: data.id,
         plan_id,
       });
     } catch (error: any) {
-      console.error("[Flutterwave] Error:", error);
+      console.error("[Polar] Error:", error);
       res.status(500).json({ error: error.message || "Failed to create checkout" });
     }
   });
