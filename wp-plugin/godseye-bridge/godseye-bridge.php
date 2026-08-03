@@ -2,14 +2,14 @@
 /**
  * Plugin Name: GodsEye — WordPress Agent
  * Description: Take control of your WordPress site from Telegram. One agent for content, security, WooCommerce, and more.
- * Version: 0.3.0
+ * Version: 1.0.0
  */
 
 if (!defined('ABSPATH')) {
     exit;
 }
 
-define('GODSEYE_BRIDGE_VERSION', '0.3.0');
+define('GODSEYE_BRIDGE_VERSION', '1.0.0');
 define('GODSEYE_BRIDGE_FILE', __FILE__);
 define('GODSEYE_BRIDGE_DIR', plugin_dir_path(__FILE__));
 
