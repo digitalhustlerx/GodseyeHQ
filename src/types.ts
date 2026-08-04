@@ -60,9 +60,11 @@ export interface PricingPlan {
   features: string[];
   polarProductId: string;
   isPopular?: boolean;
+  listPrice?: string;
   foundersPrice?: string;
   foundersExpiresInDays?: number;
   foundersBadge?: string;
+  foundersPercentageOff?: string;
 }
 
 export interface SelfHostPlan {

@@ -27,9 +27,9 @@ const FAQ = [
 ];
 
 const CREDIT_PACKS = [
-  { name: 'Wallet Top-Up', price: '$10', credits: '100' },
-  { name: 'Starter Pack', price: '$9', credits: '500' },
-  { name: 'Pro Pack', price: '$29', credits: '2,000' },
+  { id: 'topup', name: 'Wallet Top-Up', price: '$10', credits: '100' },
+  { id: 'pack-starter', name: 'Starter Pack', price: '$9', credits: '500' },
+  { id: 'pack-pro', name: 'Pro Pack', price: '$29', credits: '2,000' },
 ];
 
 // Comparison table rows. 'text' => display as string, 'check' => ✓, 'dash' => —
@@ -124,7 +124,15 @@ export default function PricingPage() {
                 </span>
               )}
               <h3 className="text-xl font-semibold">{plan.name}</h3>
-              <div className="mt-4 flex items-baseline gap-1">
+              {plan.foundersPercentageOff && (
+                <span className="mt-2 inline-block w-fit rounded-full bg-[#C4A484]/15 border border-[#C4A484]/40 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-widest text-[#C4A484] font-bold">
+                  {plan.foundersPercentageOff} · Founder Pricing
+                </span>
+              )}
+              <div className="mt-4 flex items-baseline gap-2">
+                {plan.listPrice && (
+                  <span className="text-lg text-white/35 line-through">{plan.listPrice}</span>
+                )}
                 <span className="text-4xl font-bold">{plan.price}</span>
                 <span className="text-white/50">/month</span>
               </div>
@@ -203,6 +211,7 @@ export default function PricingPage() {
                   type="button"
                   onClick={() =>
                     (window as any).godseyeCheckout({
+                      id: pack.id,
                       name: pack.name,
                       price: pack.price,
                       credits: pack.credits,

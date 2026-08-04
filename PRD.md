@@ -82,7 +82,7 @@ Godseye HQ is an **AI-powered WordPress management agent** controlled via Telegr
 | **Supabase** | Waitlist DB, referral tracking, payments | ⚙️ Schema migrated, needs connection |
 | **Telegram Bot** (`@GodseyeXbot`) | User-facing AI agent | 🟢 Active |
 | **Polar.sh** | Payment processing (checkout) | 🔧 Products created, webhook placeholder |
-| **OpenClaw** | AI/agent processing gateway | 🔧 Legacy integration |
+| **Godseye X Bot** | AI/agent processing gateway | 🔧 Legacy integration |
 | **API Backend** (`api.godseyes.digitalhustlerx.com`) | License management, site connections | 🟢 Active |
 
 ---
@@ -169,7 +169,7 @@ The app has a **soft gate**: all CTAs (Start Free, Buy Credits, etc.) are interc
 | Server | Express (Node) via `server.ts` |
 | Database | Supabase (PostgreSQL) |
 | Payments | Polar.sh (checkout), Polar webhook placeholder |
-| AI/Bot | Telegram bot `@GodseyeXbot` + OpenClaw gateway |
+| AI/Bot | Telegram bot `@GodseyeXbot` + Godseye X Bot gateway |
 | Git host | `github.com/digitalhustlerx/GodseyeHQ` |
 | Production | nginx → `/root/godseye-repo/dist/` |
 

@@ -139,7 +139,7 @@ radius: rounded-2xl (cards), rounded-full (buttons)
 | 💼 Business & Strategy | 467 | Revenue model, licensing, roadmap, competitors |
 
 **Chat ID:** `-1004450820767` (forum-enabled supergroup)
-**Bot:** @dantewslopenclawbot (Djini 🧞‍♂️) via Composio
+**Bot:** @GodseyeXbot (Godseye X Bot) via Composio
 **Rules:** Each topic stays scoped. Create temporary topics for branches, close when done. No cross-topic noise.
 
 ---

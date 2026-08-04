@@ -22,7 +22,7 @@ export default function FeaturesPage() {
           </div>
           <h1 className="font-display text-5xl md:text-8xl font-light tracking-tighter leading-[0.95] text-[#F2F2F2]">
             One agent.<br />
-            <span className="italic text-[#C4A484]">Everything your site needs.</span>
+            <span className="italic text-[#C4A484]">Everything your business needs.</span>
           </h1>
           <p className="text-base md:text-lg text-white/60 leading-relaxed max-w-2xl mx-auto font-light">
             GodsEye replaces a dozen plugins and tools. Content, commerce, security, automations — all handled by one agent that never sleeps.
@@ -32,7 +32,7 @@ export default function FeaturesPage() {
               View Plans
             </Link>
             <Link to="/start" className="w-full sm:w-auto bg-white/5 hover:bg-white/10 border border-white/10 text-[#F2F2F2] font-bold text-[10px] uppercase tracking-widest px-8 py-3.5 rounded-full transition-all">
-              Start Free
+              Get started
             </Link>
           </div>
         </div>
@@ -155,7 +155,7 @@ export default function FeaturesPage() {
               View Plans
             </Link>
             <Link to="/start" className="w-full sm:w-auto bg-transparent hover:bg-white/5 border border-white/20 text-[#F2F2F2] text-[10px] uppercase tracking-widest font-bold px-8 py-3.5 rounded-full transition-all">
-              Start Free
+              Get started
             </Link>
           </div>
         </div>

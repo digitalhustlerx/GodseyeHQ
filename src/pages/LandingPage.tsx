@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import { Check, ChevronDown, ChevronUp } from "lucide-react";
-import { useState, useEffect, useCallback } from "react";
+import { Check, ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from "lucide-react";
+import { useState, useEffect, useCallback, useRef, type TouchEvent } from "react";
 import { PRICING_PLANS } from "../mockData";
 
 const HERO_SLIDES = [
@@ -24,18 +24,51 @@ const HERO_SLIDES = [
 export default function LandingPage() {
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [currentSlide, setCurrentSlide] = useState(0);
+  // direction tracks how we got here so the slide animation moves the right way
+  const [slideDir, setSlideDir] = useState<"next" | "prev">("next");
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
+
+  const goToSlide = useCallback((idx: number, dir: "next" | "prev") => {
+    setSlideDir(dir);
+    setCurrentSlide(idx);
+  }, []);
 
   const nextSlide = useCallback(() => {
-    setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
+    setCurrentSlide((prev) => {
+      setSlideDir("next");
+      return (prev + 1) % HERO_SLIDES.length;
+    });
   }, []);
 
   const prevSlide = useCallback(() => {
-    setCurrentSlide((prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length);
+    setCurrentSlide((prev) => {
+      setSlideDir("prev");
+      return (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length;
+    });
   }, []);
 
-  // Auto-advance every 6 seconds
+  // Swipe toward previous direction — drag left/right across the hero
+  const onTouchStart = useCallback((e: TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  }, []);
+
+  const onTouchEnd = useCallback((e: TouchEvent) => {
+    if (touchStartX.current === null || touchStartY.current === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    const dy = e.changedTouches[0].clientY - touchStartY.current;
+    touchStartX.current = null;
+    touchStartY.current = null;
+    // Ignore vertical scrolls; only treat clear horizontal swipes as slide changes
+    if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy) * 1.2) return;
+    if (dx < 0) nextSlide();
+    else prevSlide();
+  }, [nextSlide, prevSlide]);
+
+  // Auto-advance every 15 seconds (slow, so the hero gets to breathe)
   useEffect(() => {
-    const timer = setInterval(nextSlide, 6000);
+    const timer = setInterval(nextSlide, 15000);
     return () => clearInterval(timer);
   }, [nextSlide]);
 
@@ -77,18 +110,43 @@ export default function LandingPage() {
   return (
     <div className="space-y-24 pb-20">
       {/* Hero Slider */}
-      <section className="px-4 pt-16 md:pt-24 max-w-7xl mx-auto relative">
+      <section
+        className="px-4 pt-16 md:pt-24 max-w-7xl mx-auto relative"
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
+      >
         <div className="text-center max-w-3xl mx-auto">
-          {/* Current Slide with fade transition */}
-          <div key={currentSlide} className="space-y-8 animate-fadeIn">
+          {/* Current Slide with directional slide animation */}
+          <div
+            key={currentSlide}
+            className={`space-y-8 ${slideDir === "next" ? "animate-slideInNext" : "animate-slideInPrev"}`}
+          >
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white/5 border border-white/10 rounded-full w-fit mx-auto">
               <span className="w-2 h-2 rounded-full bg-[#C4A484]"></span>
               <span className="text-[10px] uppercase tracking-widest text-white/80 font-mono font-bold">{HERO_SLIDES[currentSlide].badge}</span>
             </div>
 
-            <h1 className="text-5xl md:text-8xl font-light tracking-tighter leading-[0.95] text-[#F2F2F2] mb-4 font-display">
-              {HERO_SLIDES[currentSlide].h1}
-            </h1>
+            <div className="relative">
+              <h1 className="text-5xl md:text-8xl font-light tracking-tighter leading-[0.95] text-[#F2F2F2] mb-4 font-display">
+                {HERO_SLIDES[currentSlide].h1}
+              </h1>
+
+              {/* Slide Navigation Arrows — centered on the header line */}
+              <button
+                onClick={prevSlide}
+                aria-label="Previous slide"
+                className="flex absolute -left-3 sm:-left-8 lg:-left-14 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 rounded-full border border-white/20 bg-white/5 hover:bg-white/15 hover:border-white/40 text-[#F2F2F2] items-center justify-center transition-all cursor-pointer z-10"
+              >
+                <ChevronLeft className="w-5 h-5 md:w-6 md:h-6 animate-arrowNudgePrev" />
+              </button>
+              <button
+                onClick={nextSlide}
+                aria-label="Next slide"
+                className="flex absolute -right-3 sm:-right-8 lg:-right-14 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 rounded-full border border-white/20 bg-white/5 hover:bg-white/15 hover:border-white/40 text-[#F2F2F2] items-center justify-center transition-all cursor-pointer z-10"
+              >
+                <ChevronRight className="w-5 h-5 md:w-6 md:h-6 animate-arrowNudge" />
+              </button>
+            </div>
 
             <p className="text-base md:text-lg text-white/60 leading-relaxed max-w-2xl mx-auto font-light">
               {HERO_SLIDES[currentSlide].p}
@@ -97,9 +155,9 @@ export default function LandingPage() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
               <Link
                 to="/start"
-                className="w-full sm:w-auto bg-[#F2F2F2] text-[#0A0A0A] hover:bg-white px-10 py-4 rounded-full font-bold text-xs uppercase tracking-widest transition-all shadow-md text-center"
+                className="w-full sm:w-auto bg-[#C4A484] hover:bg-[#b59574] text-black px-10 py-4 rounded-full font-bold text-xs uppercase tracking-widest transition-all shadow-md text-center"
               >
-                💬 Start Free
+                Get started
               </Link>
               <Link
                 to="/features"
@@ -119,7 +177,7 @@ export default function LandingPage() {
             {HERO_SLIDES.map((_, idx) => (
               <button
                 key={idx}
-                onClick={() => setCurrentSlide(idx)}
+                onClick={() => goToSlide(idx, idx > currentSlide ? "next" : "prev")}
                 className={`h-1.5 rounded-full transition-all duration-500 cursor-pointer ${
                   idx === currentSlide ? "w-8 bg-[#C4A484]" : "w-3 bg-white/20 hover:bg-white/40"
                 }`}
@@ -331,7 +389,7 @@ export default function LandingPage() {
           </p>
           <div className="pt-3">
             <Link to="/start" className="inline-flex items-center gap-2 bg-[#F2F2F2] text-[#0A0A0A] hover:bg-white px-8 py-4 rounded-full font-bold text-xs uppercase tracking-widest shadow-md transition-all active:scale-95">
-              💬 Start Free
+              Get started
             </Link>
           </div>
           <div className="flex justify-center gap-6 pt-4 text-[10px] text-white/40 font-mono uppercase tracking-wider">
