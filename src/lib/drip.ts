@@ -448,15 +448,19 @@ export function backfillLaunchJobs(): void {
   const db = _db as DripDb;
   const cfg = getConfig();
   if (!cfg.launch_at) return;
+  // Re-anchor ALL pending E5/E6 to the currently-configured launch_at. This
+  // both (a) schedules rows that were waiting on a NULL anchor and (b) moves
+  // rows that were anchored to an earlier launch date when the date changes
+  // (so a slip doesn't leave them firing at a stale time).
   const pending = db
-    .prepare("SELECT id, email_key FROM drip_jobs WHERE email_key IN ('e5','e6') AND status='pending' AND send_at IS NULL")
+    .prepare("SELECT id, email_key FROM drip_jobs WHERE email_key IN ('e5','e6') AND status='pending'")
     .all() as Array<{ id: number; email_key: string }>;
   const upd = db.prepare("UPDATE drip_jobs SET send_at = ? WHERE id = ?");
   for (const j of pending) {
     const days = LAUNCH_OFFSET_DAYS[j.email_key as DripKey] ?? 0;
     upd.run(isoAddDays(cfg.launch_at, days), j.id);
   }
-  if (pending.length) console.log(`[GOD-15] backfilled ${pending.length} launch-anchored drip job(s) (launch_at=${cfg.launch_at})`);
+  if (pending.length) console.log(`[GOD-15] anchored ${pending.length} launch jobs (launch_at=${cfg.launch_at})`);
 }
 
 // ---- worker tick ----
