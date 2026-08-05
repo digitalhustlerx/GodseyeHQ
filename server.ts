@@ -27,6 +27,24 @@ db.exec(`CREATE TABLE IF NOT EXISTS waitlist (
   created_at TEXT DEFAULT (datetime('now'))
 )`);
 
+// GOD-10 (GOD-6B): paid-state write-back for waitlist -> paid conversion.
+// Idempotent column migration - SQLite has no "ADD COLUMN IF NOT EXISTS", so
+// guard each add by checking PRAGMA table_info first.
+const WLC = db.prepare("PRAGMA table_info(waitlist)").all() as Array<{ name: string }>;
+const wlCols = new Set(WLC.map((c) => c.name));
+const wlMigrate: Array<[string, string]> = [
+  ["paid_at", "TEXT"],
+  ["plan", "TEXT"],
+  ["credits_remaining", "INTEGER"],
+  ["conversions_source", "TEXT"],
+];
+for (const [col, type] of wlMigrate) {
+  if (!wlCols.has(col)) {
+    db.exec(`ALTER TABLE waitlist ADD COLUMN ${col} ${type}`);
+  }
+}
+db.exec(`CREATE INDEX IF NOT EXISTS waitlist_paid_idx ON waitlist (paid_at) WHERE paid_at IS NOT NULL;`);
+
 // ===== Account / Auth (local-first, dependency-free) =====
 db.exec(`
 CREATE TABLE IF NOT EXISTS users (
@@ -190,8 +208,46 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
   });
 
   app.get("/api/waitlist", (req, res) => {
+    const email = ((req.query.email as string) || "").trim().toLowerCase();
     const row = db.prepare("SELECT COUNT(*) as count FROM waitlist").get() as { count: number };
+
+    // Position: optional ?email= -> give 1-based rank + total for the GOD-6
+    // email sequence ("you're #N of 500"). Ordered by signup order (id asc).
+    if (email) {
+      const me = db.prepare("SELECT id, created_at FROM waitlist WHERE email = ?").get(email) as any;
+      if (!me) {
+        return res.status(404).json({ count: row.count, email, position: null, message: "Email not on waitlist" });
+      }
+      const before = db.prepare(
+        "SELECT COUNT(*) as c FROM waitlist WHERE id < ? OR (id = ? AND created_at < ?)"
+      ).get(me.id, me.id, me.created_at) as { c: number };
+      return res.json({ count: row.count, email, position: before.c + 1, position_of: row.count });
+    }
+
     res.json({ count: row.count });
+  });
+
+  // GOD-10 (GOD-6B): conversion write-back. Called by the payment path when a
+  // customer completes a pay-before-download purchase. Marks the waitlist row
+  // matching the email as paid (paid_at, plan, credits_remaining, source).
+  // This is the conversion event that feeds GOD-6 waitlist->paid metrics.
+  app.post("/api/waitlist/convert", (req, res) => {
+    const { email, plan, conversions_source } = req.body || {};
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(400).json({ error: "Valid email required" });
+    }
+    const emailLower = String(email).toLowerCase().trim();
+    const existing = db.prepare("SELECT id FROM waitlist WHERE email = ?").get(emailLower) as any;
+    if (!existing) {
+      return res.status(404).json({ error: "Email not on waitlist" });
+    }
+    const creditsMap: Record<string, number> = { pro: 500, business: 2000, custom: 10000, starter: 500 };
+    const credits = creditsMap[plan] ?? 500; // seed 500 at launch per GOD-10
+    db.prepare(
+      `UPDATE waitlist SET paid_at = datetime('now'), plan = ?, credits_remaining = ?, conversions_source = ? WHERE id = ?`
+    ).run(plan || null, credits, conversions_source || null, existing.id);
+    const updated = db.prepare("SELECT * FROM waitlist WHERE id = ?").get(existing.id);
+    res.json({ ok: true, converted: updated });
   });
 
   // ===== Auth =====
@@ -416,6 +472,26 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
             if (user) {
               db.prepare("UPDATE users SET plan=?, plan_id=?, credits_remaining=COALESCE(?, credits_remaining) WHERE id=?")
                 .run(planId, planId, credits, (user as any).id);
+            }
+          }
+
+          // GOD-10 (GOD-6B): write the conversion back to the waitlist row matching
+          // the purchaser's email. This is the event that feeds GOD-6
+          // waitlist->paid metrics. Updates (never creates) a waitlist row so the
+          // row's paid_at/plan is stamped for the email sequence.
+          const wlEmail = String(email || purchase.email).toLowerCase().trim();
+          if (wlEmail) {
+            // Map FLW plan_id -> GOD-10 waitlist plan value (pro | business | custom).
+            const wlPlan = planId === "godmode" ? "custom" : planId; // starter/pro -> starter|pro, godmode -> custom
+            const wlCredits = creditsMap[planId] ?? 500;             // seed 500 at launch per GOD-10
+            const wlRow = db.prepare("SELECT id FROM waitlist WHERE email = ?").get(wlEmail) as any;
+            if (wlRow) {
+              db.prepare(
+                `UPDATE waitlist SET paid_at = datetime('now'), plan = ?, credits_remaining = ?, conversions_source = ? WHERE id = ?`
+              ).run(wlPlan, wlCredits, "pay-before-download", wlRow.id);
+              console.log(`[GOD-10] waitlist converted: ${wlEmail} -> plan=${wlPlan} credits=${wlCredits}`);
+            } else {
+              console.log(`[GOD-10] purchase ${wlEmail} has no waitlist row (conversion tracked in purchases only)`);
             }
           }
 
