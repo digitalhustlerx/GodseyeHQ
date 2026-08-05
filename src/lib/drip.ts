@@ -307,8 +307,8 @@ const EMAILS: EmailDef[] = [
         `We're days out.\n\n` +
         `When Godseye opens, the first 500 (you included) get:\n` +
         `  • 500 free credits\n` +
-        `  • Early-bird pricing held forever: Pro at $19/mo instead of $29, Business at $49 instead of $79\n` +
-        `  • Your price never goes up as long as you're in\n\n` +
+        `  • Early-bird pricing held forever: Starter $9/mo, Pro $29/mo, God Mode $99/mo\n` +
+        `  • Your price never goes up as long as you're in\n` +
         `That locked-in price only exists for the first 500. When the list fills,\n` +
         `it's normal pricing, and those spots stay filled.\n\n` +
         `If you know a site owner who's done paying developers for every small\n` +
@@ -321,7 +321,7 @@ const EMAILS: EmailDef[] = [
       `<p>Hi ${c.first_name},</p>` +
       `<p>We're days out.</p>` +
       `<p>When Godseye opens, the first 500 (you included) get:</p>` +
-      `<ul><li><strong>500 free credits</strong></li><li><strong>Early-bird pricing held forever:</strong> Pro at $19/mo instead of $29, Business at $49 instead of $79</li><li><strong>Your price never goes up</strong> as long as you're in</li></ul>` +
+      `<ul><li><strong>500 free credits</strong></li><li><strong>Early-bird pricing held forever:</strong> Starter $9/mo, Pro $29/mo, God Mode $99/mo</li><li><strong>Your price never goes up</strong> as long as you're in</li></ul>` +
       `<p>That locked-in price only exists for the first 500. When the list fills, it's normal pricing, and those spots stay filled.</p>` +
       `<p>If you know a site owner who's done paying developers for every small change, forward this — invited members skip the line.</p>` +
       `<p>We'll send one more email: the second doors actually open.</p>` +
@@ -338,9 +338,10 @@ const EMAILS: EmailDef[] = [
         `  • Your 500 free credits are already on your account\n` +
         `  • Early-bird price is yours until the first 500 fills\n\n` +
         `Choose what fits:\n` +
-        `  🧑 Solo — Pro $19/mo: 500 credits, 3 sites\n` +
-        `  🏢 Agency — Business $49/mo: 2,000 credits, 20 sites\n\n` +
-        `Both come with your locked early-bird rate and a cancel-anytime guarantee.\n` +
+        `  🧑 Starter — $9/mo: 500 credits, 1 site\n` +
+        `  🚀 Pro — $29/mo: 2,000 credits, 3 sites\n` +
+        `  🌟 God Mode — $99/mo: 10,000 credits, 10 sites\n\n` +
+        `Every plan comes with your locked early-bird rate and a cancel-anytime guarantee.\n` +
         `Credits never expire.\n\n` +
         `This is the email we promised — no further pushes unless you want one.\n\n` +
         `— The Godseye team\n`,
@@ -352,8 +353,8 @@ const EMAILS: EmailDef[] = [
       `<p>Doors are open.</p>` +
       `${BUTTON(c.purchase_link || "https://godseye.digitalhustlerx.com", "Claim your early-bird spot →")}` +
       `<ul><li>Your <strong>500 free credits</strong> are already on your account</li><li><strong>Early-bird price</strong> is yours until the first 500 fills</li></ul>` +
-      `<p><strong>Choose what fits:</strong><br>🧑 Solo — Pro $19/mo: 500 credits, 3 sites<br>🏢 Agency — Business $49/mo: 2,000 credits, 20 sites</p>` +
-      `<p>Both come with your locked early-bird rate and a cancel-anytime guarantee. Credits never expire.</p>` +
+      `<p><strong>Choose what fits:</strong><br>🧑 Starter — $9/mo: 500 credits, 1 site<br>🚀 Pro — $29/mo: 2,000 credits, 3 sites<br>🌟 God Mode — $99/mo: 10,000 credits, 10 sites</p>` +
+      `<p>Every plan comes with your locked early-bird rate and a cancel-anytime guarantee. Credits never expire.</p>` +
       `<p>This is the email we promised — no further pushes unless you want one.</p>` +
       `${footer("— The Godseye team")}</div></div>`,
   },
