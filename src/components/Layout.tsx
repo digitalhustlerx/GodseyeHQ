@@ -71,6 +71,7 @@ export default function Layout({ children }: { children: ReactNode }) {
   const navLinks = [
     { to: "/features", label: "Features" },
     { to: "/templates", label: "Templates" },
+    { to: "/agents/lead-gen", label: "Hire an Agent" },
     { to: "/pricing", label: "Pricing" },
     { to: "/docs", label: "Docs" },
     { to: "/blog", label: "Blog" },
@@ -240,6 +241,7 @@ export default function Layout({ children }: { children: ReactNode }) {
             <ul className="space-y-2 text-xs text-white/50 font-light">
               <li><Link to="/" className="hover:text-[#C4A484] transition-colors">Home</Link></li>
               <li><Link to="/features" className="hover:text-[#C4A484] transition-colors">Features</Link></li>
+              <li><Link to="/agents/lead-gen" className="hover:text-[#C4A484] transition-colors">Hire an Agent</Link></li>
               <li><Link to="/pricing" className="hover:text-[#C4A484] transition-colors">Pricing</Link></li>
               <li><Link to="/start" className="hover:text-[#C4A484] transition-colors">Get Started</Link></li>
               <li><Link to="/docs" className="hover:text-[#C4A484] transition-colors">Docs</Link></li>
