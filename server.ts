@@ -45,6 +45,233 @@ for (const [col, type] of wlMigrate) {
 }
 db.exec(`CREATE INDEX IF NOT EXISTS waitlist_paid_idx ON waitlist (paid_at) WHERE paid_at IS NOT NULL;`);
 
+// ===== GOD-9 (GOD-8 referral design handoff): referral loop =====
+// referrers: one opaque referral token per email.
+// referral_events: attribution ledger keyed by (invitee_email, stage) so an
+// invitee email is credited to only ONE inviter per stage (email de-dup +
+// first-touch: whichever CTA path the invitee later takes, the inviter of the
+// earliest recorded event owns the credit for that stage).
+db.exec(`
+CREATE TABLE IF NOT EXISTS referrers (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  email TEXT UNIQUE NOT NULL,
+  token TEXT UNIQUE NOT NULL,
+  created_at TEXT DEFAULT (datetime('now'))
+);
+CREATE TABLE IF NOT EXISTS referral_events (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  inviter_id INTEGER NOT NULL,
+  inviter_email TEXT NOT NULL,
+  invitee_email TEXT NOT NULL,
+  stage TEXT NOT NULL CHECK (stage IN ('signup','paid','activated')),
+  credited_at TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'credited',
+  source TEXT,
+  UNIQUE (invitee_email, stage)
+);
+CREATE INDEX IF NOT EXISTS referral_events_inviter_idx ON referral_events (inviter_id);
+CREATE INDEX IF NOT EXISTS referral_events_stage_idx ON referral_events (stage);
+`);
+
+// Purchases get a first-touch referrer token captured at checkout creation so
+// the webhook can attribute the 'paid' stage to the inviter who referred them.
+const PCH = db.prepare("PRAGMA table_info(purchases)").all() as Array<{ name: string }>;
+if (!PCH.some((c) => c.name === "referrer_token")) {
+  db.exec("ALTER TABLE purchases ADD COLUMN referrer_token TEXT");
+}
+
+// ---- Referral loop helpers (GOD-9) ----
+// Disposable/temporary email roots (bare domain after @) + known subdomain patterns.
+// Matches `user@mailinator.com`, `user@sub.mailinator.com`, and `mailinator.com` directly.
+const DISPOSABLE_RE = /(^|[.@])(10minutemail|guerrillamail|mailinator|yopmail|tempmail|trashmail|sharklasers|throwaway|temp-mail|maildrop|mailnesia|spamgourmet|mail\.tm|mailinator2|getnada)\./i;
+
+function normalizeRefEmail(raw: string): string {
+  const email = String(raw || "").trim().toLowerCase();
+  const at = email.indexOf("@");
+  if (at === -1) return email;
+  const local = email.slice(0, at).replace(/\./g, "");
+  const domain = email.slice(at + 1);
+  return domain === "gmail.com" || domain === "googlemail.com" ? `${local}@gmail.com` : email;
+}
+
+function makeRefToken(email: string): string {
+  // Opaque, unguessable, URL-safe — not sequential, not derived from the email in a
+  // reversible way.
+  const salt = crypto.randomBytes(12).toString("hex");
+  return "godseye-uv" + crypto.createHash("sha256").update(email + salt).digest("hex").slice(0, 24);
+}
+
+function getOrCreateReferrer(email: string): { id: number; email: string; token: string } {
+  const normalized = normalizeRefEmail(email);
+  const existing = db.prepare("SELECT * FROM referrers WHERE email = ?").get(normalized) as any;
+  if (existing) return existing;
+  const token = makeRefToken(normalized);
+  db.prepare("INSERT INTO referrers (email, token) VALUES (?, ?)").run(normalized, token);
+  return db.prepare("SELECT * FROM referrers WHERE email = ?").get(normalized) as any;
+}
+
+// Record an attribution event, honoring de-dup (one inviter per (invitee,stage)),
+// self-referral guard, and (for signup) disposable-domain filter.
+function recordReferralEvent(opts: {
+  inviter: { id: number; email: string } | null;
+  inviteeEmail: string;
+  stage: "signup" | "paid" | "activated";
+  source?: string;
+  allowDisposable?: boolean;
+}): { created: boolean; ignored?: string } {
+  const normalized = normalizeRefEmail(opts.inviteeEmail);
+  if (!opts.inviter) return { created: false, ignored: "no_referrer" };
+  // Self-referral guard: a user cannot refer themselves (matched on normalized alias).
+  if (normalizeRefEmail(opts.inviter.email) === normalized) {
+    return { created: false, ignored: "self_referral" };
+  }
+  // Disposable-domain filter on intake (signup). Paid/activated stages are gated by an
+  // actual charge later, so a dead temp account cannot earn the referrer anything.
+  if (opts.stage === "signup" && !opts.allowDisposable && DISPOSABLE_RE.test(normalized)) {
+    return { created: false, ignored: "disposable_domain" };
+  }
+  try {
+    const existing = db
+      .prepare("SELECT id FROM referral_events WHERE invitee_email = ? AND stage = ?")
+      .get(normalized, opts.stage) as any;
+    if (existing) return { created: false, ignored: "already_attributed" };
+    db.prepare(
+      `INSERT INTO referral_events (inviter_id, inviter_email, invitee_email, stage, credited_at, status, source)
+       VALUES (?, ?, ?, ?, datetime('now'), 'credited', ?)`
+    ).run(opts.inviter.id, opts.inviter.email, normalized, opts.stage, opts.source || null);
+    return { created: true };
+  } catch (e: any) {
+    if (e.message?.includes("UNIQUE")) return { created: false, ignored: "already_attributed" };
+    throw e;
+  }
+}
+
+// Reward ladder from GOD-8 §3. Computed from the referral_events ledger.
+function rewardLadderFor(inviterId: number) {
+  const paidCount = (db.prepare(
+    "SELECT COUNT(*) as c FROM referral_events WHERE inviter_id = ? AND stage = 'paid' AND status='credited'"
+  ).get(inviterId) as { c: number }).c;
+  const signupCount = (db.prepare(
+    "SELECT COUNT(*) as c FROM referral_events WHERE inviter_id = ? AND stage = 'signup'"
+  ).get(inviterId) as { c: number }).c;
+  return {
+    waiting: signupCount - paidCount, // signed up but not yet paid
+    paid_count: paidCount,
+    rewards_unlocked: {
+      waitlist_priority: { unlocked: true, detail: "waitlist priority +1 per invitee" },
+      one_free_month: { unlocked: paidCount >= 1, detail: "1 month of payer's plan free, caps Pro" },
+      god_mode_trial_14d: { unlocked: paidCount >= 3, detail: "14-day God Mode trial (once)" },
+      lifetime_minus_20: { unlocked: paidCount >= 5, detail: "lifetime -20% on own plan (once)" },
+    },
+  };
+}
+
+// GOD-9: reward ledger + billing integration. Earned rewards (free month, God
+// Mode trial, lifetime -20%) are recorded here and surfaced on the NEXT
+// invoice as a `referral_discount` line (not a manual coupon), per GOD-8 §3
+// and §5. Milestone rewards (God Mode trial + lifetime discount) apply at most
+// once per customer; the free-month reward is per paid invite.
+db.exec(`
+CREATE TABLE IF NOT EXISTS rewards (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_email TEXT NOT NULL,
+  kind TEXT NOT NULL,                    -- free_month | god_mode_trial_14d | lifetime_minus_20
+  description TEXT,
+  status TEXT NOT NULL DEFAULT 'pending', -- pending | applied | used
+  source_invitee_email TEXT,
+  milestone INTEGER,
+  credited_at TEXT DEFAULT (datetime('now')),
+  applied_at TEXT,
+  UNIQUE (user_email, kind, milestone)
+);
+CREATE INDEX IF NOT EXISTS rewards_user_idx ON rewards (user_email);
+`);
+
+// Friendly label + discount equivalent for each reward kind (GOD-8 §3).
+const REWARD_DEFS: Record<string, { label: string; discountUsd?: number; pct?: number }> = {
+  free_month: { label: "1 month of your plan free", discountUsd: 29 },          // caps at Pro ($29)
+  god_mode_trial_14d: { label: "14-day God Mode trial", discountUsd: 99 },      // the $99 tier, once
+  lifetime_minus_20: { label: "Lifetime -20% on your plan", pct: 0.2 },         // once
+};
+
+// Sync the rewards ledger from the referral_events ladder. Called on every
+// account/referral read so new earned rewards appear without a manual step.
+// Idempotent: UNIQUE(user_email, kind, milestone) prevents double-crediting, and
+// milestone caps mean each rung fires exactly once (GOD-8 §3, §6).
+function syncRewardsLedger(inviterEmail: string): void {
+  const norm = normalizeRefEmail(inviterEmail);
+  const referrer = db.prepare("SELECT * FROM referrers WHERE email = ?").get(norm) as any;
+  if (!referrer) return;
+  const paidCount = (db.prepare(
+    "SELECT COUNT(*) as c FROM referral_events WHERE inviter_id=? AND stage='paid' AND status='credited'"
+  ).get(referrer.id) as { c: number }).c;
+
+  const grant = (kind: string, milestone: number | null, source: string | null, desc: string) => {
+    try {
+      db.prepare(
+        `INSERT OR IGNORE INTO rewards (user_email, kind, description, status, source_invitee_email, milestone)
+         VALUES (?, ?, ?, 'pending', ?, ?)`
+      ).run(norm, kind, desc, source, milestone);
+    } catch (e: any) {
+      if (!e.message?.includes("UNIQUE")) throw e;
+    }
+  };
+
+  // Free month: one per paid invitee (caps at Pro). Deterministic invitee list.
+  const invitees = db.prepare(
+    `SELECT invitee_email FROM referral_events WHERE inviter_id=? AND stage='paid' AND status='credited' ORDER BY id`
+  ).all(referrer.id) as Array<{ invitee_email: string }>;
+  invitees.forEach((iv, i) =>
+    grant("free_month", i + 1, iv.invitee_email, `1 free month from ${iv.invitee_email} (caps at Pro)`));
+
+  // Milestones: once each (GOD-8 §3 hard cap).
+  if (paidCount >= 3) grant("god_mode_trial_14d", 3, null, "14-day God Mode trial (once)");
+  if (paidCount >= 5) grant("lifetime_minus_20", 5, null, "Lifetime -20% on your own plan (once)");
+}
+
+// Compute the pending discount that applies to this user's NEXT invoice as the
+// `referral_discount` line item (GOD-8 §5 billing-engine flag). Free months fill
+// first (up to the cap), then a one-off God Mode trial / lifetime %, whichever
+// the ladder has earned. Returns the line + any named rewards not yet used.
+function pendingReferralDiscount(userEmail: string): {
+  referral_discount: number;      // USD-equivalent off the next invoice
+  line_label: string | null;
+  rewards: Array<{ kind: string; label: string; status: string }>;
+} {
+  const norm = normalizeRefEmail(userEmail);
+  const rows = db.prepare(
+    "SELECT * FROM rewards WHERE user_email=? ORDER BY id"
+  ).all(norm) as Array<{ kind: string; status: string; description: string }>;
+  const rewards = rows.map((r) => ({
+    kind: r.kind,
+    label: r.description || REWARD_DEFS[r.kind]?.label || r.kind,
+    status: r.status,
+  }));
+
+  const pending = rows.filter((r) => r.status === "pending");
+  const freeMonths = pending.filter((r) => r.kind === "free_month");
+  const trial = pending.find((r) => r.kind === "god_mode_trial_14d");
+  const lifetime = pending.find((r) => r.kind === "lifetime_minus_20");
+
+  // Order: a single next invoice can carry one discount line. Prefer the
+  // lifetime % if unlocked (permanent), else the highest free value (God Mode
+  // trial over one free month), else any free month.
+  let line_label: string | null = null;
+  let referral_discount = 0;
+  if (lifetime) {
+    // Lifetime % is applied continuously; report 20% of Pro ($29) as the notice.
+    line_label = REWARD_DEFS[lifetime.kind].label;
+    referral_discount = 29 * (REWARD_DEFS[lifetime.kind].pct || 0);
+  } else if (trial) {
+    line_label = REWARD_DEFS[trial.kind].label;
+    referral_discount = REWARD_DEFS[trial.kind].discountUsd || 0;
+  } else if (freeMonths.length) {
+    line_label = REWARD_DEFS[freeMonths[0].kind].label;
+    referral_discount = REWARD_DEFS[freeMonths[0].kind].discountUsd || 0;
+  }
+  return { referral_discount, line_label, rewards };
+}
+
 // ===== Account / Auth (local-first, dependency-free) =====
 db.exec(`
 CREATE TABLE IF NOT EXISTS users (
@@ -188,23 +415,127 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
 
   // ===== Waitlist API (SQLite) =====
   app.post("/api/waitlist", (req, res) => {
-    const { email, referredBy } = req.body;
+    const { email, referredBy, ref } = req.body;
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return res.status(400).json({ error: "Valid email required" });
     }
     const referralCode = Buffer.from(email).toString("base64").replace(/[^a-zA-Z0-9]/g, "").slice(0, 8).toLowerCase();
+    const emailLower = String(email).toLowerCase().trim();
+
+    // GOD-9: resolve the inviter from the referral link token (first-touch attribution).
+    // Any of ref / referredBy may carry the inviter's token or code.
+    let inviter: { id: number; email: string } | null = null;
+    const refToken = ref || referredBy || null;
+    if (refToken) {
+      // First try the opaque referral token, then fall back to the legacy
+      // waitlist.referral_code (so links shared before GOD-9 still attribute).
+      const byToken = db.prepare("SELECT id, email FROM referrers WHERE token = ?").get(refToken) as any;
+      const byCode = db.prepare(
+        "SELECT r.id, r.email FROM referrers r JOIN waitlist w ON r.email = w.email WHERE w.referral_code = ?"
+      ).get(refToken) as any;
+      inviter = byToken || byCode || null;
+    }
 
     try {
       const stmt = db.prepare("INSERT INTO waitlist (email, referred_by, referral_code) VALUES (?, ?, ?)");
-      stmt.run(email.toLowerCase(), referredBy || null, referralCode);
+      stmt.run(emailLower, referredBy || null, referralCode);
     } catch (err: any) {
       if (err.message?.includes("UNIQUE")) {
-        return res.json({ message: "Already on the waitlist!", referral_code: referralCode });
+        // Already on the list — still resolve/return the user's own referral token.
+        const self = getOrCreateReferrer(emailLower);
+        return res.json({ message: "Already on the waitlist!", referral_code: referralCode, referral_token: self.token });
       }
       return res.status(500).json({ error: "Could not register. Try again." });
     }
 
-    res.json({ message: "You're on the list!", referral_code: referralCode });
+    // GOD-9 signup attribution (de-dup + self-referral + disposable-domain guards).
+    const refRec = recordReferralEvent({
+      inviter,
+      inviteeEmail: emailLower,
+      stage: "signup",
+      source: "waitlist",
+    });
+    if (!refRec.created && refRec.ignored) {
+      console.log(`[GOD-9] signup attribution ignored for ${emailLower}: ${refRec.ignored}`);
+    }
+
+    // GOD-9: the new user immediately gets their own referral token to share.
+    const self = getOrCreateReferrer(emailLower);
+    res.json({ message: "You're on the list!", referral_code: referralCode, referral_token: self.token });
+  });
+
+  // GOD-9: return this user's opaque referral token (create lazily on first read).
+  app.get("/api/referral", (req, res) => {
+    const email = ((req.query.email as string) || "").trim().toLowerCase();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(400).json({ error: "A valid email is required" });
+    }
+    const self = getOrCreateReferrer(email);
+    res.json({ email, referral_token: self.token });
+  });
+
+  // GOD-9: funnel stats for a referrer (invites sent, signup, paid, referred revenue,
+  // reward ladder). Feeds the Growth dashboard.
+  app.get("/api/referral/stats", (req, res) => {
+    const email = ((req.query.email as string) || "").trim().toLowerCase();
+    if (!email) return res.status(400).json({ error: "email required" });
+    const self = db.prepare("SELECT * FROM referrers WHERE email = ?").get(normalizeRefEmail(email)) as any;
+    if (!self) return res.json({ email, invites_sent: 0, signature: null, referred_revenue: 0 });
+    const signups = (db.prepare(
+      "SELECT COUNT(*) as c FROM referral_events WHERE inviter_id = ? AND stage='signup'"
+    ).get(self.id) as { c: number }).c;
+    const paid = (db.prepare(
+      "SELECT COUNT(*) as c FROM referral_events WHERE inviter_id = ? AND stage='paid' AND status='credited'"
+    ).get(self.id) as { c: number }).c;
+    const activated = (db.prepare(
+      "SELECT COUNT(*) as c FROM referral_events WHERE inviter_id = ? AND stage='activated' AND status='credited'"
+    ).get(self.id) as { c: number }).c;
+    // Referred revenue = sum of confirmed paid purchases by invitees who came through
+    // this referrer's link (matched on the invitee email in the paid ledger).
+    const referredRevenue = (db.prepare(
+      `SELECT COALESCE(SUM(p.amount_usd),0) as s FROM purchases p
+       JOIN referral_events e ON lower(e.invitee_email) = lower(p.email)
+       WHERE e.inviter_id = ? AND e.stage='paid' AND p.status='paid'`
+    ).get(self.id) as { s: number }).s;
+    // GOD-9: rewards ledger + pending referral_discount for this referrer.
+    syncRewardsLedger(self.email);
+    const disc = pendingReferralDiscount(self.email);
+    res.json({
+      email,
+      referral_token: self.token,
+      invites_sent: signups,
+      funnel: { invite_to_signup: signups, signup_to_paid: paid, signup_to_activated: activated },
+      invite_to_signup: signups,
+      signup_to_paid: { signups, paid, rate: signups > 0 ? paid / signups : 0 },
+      referred_revenue: referredRevenue,
+      rewards: rewardLadderFor(self.id),
+      rewards_ledger: disc.rewards,
+      referral_discount: disc.referral_discount,
+    });
+  });
+
+  // GOD-9: attribution at ACTIVATION (first real action). Called by the product
+  // when a referred user completes their first real action. Resolves the inviter
+  // from the inviter's referral token (or from the activate token passed at
+  // signup), then creds the 'activated' stage — first-touch, de-duped, and gated
+  // so only a previously-signup-attributed invitee counts.
+  app.post("/api/referral/activate", (req, res) => {
+    const { email, ref } = req.body || {};
+    const inviteeEmail = String(email || "").trim().toLowerCase();
+    if (!inviteeEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inviteeEmail)) {
+      return res.status(400).json({ error: "A valid invitee email is required" });
+    }
+    // Prefer re-reading the referral token off the waitlist row (first-touch),
+    // else fall back to the caller-supplied ref token.
+    let inviter: { id: number; email: string } | null = null;
+    const wl = db.prepare("SELECT referred_by FROM waitlist WHERE email = ?").get(inviteeEmail) as any;
+    const token = (ref as string) || wl?.referred_by || null;
+    if (token) {
+      const byToken = db.prepare("SELECT id, email FROM referrers WHERE token = ?").get(token) as any;
+      if (byToken) inviter = byToken;
+    }
+    const rec = recordReferralEvent({ inviter, inviteeEmail, stage: "activated", source: "first-action" });
+    res.json({ ok: rec.created, ignored: rec.ignored || null });
   });
 
   app.get("/api/waitlist", (req, res) => {
@@ -302,12 +633,19 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
   app.get("/api/account", (req, res) => {
     const user = userFromRequest(req);
     if (!user) return res.status(401).json({ error: "Not logged in" });
+    // GOD-9: refresh the rewards ledger from the live referral ladder, then
+    // surface any pending referral_discount as a line on the next invoice.
+    syncRewardsLedger(user.email);
+    const discount = pendingReferralDiscount(user.email);
     res.json({
       user,
       subscription: {
         plan: user.plan,
         plan_id: user.plan_id,
         credits_remaining: user.credits_remaining,
+        referral_discount: discount.referral_discount,
+        referral_discount_label: discount.line_label,
+        rewards: discount.rewards,
       },
       next_step: user.plan === "free" ? "subscribe" : "active",
     });
@@ -418,10 +756,18 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
 
       // Record intent now; flip to paid only when the webhook verifies payment.
       const tokenInfo = newDownloadToken();
+      // GOD-9: capture the referral link token (first-touch) onto the purchase so the
+      // webhook can credit the inviter when the invitee actually pays.
+      let referrerToken: string | null = null;
+      const refToken = (req.body && req.body.ref) || (req.query && (req.query.ref as string));
+      if (refToken) {
+        const r = db.prepare("SELECT id, email FROM referrers WHERE token = ?").get(refToken) as any;
+        if (r) referrerToken = String(refToken);
+      }
       db.prepare(
-        `INSERT INTO purchases (email, plan_id, plan_name, amount_usd, tx_ref, status, download_token, download_token_expires)
-         VALUES (?, ?, ?, ?, ?, 'pending', ?, ?)`
-      ).run(String(email).toLowerCase().trim(), plan_id, label, numericPrice, tx_ref, tokenInfo.token, tokenInfo.expires);
+        `INSERT INTO purchases (email, plan_id, plan_name, amount_usd, tx_ref, status, download_token, download_token_expires, referrer_token)
+         VALUES (?, ?, ?, ?, ?, 'pending', ?, ?, ?)`
+      ).run(String(email).toLowerCase().trim(), plan_id, label, numericPrice, tx_ref, tokenInfo.token, tokenInfo.expires, referrerToken);
 
       const checkoutUrl = data.data.link; // may include ?tx_ref already; encode ours too
       const sep = checkoutUrl.includes("?") ? "&" : "?";
@@ -492,6 +838,28 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
               console.log(`[GOD-10] waitlist converted: ${wlEmail} -> plan=${wlPlan} credits=${wlCredits}`);
             } else {
               console.log(`[GOD-10] purchase ${wlEmail} has no waitlist row (conversion tracked in purchases only)`);
+            }
+          }
+
+          // GOD-9: attribute the 'paid' stage to the inviter whose referral token was
+          // captured at checkout. This is what unlocks the referrer's reward ladder
+          // (paid count drives free month / God Mode trial / lifetime discount) and
+          // feeds the referred-revenue number on the dashboard. Gated on an actual
+          // confirmed charge (this is already inside the successful webhook branch).
+          const purchaseRef = purchase.referrer_token;
+          if (purchaseRef) {
+            const inviter = db.prepare("SELECT id, email FROM referrers WHERE token = ?").get(purchaseRef) as any;
+            const paidRec = recordReferralEvent({
+              inviter,
+              inviteeEmail: String(email || purchase.email),
+              stage: "paid",
+              source: "pay-before-download",
+            });
+            const payerEmail = String(email || purchase.email).toLowerCase().trim();
+            if (paidRec.created) {
+              console.log(`[GOD-9] paid referral credited: ${payerEmail} paid via ${inviter ? inviter.email : purchaseRef}`);
+            } else if (paidRec.ignored) {
+              console.log(`[GOD-9] paid attribution ignored for ${payerEmail}: ${paidRec.ignored}`);
             }
           }
 
