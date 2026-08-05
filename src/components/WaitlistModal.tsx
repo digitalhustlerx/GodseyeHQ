@@ -1,10 +1,12 @@
 import { useState, useEffect, FormEvent } from "react";
+import { getReferralToken, referralUrl, WAITLIST_REFERRAL_COPY } from "../lib/referral";
 
 interface WaitlistSession {
   email: string;
   signupDate: string;
   isFounder: boolean;
   referralCode?: string;
+  referralToken?: string;
 }
 
 interface WaitlistModalProps {
@@ -45,6 +47,9 @@ export default function WaitlistModal({ open, onClose, onSuccess, referralParam 
     setError("");
 
     try {
+      // GOD-9: the ref param carries the referrer's OPAQUE referral token
+      // (godseye-uv...), which the backend resolves to the inviter. Send it so
+      // first-touch attribution works on signup.
       const body: Record<string, string> = { email: trimmed };
       if (referralParam) body.referredBy = referralParam;
 
@@ -65,9 +70,11 @@ export default function WaitlistModal({ open, onClose, onSuccess, referralParam 
         count = countData.count ?? 0;
       } catch {}
 
-      // Generate referral code from email hash
-      const code = btoa(trimmed).replace(/[^a-zA-Z0-9]/g, "").slice(0, 8).toLowerCase();
-      const refLink = `${window.location.origin}${window.location.pathname}?ref=${code}`;
+      // GOD-9: use the server's OPAQUE unguessable referral token, not the old
+      // base64-derived code, so shared links can't be guessed/predicted.
+      const apiToken = data?.referral_token as string | undefined;
+      const token = apiToken || (await getReferralToken(trimmed)) || "";
+      const refLink = token ? referralUrl(token) : "";
 
       setWaitlistCount(count);
       setReferralLink(refLink);
@@ -77,7 +84,8 @@ export default function WaitlistModal({ open, onClose, onSuccess, referralParam 
         email: trimmed,
         signupDate: new Date().toISOString(),
         isFounder: count < 100,
-        referralCode: code,
+        referralCode: token || undefined,
+        referralToken: token || undefined,
       });
     } catch {
       setError("Could not reach the waitlist server. Please try again.");
@@ -188,30 +196,36 @@ export default function WaitlistModal({ open, onClose, onSuccess, referralParam 
               Check your email. We'll send you a private invite link to start your session with the bot. Your bot access details will arrive within minutes.
             </p>
 
-            {/* Referral section */}
+            {/* Referral section (GOD-8 §4 waitlist banner copy) */}
             <div className="border-t border-white/10 pt-4 mt-4">
-              <p className="text-white/60 text-xs mb-2 font-medium">
-                Refer a friend → you both get <strong className="text-[#C4A484]">500 credits</strong> when they subscribe
+              <p className="text-white/60 text-xs mb-2 font-medium font-light leading-relaxed">
+                {WAITLIST_REFERRAL_COPY}
               </p>
-              <div className="flex items-center gap-2 bg-white/5 rounded-xl p-2">
-                <input
-                  type="text"
-                  readOnly
-                  value={referralLink}
-                  className="flex-1 bg-transparent text-white/60 text-xs px-2 py-1.5 outline-none"
-                  onClick={(e) => (e.target as HTMLInputElement).select()}
-                />
-                <button
-                  onClick={() => {
-                    navigator.clipboard.writeText(referralLink);
-                    setCopied(true);
-                    setTimeout(() => setCopied(false), 2000);
-                  }}
-                  className="bg-[#C4A484] text-black text-[10px] font-bold px-3 py-1.5 rounded-lg uppercase tracking-wider whitespace-nowrap hover:bg-[#C4A484]/90 transition-all"
-                >
-                  {copied ? "Copied!" : "Copy"}
-                </button>
-              </div>
+              {referralLink ? (
+                <div className="flex items-center gap-2 bg-white/5 rounded-xl p-2 mt-3">
+                  <input
+                    type="text"
+                    readOnly
+                    value={referralLink}
+                    className="flex-1 bg-transparent text-white/60 text-[11px] px-2 py-1.5 outline-none"
+                    onClick={(e) => (e.target as HTMLInputElement).select()}
+                  />
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(referralLink);
+                      setCopied(true);
+                      setTimeout(() => setCopied(false), 2000);
+                    }}
+                    className="bg-[#C4A484] text-black text-[10px] font-bold px-3 py-1.5 rounded-lg uppercase tracking-wider whitespace-nowrap hover:bg-[#C4A484]/90 transition-all"
+                  >
+                    {copied ? "Copied!" : "Copy"}
+                  </button>
+                </div>
+              ) : (
+                <p className="text-[10px] text-white/30 text-left mt-3">
+                  Your personal invite link will appear here.
+                </p>
+              )}
             </div>
 
             <button

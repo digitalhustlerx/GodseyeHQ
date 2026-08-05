@@ -1,7 +1,8 @@
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { Check, ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState, useEffect, useCallback, useRef, type TouchEvent } from "react";
 import { PRICING_PLANS } from "../mockData";
+import WaitlistModal from "../components/WaitlistModal";
 
 const HERO_SLIDES = [
   {
@@ -28,6 +29,14 @@ export default function LandingPage() {
   const [slideDir, setSlideDir] = useState<"next" | "prev">("next");
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
+
+  // GOD-9: waitlist referral surface. Read the opaque ref token from the URL so
+  // someone arriving via a friend's referral link attributes on signup.
+  const [searchParams] = useSearchParams();
+  const refParam = searchParams.get("ref") || undefined;
+  const [showWaitlist, setShowWaitlist] = useState(
+    () => typeof window !== "undefined" && !!refParam
+  );
 
   const goToSlide = useCallback((idx: number, dir: "next" | "prev") => {
     setSlideDir(dir);
@@ -159,6 +168,12 @@ export default function LandingPage() {
               >
                 Get started
               </Link>
+              <button
+                onClick={() => setShowWaitlist(true)}
+                className="w-full sm:w-auto bg-transparent hover:bg-white/5 border border-white/20 text-[#F2F2F2] px-10 py-4 rounded-full font-bold text-xs uppercase tracking-widest transition-all text-center cursor-pointer"
+              >
+                Join the waitlist
+              </button>
               <Link
                 to="/features"
                 className="w-full sm:w-auto bg-transparent hover:bg-white/5 border border-white/20 text-[#F2F2F2] px-10 py-4 rounded-full font-bold text-xs uppercase tracking-widest transition-all text-center"
@@ -399,6 +414,14 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* GOD-9: waitlist referral banner/signup surface */}
+      <WaitlistModal
+        open={showWaitlist}
+        onClose={() => setShowWaitlist(false)}
+        onSuccess={() => setShowWaitlist(false)}
+        referralParam={refParam}
+      />
     </div>
   );
 }

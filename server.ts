@@ -73,13 +73,6 @@ CREATE INDEX IF NOT EXISTS referral_events_inviter_idx ON referral_events (invit
 CREATE INDEX IF NOT EXISTS referral_events_stage_idx ON referral_events (stage);
 `);
 
-// Purchases get a first-touch referrer token captured at checkout creation so
-// the webhook can attribute the 'paid' stage to the inviter who referred them.
-const PCH = db.prepare("PRAGMA table_info(purchases)").all() as Array<{ name: string }>;
-if (!PCH.some((c) => c.name === "referrer_token")) {
-  db.exec("ALTER TABLE purchases ADD COLUMN referrer_token TEXT");
-}
-
 // ---- Referral loop helpers (GOD-9) ----
 // Disposable/temporary email roots (bare domain after @) + known subdomain patterns.
 // Matches `user@mailinator.com`, `user@sub.mailinator.com`, and `mailinator.com` directly.
@@ -316,6 +309,14 @@ CREATE TABLE IF NOT EXISTS purchases (
 );
 `);
 
+// Purchases get a first-touch referrer token captured at checkout creation so
+// the webhook can attribute the 'paid' stage to the inviter who referred them.
+// (Runs AFTER the purchases table exists so a fresh DB boots cleanly.)
+const PCH = db.prepare("PRAGMA table_info(purchases)").all() as Array<{ name: string }>;
+if (!PCH.some((c) => c.name === "referrer_token")) {
+  db.exec("ALTER TABLE purchases ADD COLUMN referrer_token TEXT");
+}
+
 // Password hashing with Node's built-in scrypt (salt:hash)
 function hashPassword(password: string): string {
   const salt = crypto.randomBytes(16).toString("hex");
@@ -437,12 +438,30 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
     }
 
     try {
+      // GOD-14: persist the resolved first-touch inviter's canonical token onto
+      // the waitlist row so downstream stages (activated) can re-resolve the
+      // inviter even when the client only sent a `ref` token and no `referredBy`.
+      // Fall back to the raw referredBy voice only when the token didn't resolve.
+      const persistedReferrer =
+        (inviter && getOrCreateReferrer(inviter.email).token) ||
+        referredBy ||
+        null;
       const stmt = db.prepare("INSERT INTO waitlist (email, referred_by, referral_code) VALUES (?, ?, ?)");
-      stmt.run(emailLower, referredBy || null, referralCode);
+      stmt.run(emailLower, persistedReferrer, referralCode);
     } catch (err: any) {
       if (err.message?.includes("UNIQUE")) {
         // Already on the list — still resolve/return the user's own referral token.
         const self = getOrCreateReferrer(emailLower);
+        // GOD-14: backfill first-touch attribution onto an existing row that was
+        // created before referral storage (or joined via a non-ref path), so the
+        // activation hook can still resolve the inviter.
+        if (inviter) {
+          const row = db.prepare("SELECT referred_by FROM waitlist WHERE email = ?").get(emailLower) as any;
+          if (row && !row.referred_by) {
+            db.prepare("UPDATE waitlist SET referred_by = ? WHERE email = ?")
+              .run(getOrCreateReferrer(inviter.email).token, emailLower);
+          }
+        }
         return res.json({ message: "Already on the waitlist!", referral_code: referralCode, referral_token: self.token });
       }
       return res.status(500).json({ error: "Could not register. Try again." });

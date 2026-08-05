@@ -11,13 +11,24 @@ export interface User {
   credits?: string;
 }
 
+export interface Subscription {
+  plan: string;
+  plan_id: string;
+  credits_remaining: number;
+  referral_discount?: number;
+  referral_discount_label?: string | null;
+  rewards?: Reward[];
+}
+
+export interface Reward {
+  kind: string;
+  label: string;
+  status: string;
+}
+
 export interface AccountData {
   user: User;
-  subscription: {
-    plan: string;
-    plan_id: string;
-    credits_remaining: number;
-  };
+  subscription: Subscription;
   next_step: string;
 }
 

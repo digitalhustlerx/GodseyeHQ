@@ -5,9 +5,18 @@ const API_BASE_URL = (process.env.GODSEYE_API_BASE_URL ?? "https://api.godseyes.
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN ?? "";
 const PLANT_PLUGIN_URL = process.env.GODSEYE_PLUGIN_URL ?? "https://api.godseyes.digitalhustlerx.com/dist/godseye-bridge.zip";
 const SIGNUP_URL = process.env.GODSEYE_SIGNUP_URL ?? "https://godseye.digitalhustlerx.com";
+// GOD-14 §C: the landing/referral API that owns the referral ledger. The bot
+// fires the 'activated' stage event here once a user completes their first real
+// action (successful /connect with a license + site) so Growth sees the
+// signup -> activated -> paid funnel. Overridable for local testing.
+const LANDING_API_BASE_URL = (process.env.GODSEYE_LANDING_API_BASE_URL ?? "https://godseye.digitalhustlerx.com").replace(/\/+$/, "");
 
 // Per-chat session state.
 const sessions = new Map();
+
+// GOD-14 §C: one-shot activation emission per license key (activation is a first-
+// action event; don't re-fire on every /connect or every message).
+const activatedLicenses = new Set();
 
 // Force IPv4 for outbound fetch. The VPS resolves api.telegram.org to IPv6 by default but has
 // no working IPv6 route to Telegram, so node's fetch fails every poll. IPv4 works consistently.
@@ -85,6 +94,33 @@ async function findSitesForLicense(licenseKey) {
 async function getLicense(licenseKey) {
   const data = await api(`/api/licenses/${encodeURIComponent(licenseKey)}`);
   return data.license || null;
+}
+
+// GOD-14 §C: emit a one-time 'activated' stage event to the referral ledger when
+// a user takes their first real action (successful /connect). Dispatches to the
+// landing API's /api/referral/activate; resolution is best-effort and never
+// blocks or fails the connect flow.
+async function emitActivation(licenseKey, email, state) {
+  const key = `${licenseKey}:${(email || "").toLowerCase()}`;
+  if (activatedLicenses.has(key)) return;
+  activatedLicenses.add(key);
+  if (state) state.activatedEmitted = key;
+  const inviteeEmail = String(email || "").trim().toLowerCase();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inviteeEmail)) {
+    console.log(`[GOD-14] activation skipped for license ${licenseKey}: no valid email`);
+    return;
+  }
+  try {
+    const res = await fetch(`${LANDING_API_BASE_URL}/api/referral/activate`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ email: inviteeEmail }),
+    });
+    const data = await res.json();
+    console.log(`[GOD-14] activation emitted for ${inviteeEmail}: ok=${data?.ok} ignored=${data?.ignored ?? "null"} (HTTP ${res.status})`);
+  } catch (err) {
+    console.error(`[GOD-14] activation emission failed for ${inviteeEmail}: ${err.message}`);
+  }
 }
 
 // Kick off a real task against the user's connected site. Returns {conversationId, task}.
@@ -251,6 +287,10 @@ async function handleCommand(chatId, text, fromCallback = true) {
       const sites = await findSitesForLicense(licenseKey);
       state.licenseKey = licenseKey;
       state.onboardingStep = 0;
+      // GOD-14 §C: a successfully connected license is the user's first real
+      // action in the /connect flow — emit the 'activated' stage event to the
+      // referral ledger (best-effort, once per license).
+      emitActivation(licenseKey, license?.email, state);
       if (!sites.length) {
         return send(chatId, `✅ License connected (${license.plan ?? "plan"}).\n\nNo connected sites yet. Install the plugin so your site registers, then come back to /sites.`, HAVE_LICENSE_KYBD);
       }
