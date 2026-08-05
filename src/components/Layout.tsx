@@ -70,6 +70,7 @@ export default function Layout({ children }: { children: ReactNode }) {
 
   const navLinks = [
     { to: "/features", label: "Features" },
+    { to: "/templates", label: "Templates" },
     { to: "/pricing", label: "Pricing" },
     { to: "/docs", label: "Docs" },
     { to: "/blog", label: "Blog" },

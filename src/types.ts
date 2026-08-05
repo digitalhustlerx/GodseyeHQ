@@ -79,3 +79,41 @@ export interface SelfHostPlan {
   isPopular?: boolean;
 }
 
+// ── Niche Profile Templates ─────────────────────────────
+// A template is a pre-built "agent profile": pick a niche, and the agent
+// boots already knowing your world, your tools, and your work — then asks
+// a short set of onboarding questions to go specific before it starts.
+
+export interface OnboardingQuestion {
+  id: string;
+  /** The question itself, phrased the way the agent would actually ask it. */
+  prompt: string;
+  /** Hint / example the reader can type (shows in the input placeholder). */
+  placeholder: string;
+}
+
+export interface TemplateCapability {
+  /** Name-dropped platform/tool, e.g. Elementor, WooCommerce, RankMath. */
+  label: string;
+}
+
+export interface ProfileTemplate {
+  id: string;
+  /** Niche name, e.g. "Solo Web Developer" */
+  title: string;
+  /** Short one-line hook for the card. */
+  tagline: string;
+  /** Longer description shown on the detail panel. */
+  description: string;
+  /** Icon emoji. */
+  icon: string;
+  /** Optional pro-mode gate — feature set that unlocks on a paid plan. */
+  pro?: boolean;
+  /** The pre-loaded "skills" / behavior the agent has from second one. */
+  skills: string[];
+  /** The tools & platforms the agent already knows how to drive. */
+  capabilities: TemplateCapability[];
+  /** The onboarding questions the agent asks to go specific. */
+  onboarding: OnboardingQuestion[];
+}
+
