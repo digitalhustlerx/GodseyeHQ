@@ -7,6 +7,11 @@ import fs from "fs";
 import dotenv from "dotenv";
 import crypto from "crypto";
 import { sendMail } from "./src/lib/mailer.js";
+import {
+  initDrip, enqueueDrip, backfillLaunchJobs as _backfillLaunchJobs,
+  startDripWorker, getConfig as getDripConfig, setConfig as setDripConfig,
+  flushDue as _flushDrip, DRIP_KEYS, type DripKey,
+} from "./src/lib/drip.js";
 
 dotenv.config();
 
@@ -44,6 +49,24 @@ for (const [col, type] of wlMigrate) {
   }
 }
 db.exec(`CREATE INDEX IF NOT EXISTS waitlist_paid_idx ON waitlist (paid_at) WHERE paid_at IS NOT NULL;`);
+
+// ===== GOD-15 (GOD-6): waitlist -> paid drip scheduler =====
+// Creates drip_jobs + drip_config and backfills the scheduler for any waitlist
+// rows that joined before this feature existed, so the 6-email sequence covers
+// the cohort we already hold. Idempotent (UNIQUE (email, email_key)).
+initDrip(db);
+(function backfillExistingWaitlist() {
+  const rows = db.prepare("SELECT id, email, created_at FROM waitlist").all() as Array<{ id: number; email: string; created_at: string }>;
+  let added = 0;
+  for (const r of rows) {
+    const before = db.prepare("SELECT COUNT(*) as c FROM drip_jobs WHERE email = ?").get(r.email.toLowerCase()) as { c: number };
+    if (before.c === 0) {
+      enqueueDrip(r.email, r.id, r.created_at);
+      added++;
+    }
+  }
+  if (added > 0) console.log(`[GOD-15] backfilled drip sequence for ${added} existing waitlist row(s)`);
+})();
 
 // ===== GOD-9 (GOD-8 referral design handoff): referral loop =====
 // referrers: one opaque referral token per email.
@@ -447,7 +470,12 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
         referredBy ||
         null;
       const stmt = db.prepare("INSERT INTO waitlist (email, referred_by, referral_code) VALUES (?, ?, ?)");
-      stmt.run(emailLower, persistedReferrer, referralCode);
+      const info = stmt.run(emailLower, persistedReferrer, referralCode);
+
+      // GOD-15: wire the waitlist -> paid email sequence for this new joiner.
+      // send_at offsets computed relative to now (see src/lib/drip.ts). This is
+      // the mechanism only — the drip stays OFF until Growth flips it live.
+      enqueueDrip(emailLower, Number(info.lastInsertRowid), new Date().toISOString());
     } catch (err: any) {
       if (err.message?.includes("UNIQUE")) {
         // Already on the list — still resolve/return the user's own referral token.
@@ -948,6 +976,65 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
     });
   });
 
+  // ===== GOD-15: drip scheduler ops (config flip + status + manual flush) =====
+  // Growth/CEOs flip the drip live with a PATCH to /api/drip/config. The worker
+  // itself is gated by drip.enabled (default OFF), so nothing is sent until it
+  // is explicitly switched on. Guarded by an admin header so it isn't a public
+  // spam vector.
+  const DRIP_ADMIN = process.env.DRIP_ADMIN_KEY || "change-me";
+  const adminOk = (req: any) => req.headers?.["x-drip-admin"] === DRIP_ADMIN;
+
+  app.get("/api/drip/config", (req, res) => {
+    const cfg = getDripConfig();
+    const pending = db.prepare("SELECT COUNT(*) as c FROM drip_jobs WHERE status='pending'").get() as { c: number };
+    const sent = db.prepare("SELECT COUNT(*) as c FROM drip_jobs WHERE status='sent'").get() as { c: number };
+    const skippedPaid = db.prepare("SELECT COUNT(*) as c FROM drip_jobs WHERE status='skipped_paid'").get() as { c: number };
+    const dueNow = (db.prepare(
+      "SELECT COUNT(*) as c FROM drip_jobs WHERE status='pending' AND send_at IS NOT NULL AND send_at <= ?"
+    ).get(new Date().toISOString())) as { c: number };
+    res.json({
+      config: cfg,
+      queue: { pending, sent, skipped_paid: skippedPaid, due_now: dueNow },
+      worker_started: (global as any).__dripStarted ? true : false,
+    });
+  });
+
+  app.patch("/api/drip/config", (req, res) => {
+    if (!adminOk(req)) return res.status(401).json({ error: "Unauthorized" });
+    const body = (req.body || {}) as Record<string, string>;
+    // Whitelist keys; ignore anything we don't own.
+    const allowed = ["enabled", "launch_at", "early_bird_deadline", "purchase_link"];
+    const patch: Record<string, string> = {};
+    for (const k of allowed) if (body[k] !== undefined) patch[k] = String(body[k]);
+    if (Object.keys(patch).length === 0) return res.status(400).json({ error: "No valid keys" });
+    const next = setDripConfig(patch);
+    res.json({ ok: true, config: next });
+  });
+
+  // Manual one-shot flush — lets Growth trigger the worker on demand (e.g. to
+  // prove a live send on a test address) without waiting for the interval.
+  app.post("/api/drip/run", async (req, res) => {
+    if (!adminOk(req)) return res.status(401).json({ error: "Unauthorized" });
+    try {
+      const result = await _flushDrip();
+      res.json({ ok: true, ...result });
+    } catch (e: any) {
+      res.status(500).json({ error: e.message || "flush failed" });
+    }
+  });
+
+  // GOD-15: ensure the worker is running (idempotent; auto-starts on boot, so
+  // this is only a safety/manual re-start). Returns current worker state.
+  app.post("/api/drip/worker", (req, res) => {
+    if (!adminOk(req)) return res.status(401).json({ error: "Unauthorized" });
+    if (!(global as any).__dripTimer) {
+      const t = startDripWorker();
+      (global as any).__dripTimer = t;
+      (global as any).__dripStarted = true;
+    }
+    res.json({ ok: true, worker_running: true, enabled: getDripConfig().enabled });
+  });
+
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
@@ -965,6 +1052,12 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
 
   app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server running on http://localhost:${PORT}`);
+    // GOD-15: auto-start the drip worker on boot so due emails keep flushing
+    // across restarts. Gated internally by drip.enabled (default OFF), so the
+    // worker runs but stays a no-op until Growth flips the drip live.
+    const t = startDripWorker();
+    (global as any).__dripTimer = t;
+    (global as any).__dripStarted = true;
   });
 }
 
