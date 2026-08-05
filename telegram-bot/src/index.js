@@ -23,6 +23,10 @@ const activatedLicenses = new Set();
 import { setDefaultResultOrder } from "node:dns";
 setDefaultResultOrder("ipv4first");
 
+// Niche Profile Templates — the /templates gateway deep-links here via
+// t.me/GodseyeXbot?start=<template_id> so the agent already knows the niche.
+import { botTemplate } from "./templates.js";
+
 async function api(path, options = {}) {
   const response = await fetch(`${API_BASE_URL}${path}`, {
     headers: { "content-type": "application/json", ...(options.headers || {}) },
@@ -68,6 +72,9 @@ function session(chatId) {
       pendingTaskId: null,
       // 0 = not onboarded; 1 = wizard awaiting "new or have-license"; 2 = awaiting license key entry
       onboardingStep: 0,
+      // Niche profile template (from /templates deep-link) + onboarding position.
+      templateId: null,
+      templateOnboardStep: -1,
     });
   }
   return sessions.get(key);
@@ -273,6 +280,25 @@ async function handleCommand(chatId, text, fromCallback = true) {
   const [command, ...rest] = text.trim().split(/\s+/);
 
   if (command === "/start" || command === "/help") {
+    // Deep-link from the /templates gateway: t.me/GodseyeXbot?start=<template_id>
+    const param = rest[0];
+    const tpl = param && param.startsWith("template_") ? botTemplate(param.replace("template_", "")) : botTemplate(param);
+    if (tpl) {
+      state.templateId = param;
+      state.templateOnboardStep = 0;
+      state.onboardingStep = 0;
+      // The agent already knows the niche — acknowledge + ask the first question.
+      const q1 = tpl.onboarding[0];
+      return send(
+        chatId,
+        `${tpl.icon} Deep-link confirmed: **${tpl.title}** profile loaded.\n\n` +
+          `I'm your agent, and I already know this world — your tools, your workflow, your corners. Before I start, one quick question to go specific:\n\n` +
+          `_${q1}_`,
+        HAVE_LICENSE_KYBD
+      );
+    }
+    // Plain /start — no template. Pre-seed the empty slot so /templates can attach later.
+    if (!state.templateId) state.onboardingStep = 0;
     return send(chatId, welcomeText(state), WELCOME_KYBD);
   }
 
@@ -382,6 +408,27 @@ async function handleMessage(message) {
     // the wizard is awaiting one is treated as /connect with that key.
     if (state.onboardingStep === 2 && /^GS-[A-Z0-9-]{4,}$/i.test(text.trim())) {
       return await handleCommand(chatId, `/connect ${text.trim()}`);
+    }
+
+    // Niche template onboarding: after a template deep-link, a free-text reply
+    // answers the current question and advances the in-chat onboarding flow.
+    if (typeof state.templateOnboardStep === "number" && state.templateOnboardStep >= 0) {
+      const tpl = botTemplate((state.templateId || "").replace("template_", ""));
+      const answers = state.templateAnswers ?? (state.templateAnswers = []);
+      answers[state.templateOnboardStep] = text.trim() || "";
+      const next = state.templateOnboardStep + 1;
+      if (tpl && next < tpl.onboarding.length) {
+        state.templateOnboardStep = next;
+        return await send(chatId, `_${tpl.onboarding[next]}_`);
+      }
+      // Onboarding complete — agent is primed with behavior + answers.
+      state.templateOnboardStep = -1; // exit wizard
+      return await send(
+        chatId,
+        `${tpl?.icon || "👁️"} Got it — your **${tpl?.title || "agent"}** is dialled in.\n\n` +
+          `It now knows your niche and how you like to work. Finish the last step: connect your WordPress site so I can start doing real work.`,
+        HAVE_LICENSE_KYBD
+      );
     }
 
     if (!state.siteId) {
