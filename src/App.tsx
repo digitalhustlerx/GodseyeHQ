@@ -5,6 +5,16 @@ import FeaturesPage from "./pages/FeaturesPage";
 import PricingPage from "./pages/PricingPage";
 import StartPage from "./pages/StartPage";
 import DocsPage from "./pages/DocsPage";
+import AuthPage from "./pages/AuthPage";
+import AccountPage from "./pages/AccountPage";
+
+// Blog is served as static, crawlable HTML from dist/blog/ (SEO).
+// React Router only handles client-side paths; force a full page load so
+// the static blog tree (not the SPA shell) renders.
+function BlogRedirect() {
+  window.location.href = "/blog/";
+  return null;
+}
 
 export default function App() {
   return (
@@ -16,6 +26,10 @@ export default function App() {
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/start" element={<StartPage />} />
           <Route path="/docs" element={<DocsPage />} />
+          <Route path="/blog" element={<BlogRedirect />} />
+          <Route path="/login" element={<AuthPage />} />
+          <Route path="/signup" element={<AuthPage mode="signup" />} />
+          <Route path="/account" element={<AccountPage />} />
           <Route path="*" element={<LandingPage />} />
         </Routes>
       </Layout>

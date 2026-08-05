@@ -65,7 +65,7 @@ export default function LivePlayground({
       const botMsgId = `bot_${Date.now()}`;
       const botMessage: PlaygroundMessage = {
         id: botMsgId,
-        sender: "agent",
+        sender: "bot",
         text: data.telegramResponse || "👁️ Command received and processed successfully.",
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };

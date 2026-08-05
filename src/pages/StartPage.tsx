@@ -1,7 +1,56 @@
-import { Link } from "react-router-dom";
-import { Download } from "lucide-react";
+import { Link, useSearchParams } from "react-router-dom";
+import { Download, CheckCircle2, Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
+
+type PurchaseStatus = {
+  tx_ref: string;
+  plan_name: string;
+  amount_usd: number;
+  status: string;
+  download_token?: string;
+};
 
 export default function StartPage() {
+  const [searchParams] = useSearchParams();
+  const success = searchParams.get("success") === "true";
+  const txRef = searchParams.get("tx_ref") || "";
+  const [purchase, setPurchase] = useState<PurchaseStatus | null>(null);
+  const [checking, setChecking] = useState<boolean>(success);
+
+  // Poll purchase status after a Flutterwave redirect so the customer can grab
+  // their plugin the instant the charge is confirmed.
+  useEffect(() => {
+    if (!success || !txRef) return;
+    let active = true;
+    let tries = 0;
+    const tick = async () => {
+      try {
+        const res = await fetch(`/api/purchase/status?tx_ref=${encodeURIComponent(txRef)}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (active) {
+            setPurchase(data);
+            if (data.status === "paid") {
+              setChecking(false);
+              return; // done — stop polling
+            }
+          }
+        }
+      } catch {
+        /* network hiccup; keep polling */
+      }
+      tries += 1;
+      if (active && tries < 20) setTimeout(tick, 3500);
+      else if (active) setChecking(false);
+    };
+    tick();
+    return () => { active = false; };
+  }, [success, txRef]);
+
+  const downloadUrl = purchase?.download_token
+    ? `/api/plugin-download?token=${purchase.download_token}`
+    : null;
+
   const steps = [
     {
       num: "01",
@@ -92,6 +141,57 @@ export default function StartPage() {
           Three steps to connect your WordPress site to your AI agent.
         </p>
       </div>
+
+      {/* PAYMENT / DOWNLOAD CARD (shown after a Flutterwave redirect) */}
+      {success && (
+        <div className="bg-[#121212] border border-[#C4A484]/30 rounded-2xl p-8 relative overflow-hidden">
+          {checking && !purchase?.download_token ? (
+            <div className="text-center space-y-4 py-6">
+              <Loader2 className="w-8 h-8 text-[#C4A484] animate-spin mx-auto" />
+              <h2 className="text-xl font-light text-[#F2F2F2]" style={{ fontFamily: "'Georgia', serif" }}>
+                Confirming your payment…
+              </h2>
+              <p className="text-xs text-white/50 font-light">
+                Your download link will appear the moment it's confirmed. This usually takes a few seconds.
+              </p>
+              <p className="font-mono text-[10px] uppercase tracking-widest text-white/40">Ref: {txRef}</p>
+            </div>
+          ) : purchase?.download_token ? (
+            <div className="text-center space-y-5 py-4">
+              <div className="w-12 h-12 rounded-full bg-[#C4A484]/20 flex items-center justify-center mx-auto">
+                <CheckCircle2 className="w-6 h-6 text-[#C4A484]" />
+              </div>
+              <div className="space-y-1.5">
+                <h2 className="text-2xl font-light text-[#F2F2F2]" style={{ fontFamily: "'Georgia', serif" }}>
+                  Payment received. Your plugin is ready.
+                </h2>
+                <p className="text-[11px] text-white/50 font-light">
+                  {purchase.plan_name} plan · ${purchase.amount_usd} · Ref {purchase.tx_ref}
+                </p>
+              </div>
+              <a
+                href={downloadUrl || "#"}
+                className="inline-flex items-center gap-2 bg-[#C4A484] hover:bg-[#b59574] text-black text-[10px] uppercase tracking-widest font-bold py-3.5 rounded-full px-6 transition-all active:scale-95 shadow-md"
+              >
+                <Download className="w-4 h-4" />
+                Download plugin (.zip)
+              </a>
+              <p className="text-[10px] text-white/40 font-light">
+                Also sent to your email. Link valid for 7 days.
+              </p>
+            </div>
+          ) : (
+            <div className="text-center space-y-3 py-4">
+              <h2 className="text-xl font-light text-[#F2F2F2]" style={{ fontFamily: "'Georgia', serif" }}>
+                Waiting for payment…
+              </h2>
+              <p className="text-xs text-white/50 font-light">
+                We couldn't confirm your payment yet. If you've paid, your download link will also arrive by email.
+              </p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* STEPS */}
       <div className="space-y-5">

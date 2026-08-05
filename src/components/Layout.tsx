@@ -1,7 +1,8 @@
-import { useState, FormEvent, ReactNode } from "react";
+import { useState, useEffect, FormEvent, ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { PRICING_PLANS } from "../mockData";
 import { PricingPlan } from "../types";
+import { getMe, User } from "../lib/auth";
 import { Menu, X, Coins, ArrowRight, RefreshCw } from "lucide-react";
 
 export default function Layout({ children }: { children: ReactNode }) {
@@ -10,9 +11,23 @@ export default function Layout({ children }: { children: ReactNode }) {
   const [selectedPlan, setSelectedPlan] = useState<PricingPlan | null>(null);
   const [checkoutEmail, setCheckoutEmail] = useState("");
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
   const location = useLocation();
 
+  // Load session on mount + whenever location changes (page navigations).
+  useEffect(() => {
+    let active = true;
+    getMe().then((u) => {
+      if (active) setUser(u);
+      if (u?.email && (!checkoutEmail)) setCheckoutEmail(u.email);
+    });
+    return () => {
+      active = false;
+    };
+  }, [location.pathname]);
+
   const handleOpenCheckout = (plan: PricingPlan) => {
+    // A logged-in user clicks Subscribe → straight to checkout with their email.
     setSelectedPlan(plan);
     setShowCheckoutModal(true);
   };
@@ -40,6 +55,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       setCheckoutLoading(false);
       setShowCheckoutModal(false);
       setCheckoutEmail("");
+      window.dispatchEvent(new CustomEvent("godseye:authed"));
       window.location.href = data.checkout_url;
     } catch (err: any) {
       setCheckoutLoading(false);
@@ -56,6 +72,7 @@ export default function Layout({ children }: { children: ReactNode }) {
     { to: "/features", label: "Features" },
     { to: "/pricing", label: "Pricing" },
     { to: "/docs", label: "Docs" },
+    { to: "/blog", label: "Blog" },
   ];
 
   return (
@@ -92,6 +109,21 @@ export default function Layout({ children }: { children: ReactNode }) {
 
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center gap-4">
+            {user ? (
+              <Link
+                to="/account"
+                className="text-[10px] uppercase tracking-widest font-bold bg-white/5 hover:bg-white/10 text-[#F2F2F2] border border-white/10 px-6 py-3 rounded-full flex items-center gap-1.5 transition-all active:scale-95"
+              >
+                My Account
+              </Link>
+            ) : (
+              <Link
+                to="/login?next=/account"
+                className="text-[10px] uppercase tracking-widest font-bold bg-white/5 hover:bg-white/10 text-[#F2F2F2] border border-white/10 px-6 py-3 rounded-full flex items-center gap-1.5 transition-all active:scale-95"
+              >
+                Log In
+              </Link>
+            )}
             <Link
               to="/start"
               className="text-[10px] uppercase tracking-widest font-bold bg-[#F2F2F2] hover:bg-white text-[#0A0A0A] px-6 py-3 rounded-full flex items-center gap-1.5 transition-all active:scale-95 shadow-md"
@@ -122,6 +154,23 @@ export default function Layout({ children }: { children: ReactNode }) {
                 {link.label}
               </Link>
             ))}
+            {user ? (
+              <Link
+                to="/account"
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-xs font-semibold bg-white/5 text-white border border-white/10 py-2.5 rounded-lg text-center"
+              >
+                My Account
+              </Link>
+            ) : (
+              <Link
+                to="/login?next=/account"
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-xs font-semibold bg-white/5 text-white border border-white/10 py-2.5 rounded-lg text-center"
+              >
+                Log In
+              </Link>
+            )}
             <Link
               to="/start"
               onClick={() => setMobileMenuOpen(false)}
@@ -244,6 +293,11 @@ export default function Layout({ children }: { children: ReactNode }) {
                 <span className="text-xs text-white/50 font-light ml-1">/month</span>
               </div>
               <p className="text-[11px] text-white/60 font-light">{selectedPlan.credits} credits/mo · {selectedPlan.sites}</p>
+              {user && (
+                <p className="text-[11px] text-[#C4A484] font-medium">
+                  Logged in as {checkoutEmail || user.email}
+                </p>
+              )}
             </div>
 
             <form onSubmit={handleCreateCheckout} className="space-y-4">
@@ -258,6 +312,11 @@ export default function Layout({ children }: { children: ReactNode }) {
                   className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#C4A484]/50 transition-all"
                 />
               </div>
+              {!user && (
+                <p className="text-[10px] text-white/40 text-center font-light">
+                  Tip: <Link to="/login?next=/pricing" className="text-[#C4A484] hover:text-[#d9c4af]">log in</Link> first to attach your subscription to an account.
+                </p>
+              )}
 
               <button
                 type="submit"
