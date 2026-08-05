@@ -3,10 +3,11 @@ import { Link, useLocation } from "react-router-dom";
 import { PRICING_PLANS } from "../mockData";
 import { PricingPlan } from "../types";
 import { getMe, User } from "../lib/auth";
-import { Menu, X, Coins, ArrowRight, RefreshCw } from "lucide-react";
+import { Menu, X, Coins, ArrowRight, RefreshCw, ChevronDown } from "lucide-react";
 
 export default function Layout({ children }: { children: ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [agentsMenuOpen, setAgentsMenuOpen] = useState(false);
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<PricingPlan | null>(null);
   const [checkoutEmail, setCheckoutEmail] = useState("");
@@ -71,10 +72,16 @@ export default function Layout({ children }: { children: ReactNode }) {
   const navLinks = [
     { to: "/features", label: "Features" },
     { to: "/templates", label: "Templates" },
-    { to: "/agents/lead-gen", label: "Hire an Agent" },
     { to: "/pricing", label: "Pricing" },
     { to: "/docs", label: "Docs" },
     { to: "/blog", label: "Blog" },
+  ];
+
+  // "Agents" parent dropdown — every agent buyer page lives under /agents/<slug>.
+  const agentsLinks = [
+    { to: "/agents/lead-gen", label: "Lead Generation" },
+    { to: "/agents/team", label: "Chief of Staff" },
+    { to: "/agents/home", label: "Home & Life" },
   ];
 
   return (
@@ -98,6 +105,42 @@ export default function Layout({ children }: { children: ReactNode }) {
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-7 text-[11px] uppercase tracking-[0.2em] font-semibold text-gray-400">
+            {/* Agents dropdown parent */}
+            <div
+              className="relative"
+              onMouseEnter={() => setAgentsMenuOpen(true)}
+              onMouseLeave={() => setAgentsMenuOpen(false)}
+            >
+              <button
+                onClick={() => setAgentsMenuOpen((o) => !o)}
+                className={`flex items-center gap-1.5 hover:text-[#C4A484] transition-colors cursor-pointer ${location.pathname.startsWith("/agents")
+                  ? "text-[#C4A484]"
+                  : "text-gray-400"
+                }`}
+              >
+                Agents <ChevronDown className={`w-3 h-3 transition-transform ${agentsMenuOpen ? "rotate-180" : ""}`} />
+              </button>
+              {agentsMenuOpen && (
+                <div className="absolute left-0 top-full pt-3 z-50">
+                  <div className="bg-[#121212] border border-white/10 rounded-2xl p-2 min-w-[220px] shadow-2xl shadow-black/50">
+                    {agentsLinks.map((a) => (
+                      <Link
+                        key={a.to}
+                        to={a.to}
+                        onClick={() => setAgentsMenuOpen(false)}
+                        className={`block px-4 py-2.5 rounded-xl text-[11px] uppercase tracking-widest font-semibold transition-colors ${
+                          location.pathname === a.to
+                            ? "text-[#C4A484] bg-[#C4A484]/10"
+                            : "text-gray-400 hover:text-[#C4A484] hover:bg-white/5"
+                        }`}
+                      >
+                        {a.label}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
             {navLinks.map((link) => (
               <Link
                 key={link.to}
@@ -146,6 +189,30 @@ export default function Layout({ children }: { children: ReactNode }) {
         {/* Mobile Nav */}
         {mobileMenuOpen && (
           <div className="md:hidden mt-4 pt-4 border-t border-gray-800 space-y-3.5 flex flex-col">
+            {/* Agents expandable section */}
+            <div>
+              <button
+                onClick={() => setAgentsMenuOpen((o) => !o)}
+                className="w-full flex items-center justify-between text-xs font-semibold text-[#C4A484]"
+              >
+                Agents
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${agentsMenuOpen ? "rotate-180" : ""}`} />
+              </button>
+              {agentsMenuOpen && (
+                <div className="mt-2 pl-3 space-y-2.5 flex flex-col border-l border-white/10">
+                  {agentsLinks.map((a) => (
+                    <Link
+                      key={a.to}
+                      to={a.to}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="text-xs font-medium text-gray-400 hover:text-white"
+                    >
+                      {a.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
             {navLinks.map((link) => (
               <Link
                 key={link.to}
