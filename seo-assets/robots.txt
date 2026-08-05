@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Prime content
+Sitemap: https://godseye.digitalhustlerx.com/sitemap.xml
