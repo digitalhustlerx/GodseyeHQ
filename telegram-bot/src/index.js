@@ -1,0 +1,403 @@
+// GodseyeXbot — guided onboarding + WordPress-agent command flow.
+// Pure Node (no runtime deps). Talks to the Godseye backend API and the Telegram Bot API.
+// Onboarding goal: take a new user from /start to a first executed WordPress task in <2 min.
+const API_BASE_URL = (process.env.GODSEYE_API_BASE_URL ?? "https://api.godseyes.digitalhustlerx.com").replace(/\/+$/, "");
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN ?? "";
+const PLANT_PLUGIN_URL = process.env.GODSEYE_PLUGIN_URL ?? "https://api.godseyes.digitalhustlerx.com/dist/godseye-bridge.zip";
+const SIGNUP_URL = process.env.GODSEYE_SIGNUP_URL ?? "https://godseye.digitalhustlerx.com";
+
+// Per-chat session state.
+const sessions = new Map();
+
+// Force IPv4 for outbound fetch. The VPS resolves api.telegram.org to IPv6 by default but has
+// no working IPv6 route to Telegram, so node's fetch fails every poll. IPv4 works consistently.
+import { setDefaultResultOrder } from "node:dns";
+setDefaultResultOrder("ipv4first");
+
+async function api(path, options = {}) {
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    headers: { "content-type": "application/json", ...(options.headers || {}) },
+    ...options,
+  });
+  const text = await response.text();
+  const data = text ? JSON.parse(text) : null;
+  if (!response.ok) throw new Error(data?.error || data?.message || `API request failed with HTTP ${response.status}`);
+  return data;
+}
+
+async function telegram(method, payload) {
+  if (!TELEGRAM_BOT_TOKEN) throw new Error("TELEGRAM_BOT_TOKEN is required.");
+  // getUpdates is a LONG-POLL — Telegram holds the connection open up to `timeout` seconds (30s).
+  // The AbortSignal budget MUST exceed the poll window or the request aborts mid-poll.
+  const abortMs = method === "getUpdates" ? 75000 : 30000;
+  try {
+    const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/${method}`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(abortMs),
+    });
+    const data = await response.json();
+    if (!data.ok) throw new Error(data.description || "Telegram API request failed.");
+    return data.result;
+  } catch (err) {
+    if (err.name === "TimeoutError" || err.code === "ETIMEDOUT") {
+      console.log(`[telegram] ${method} timed out, retrying...`);
+      return null;
+    }
+    throw err;
+  }
+}
+
+function session(chatId) {
+  const key = String(chatId);
+  if (!sessions.has(key)) {
+    sessions.set(key, {
+      licenseKey: null,
+      siteId: null,
+      conversationId: null,
+      pendingTaskId: null,
+      // 0 = not onboarded; 1 = wizard awaiting "new or have-license"; 2 = awaiting license key entry
+      onboardingStep: 0,
+    });
+  }
+  return sessions.get(key);
+}
+
+function inlineKeyboard(rows) {
+  return { inline_keyboard: rows };
+}
+
+async function send(chatId, text, replyMarkup) {
+  const payload = { chat_id: chatId, text, ...(replyMarkup ? { reply_markup: replyMarkup } : {}) };
+  return telegram("sendMessage", payload);
+}
+
+async function answer(queryId, text) {
+  return telegram("answerCallbackQuery", { callback_query_id: queryId, ...(text ? { text } : {}) });
+}
+
+async function findSitesForLicense(licenseKey) {
+  const data = await api(`/api/sites?licenseKey=${encodeURIComponent(licenseKey)}&active=true`);
+  return data.sites || [];
+}
+
+async function getLicense(licenseKey) {
+  const data = await api(`/api/licenses/${encodeURIComponent(licenseKey)}`);
+  return data.license || null;
+}
+
+// Kick off a real task against the user's connected site. Returns {conversationId, task}.
+async function startTask(siteId, conversationId, text, autoApprove = true) {
+  const planned = await api("/api/tasks/plan", {
+    method: "POST",
+    body: JSON.stringify({ siteId, conversationId, prompt: text }),
+  });
+  const needsApproval = planned.task.plan.operations.some((operation) => operation.requiresApproval);
+  if (!needsApproval && autoApprove) {
+    const executed = await api(`/api/tasks/${planned.task.id}/approve`, { method: "POST" });
+    return { conversationId: planned.conversationId, task: executed.task };
+  }
+  return { conversationId: planned.conversationId, task: planned.task, needsApproval };
+}
+
+function formatSite(site) {
+  return `${site.name || site.url}${site.connectionStatus ? ` · ${site.connectionStatus}` : ""}${site.pluginVersion ? ` · plugin ${site.pluginVersion}` : ""}`;
+}
+
+// ---------- Onboarding wizard ----------
+
+const WELCOME_KYBD = inlineKeyboard([
+  [{ text: "🔑 I have a license", callback_data: "ob:have_license" }],
+  [{ text: "🆕 I'm new", callback_data: "ob:new_user" }],
+]);
+const HAVE_LICENSE_KYBD = inlineKeyboard([
+  [{ text: "🔗 Install / connect your WordPress site", callback_data: "ob:connect_site" }],
+  [{ text: "⌨️ Full command list", callback_data: "ob:commands" }],
+]);
+const NEW_USER_KYBD = inlineKeyboard([[{ text: "🔑 I got my license", callback_data: "ob:have_license" }]]);
+const CONNECT_SITE_KYBD = inlineKeyboard([
+  [{ text: "⚡ Try a demo task", callback_data: "task:demo" }],
+  [{ text: "🖥 /sites", callback_data: "cmd:sites" }],
+  [{ text: "❓ Help", callback_data: "ob:commands" }],
+]);
+const COMMANDS_KYBD = inlineKeyboard([
+  [{ text: "⚡ Try a demo task", callback_data: "task:demo" }],
+  [{ text: "🖥 List my sites", callback_data: "cmd:sites" }],
+  [{ text: "🔗 Manage WordPress", callback_data: "ob:connect_site" }],
+]);
+
+const DEMO_TASK_TEXT = "Create a draft post titled 'Hello Godseye' with the content block 'This post was created from Telegram.'";
+
+function welcomeText(state) {
+  const amConnected = !!(state.siteId || state.licenseKey);
+  const lines = [
+    "👁️ Welcome to Godseye.",
+    "",
+    "I'm your agent. Connect your WordPress site here, then run it straight from this chat — create drafts, manage pages, comments, WooCommerce, and more.",
+  ];
+  if (amConnected) {
+    lines.push("", `You're ready to go. Connected site: \`${state.siteId || "see /sites"}\` — try a demo task.`);
+  }
+  lines.push("", "How can we get you set up?");
+  return lines.join("\n");
+}
+
+function commandsText() {
+  return [
+    "Godseye commands:",
+    "",
+    "`/connect <license>` — connect your license & sites",
+    "`/sites` — list sites on your license",
+    "`/site <site_id>` — pick the active site",
+    "`/status` — check site/bridge status",
+    "`/approve` · `/reject` — approve or reject a planned task",
+    "",
+    "Or just send a normal message and I'll turn it into a task on your active site.",
+  ].join("\n");
+}
+
+// Route a callback query from an inline button.
+async function handleCallback(chatId, queryId, data) {
+  const state = session(chatId);
+  await answer(queryId);
+
+  if (data === "ob:have_license") {
+    state.onboardingStep = 2;
+    return send(chatId, "🔑 Send me your license key in the format `GS-XXXX-XXXX`.\n\nExample: `/connect GS-1A2B-3C4D`\n\nDon't have it handy? Tap below to see where to get it.", HAVE_LICENSE_KYBD);
+  }
+
+  if (data === "ob:new_user") {
+    state.onboardingStep = 1;
+    return send(
+      chatId,
+      [
+        "🆕 Getting started is a 3-step setup:",
+        "",
+        `1. Grab a license at ${SIGNUP_URL} (founder pricing live). You'll get a key like \`GS-1A2B-3C4D\`.`,
+        `2. Install the plugin on your WordPress site — download ${PLANT_PLUGIN_URL}, then Plugins → Upload → Activate. The plugin connects the site to your license automatically.`,
+        "3. Come back here and/or connect: `/connect <license>`, then send a message to run your first task.",
+        "",
+        "Tap below once you have your license.",
+      ].join("\n"),
+      NEW_USER_KYBD
+    );
+  }
+
+  if (data === "ob:connect_site") {
+    const licence = state.licenseKey;
+    return send(
+      chatId,
+      [
+        `Plugin download: ${PLANT_PLUGIN_URL}`,
+        "",
+        "Install on your WordPress site: Plugins → Add New → Upload Plugin → select the zip → Activate.",
+        "Then open Settings → Godseye, paste your license key, and click Connect.",
+        licence ? `Your license: \`${licence}\`` : "You'll need a license key first (see /start).",
+      ].join("\n"),
+      COMMANDS_KYBD
+    );
+  }
+
+  if (data === "ob:commands") {
+    return send(chatId, commandsText(), COMMANDS_KYBD);
+  }
+
+  if (data === "cmd:sites") {
+    return handleCommand(chatId, "/sites", false);
+  }
+
+  if (data === "task:demo") {
+    if (!state.siteId) {
+      return send(chatId, "Connect a site first. Tap below to connect.", HAVE_LICENSE_KYBD);
+    }
+    try {
+      const { conversationId, task, needsApproval } = await startTask(state.siteId, state.conversationId, DEMO_TASK_TEXT);
+      state.conversationId = conversationId;
+      if (needsApproval) {
+        state.pendingTaskId = task.id;
+        return send(chatId, `${task.plan.summary}\nApprove with /approve or reject with /reject.`);
+      }
+      state.pendingTaskId = null;
+      return send(chatId, `✅ Demo task executed:\n\n${task.result?.message ?? "Done."}\n\nThat's the loop — send any message and I'll plan + run it on your site.`, COMMANDS_KYBD);
+    } catch (error) {
+      return send(chatId, `Godseye error: ${error instanceof Error ? error.message : "Unknown error"}`);
+    }
+  }
+
+  return send(chatId, "Unknown option.");
+}
+
+// ---------- Commands ----------
+
+const COMMANDS_KYBD_FOR_START = COMMANDS_KYBD;
+
+async function handleCommand(chatId, text, fromCallback = true) {
+  const state = session(chatId);
+  const [command, ...rest] = text.trim().split(/\s+/);
+
+  if (command === "/start" || command === "/help") {
+    return send(chatId, welcomeText(state), WELCOME_KYBD);
+  }
+
+  if (command === "/connect") {
+    const licenseKey = rest[0];
+    if (!licenseKey) {
+      state.onboardingStep = 2;
+      return send(chatId, "Usage: `/connect <license_key>`\n\nSend your license key now (format `GS-XXXX-XXXX`).", HAVE_LICENSE_KYBD);
+    }
+    try {
+      const license = await getLicense(licenseKey);
+      const sites = await findSitesForLicense(licenseKey);
+      state.licenseKey = licenseKey;
+      state.onboardingStep = 0;
+      if (!sites.length) {
+        return send(chatId, `✅ License connected (${license.plan ?? "plan"}).\n\nNo connected sites yet. Install the plugin so your site registers, then come back to /sites.`, HAVE_LICENSE_KYBD);
+      }
+      state.siteId = sites[0].id;
+      state.conversationId = null; // fresh conversation per setup
+      const siteList = sites.map((site) => `• \`${site.id}\` — ${formatSite(site)}`).join("\n");
+      return send(
+        chatId,
+        [
+          "✅ Connected.",
+          "",
+          `Active site: \`${sites[0].id}\` — ${formatSite(sites[0])}`,
+          "",
+          siteList ? `Other sites:\n${siteList}` : "",
+          "",
+          "⚡ Run a demo task to see the loop.",
+        ].join("\n"),
+        CONNECT_SITE_KYBD
+      );
+    } catch (error) {
+      return send(chatId, `Couldn't connect that license: ${error instanceof Error ? error.message : "invalid key"}. Check the key and try again.`);
+    }
+  }
+
+  if (command === "/sites") {
+    if (!state.licenseKey) return send(chatId, "Connect a license first with `/connect <license_key>`.", HAVE_LICENSE_KYBD);
+    const sites = await findSitesForLicense(state.licenseKey);
+    if (!sites.length) return send(chatId, "No sites found for this license yet. Install the plugin to register your site.", HAVE_LICENSE_KYBD);
+    return send(chatId, "Your sites:\n" + sites.map((site) => `• \`${site.id}\` — ${formatSite(site)}`).join("\n"), COMMANDS_KYBD);
+  }
+
+  if (command === "/site") {
+    const siteId = rest[0];
+    if (!siteId) return send(chatId, "Usage: `/site <site_id>`");
+    await api(`/api/sites/${siteId}`);
+    state.siteId = siteId;
+    return send(chatId, `Active site set to \`${siteId}\`.`);
+  }
+
+  if (command === "/status") {
+    if (!state.siteId) return send(chatId, "No active site. Use `/connect` and `/site` first.", CONNECT_SITE_KYBD);
+    const data = await api(`/api/sites/${state.siteId}`);
+    const site = data.site;
+    const statusMsg = [
+      `*${site.name || site.url}*`,
+      `Status: ${site.connectionStatus}`,
+      `Plugin: ${site.pluginVersion || "unknown"}`,
+      `Last bridge check: ${site.lastBridgeCheckAt || "not checked"}`,
+    ];
+    return send(chatId, statusMsg.join("\n"), COMMANDS_KYBD);
+  }
+
+  if (command === "/approve") {
+    if (!state.pendingTaskId) return send(chatId, "No pending task to approve.");
+    const data = await api(`/api/tasks/${state.pendingTaskId}/approve`, { method: "POST" });
+    state.pendingTaskId = null;
+    return send(chatId, data.task.result?.message || "Task approved and executed.", COMMANDS_KYBD);
+  }
+
+  if (command === "/reject") {
+    if (!state.pendingTaskId) return send(chatId, "No pending task to reject.");
+    await api(`/api/tasks/${state.pendingTaskId}/reject`, { method: "POST" });
+    state.pendingTaskId = null;
+    return send(chatId, "Task rejected.", COMMANDS_KYBD);
+  }
+
+  return send(chatId, "Unknown command. Send `/start` to get oriented, or use `/help`.", COMMANDS_KYBD);
+}
+
+export async function planTelegramMessage({ siteId, conversationId, text }) {
+  return api("/api/tasks/plan", {
+    method: "POST",
+    body: JSON.stringify({ siteId, conversationId, prompt: text }),
+  });
+}
+
+async function handleMessage(message) {
+  const chatId = message.chat.id;
+  const text = message.text || "";
+  const state = session(chatId);
+
+  try {
+    if (text.startsWith("/")) {
+      state.onboardingStep = 0; // explicit command resets any pending wizard input
+      return await handleCommand(chatId, text);
+    }
+
+    // Inline-keyboard "I'm new" already handled via callbacks; a free-text license key when
+    // the wizard is awaiting one is treated as /connect with that key.
+    if (state.onboardingStep === 2 && /^GS-[A-Z0-9-]{4,}$/i.test(text.trim())) {
+      return await handleCommand(chatId, `/connect ${text.trim()}`);
+    }
+
+    if (!state.siteId) {
+      return await send(chatId, "Connect a site first. Send `/connect <license_key>` or tap below.", HAVE_LICENSE_KYBD);
+    }
+
+    const planned = await planTelegramMessage({ siteId: state.siteId, conversationId: state.conversationId, text });
+    state.conversationId = planned.conversationId;
+    state.pendingTaskId = planned.task.id;
+    const needsApproval = planned.task.plan.operations.some((operation) => operation.requiresApproval);
+
+    if (!needsApproval) {
+      const executed = await api(`/api/tasks/${planned.task.id}/approve`, { method: "POST" });
+      state.pendingTaskId = null;
+      return await send(chatId, executed.task.result?.message || "Task executed.", COMMANDS_KYBD);
+    }
+
+    return await send(chatId, `${planned.task.plan.summary}\nApprove with /approve or reject with /reject.`, COMMANDS_KYBD);
+  } catch (error) {
+    return await send(chatId, `Godseye error: ${error instanceof Error ? error.message : "Unknown error"}`);
+  }
+}
+
+export async function runPolling() {
+  if (!TELEGRAM_BOT_TOKEN) {
+    console.log("Set TELEGRAM_BOT_TOKEN to start the Telegram bot.");
+    return;
+  }
+
+  let offset = 0;
+  console.log("Godseye Telegram bot polling started.");
+  while (true) {
+    try {
+      const updates = await telegram("getUpdates", { offset, timeout: 30 });
+      if (!updates) continue; // timeout, retry
+      for (const update of updates) {
+        offset = update.update_id + 1;
+        if (update.callback_query) {
+          const chatId = update.callback_query.message.chat.id;
+          const queryId = update.callback_query.id;
+          const data = update.callback_query.data ?? "";
+          await handleCallback(chatId, queryId, data);
+        } else if (update.message?.text) {
+          await handleMessage(update.message);
+        }
+      }
+    } catch (err) {
+      console.error(`[telegram] Polling error: ${err.message}`);
+      await new Promise((r) => setTimeout(r, 5000)); // wait before retry
+    }
+  }
+}
+
+if (import.meta.url === `file://${process.argv[1]}`) {
+  runPolling().catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
+}
