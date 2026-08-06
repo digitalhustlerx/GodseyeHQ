@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GodsEye — Your Agent, Wrapped</title>
+  <meta name="description" content="30 days of a power user on one AI agent. What it actually ran, what it cost, and why it scales.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#0A0A0A; --surface:#121212; --elevated:#181818;
+      --gold:#C4A484; --gold-hover:#b39272; --gold-dim:#8a6f50;
+      --text:#F2F2F2; --muted:#939393; --dim:#636363;
+      --border:rgba(255,255,255,0.1);
+      --font-display:'Space Grotesk',sans-serif;
+      --font-body:'Inter',sans-serif;
+      --font-mono:'JetBrains Mono',monospace;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      background:var(--bg); color:var(--text); font-family:var(--font-body);
+      min-height:100vh; -webkit-font-smoothing:antialiased;
+    }
+    .wrap { max-width:720px; margin:0 auto; padding:70px 24px 60px; }
+
+    /* Top bar */
+    .bar { display:flex; align-items:center; justify-content:space-between; margin-bottom:36px; }
+    .brand { font-family:var(--font-display); font-weight:700; letter-spacing:0.04em; font-size:18px; }
+    .brand span { color:var(--gold); }
+    .badge {
+      font-family:var(--font-mono); font-size:11px; letter-spacing:0.18em; text-transform:uppercase;
+      color:var(--gold); border:1px solid rgba(196,164,132,0.3); background:rgba(196,164,132,0.06);
+      padding:7px 14px; border-radius:999px;
+    }
+
+    /* Hero */
+    .hero { margin-bottom:44px; }
+    .eyebrow { display:inline-block; font-family:var(--font-mono); font-size:11px; letter-spacing:0.2em; text-transform:uppercase; color:var(--gold-dim); margin-bottom:14px; }
+    h1 { font-family:var(--font-display); font-weight:600; font-size:46px; line-height:1.05; letter-spacing:-0.02em; margin-bottom:16px; }
+    h1 em { color:var(--gold); font-style:normal; }
+    .sub { color:var(--muted); font-weight:300; font-size:15px; line-height:1.7; max-width:560px; }
+    .range { font-family:var(--font-mono); font-size:12px; color:var(--dim); margin-top:18px; text-transform:uppercase; letter-spacing:0.08em; }
+
+    /* Section label */
+    .sect { font-family:var(--font-mono); font-size:11px; letter-spacing:0.18em; text-transform:uppercase; color:var(--gold); margin:38px 0 16px; display:flex; align-items:center; gap:12px; }
+    .sect::after { content:''; flex:1; height:1px; background:var(--border); }
+
+    /* Highlight hero stat */
+    .highlight {
+      background:linear-gradient(150deg, rgba(196,164,132,0.10), var(--surface) 60%);
+      border:1px solid rgba(196,164,132,0.35); border-radius:20px; padding:28px;
+    }
+    .highlight .big { font-family:var(--font-display); font-weight:700; font-size:34px; color:var(--gold); line-height:1.1; margin-bottom:10px; }
+    .highlight p { color:var(--text); font-weight:300; font-size:15px; line-height:1.6; }
+
+    /* Stat grid */
+    .grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .stat { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:22px; }
+    .stat .v { font-family:var(--font-display); font-weight:700; font-size:30px; color:var(--gold); margin-bottom:6px; }
+    .stat .v.plain { color:var(--text); }
+    .stat .l { font-family:var(--font-mono); font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); }
+
+    /* Engine callout */
+    .engine { background:var(--elevated); border:1px solid rgba(196,164,132,0.4); border-radius:20px; padding:26px; }
+    .engine h3 { font-family:var(--font-mono); font-size:11px; letter-spacing:0.18em; color:var(--gold); text-transform:uppercase; margin-bottom:12px; }
+    .engine .lead { font-family:var(--font-display); font-weight:600; font-size:22px; margin-bottom:10px; }
+    .engine .meta { font-family:var(--font-mono); font-size:12px; color:var(--muted); }
+
+    /* Rows */
+    .row { display:flex; justify-content:space-between; align-items:baseline; background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:18px 22px; margin-bottom:10px; }
+    .row .lab { color:var(--muted); font-weight:300; font-size:14px; }
+    .row .val { font-family:var(--font-mono); font-weight:600; color:var(--gold); font-size:14px; text-align:right; }
+    .row .val.plain { color:var(--text); }
+
+    /* Caveat */
+    .caveat { margin-top:38px; background:var(--elevated); border:1px solid var(--border); border-radius:16px; padding:22px; }
+    .caveat h4 { font-family:var(--font-mono); font-size:11px; letter-spacing:0.18em; color:var(--gold); text-transform:uppercase; margin-bottom:10px; }
+    .caveat p { color:var(--muted); font-weight:300; font-size:13px; line-height:1.7; }
+
+    /* Footer */
+    .foot { text-align:center; margin-top:48px; padding-top:24px; border-top:1px solid var(--border); }
+    .foot a { color:var(--gold); text-decoration:none; font-family:var(--font-mono); font-size:13px; }
+    .foot a:hover { text-decoration:underline; }
+
+    @media(max-width:520px){
+      h1 { font-size:34px; }
+      .grid { grid-template-columns:1fr; }
+      .highlight .big { font-size:28px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- Top bar -->
+    <div class="bar">
+      <div class="brand">GODS<span>EYE</span></div>
+      <div class="badge">Wrapped</div>
+    </div>
+
+    <!-- Hero -->
+    <div class="hero">
+      <div class="eyebrow">Your AI Agent, Wrapped</div>
+      <h1>30 days of running a <em>whole business</em> on one agent.</h1>
+      <p class="sub">A solo founder ran a full software operation on a single AI agent for a month. Here's what that actually ran, what it cost, and why it scales instead of breaking.</p>
+      <div class="range">Jul 06 – Aug 05, 2026 · 30 days</div>
+    </div>
+
+    <!-- Highlight -->
+    <div class="highlight">
+      <div class="big">2.47 BILLION tokens · 51,249 real actions</div>
+      <p>The agent took <strong>14.9</strong> actions on its own for every single one the founder took. It worked while he slept.</p>
+    </div>
+
+    <!-- Stats -->
+    <div class="sect">The Month In Numbers</div>
+    <div class="grid">
+      <div class="stat"><div class="v">2.47B</div><div class="l">Tokens processed</div></div>
+      <div class="stat"><div class="v">51,249</div><div class="l">Real actions</div></div>
+      <div class="stat"><div class="v plain">4,324</div><div class="l">Sessions / 30 days</div></div>
+      <div class="stat"><div class="v plain">93,279</div><div class="l">Messages</div></div>
+    </div>
+
+    <!-- Autonomy engine -->
+    <div class="sect">The Autonomy Engine</div>
+    <div class="engine">
+      <h3>It runs on its own</h3>
+      <div class="lead">43% of every token ran with nobody watching.</div>
+      <div class="meta">8+ background agents · 87 skills · 1,083 skill loads · 269 edits</div>
+    </div>
+
+    <!-- Costs -->
+    <div class="sect">What It Costs</div>
+    <div class="row"><span class="lab">Cost of the engine (clean)</span><span class="val">$52 / month</span></div>
+    <div class="row"><span class="lab">Full operating blend (with context re-reads)</span><span class="val">$618</span></div>
+    <div class="row"><span class="lab">One directed action</span><span class="val">$0.012 — a cent</span></div>
+    <div class="row"><span class="lab">Autonomy ratio</span><span class="val">14.9× per 1 of yours</span></div>
+    <div class="row"><span class="lab">Heavy user vs a light user</span><span class="val">206× more tokens / day</span></div>
+    <div class="row"><span class="lab">Model loyalty</span><span class="val plain">deepseek-v4-flash · 87.2%</span></div>
+
+    <!-- Caveat -->
+    <div class="caveat">
+      <h4>The Honest Caveat</h4>
+      <p>These are usage and cost metrics — proof of execution capacity and cost efficiency, not revenue. Throughput isn't completion. Autonomy compounds cost, so budget to the blended number, not the clean one.</p>
+    </div>
+
+    <div class="foot">
+      <a href="https://godseye.digitalhustlerx.com">godseye.digitalhustlerx.com</a>
+    </div>
+  </div>
+</body>
+</html>
