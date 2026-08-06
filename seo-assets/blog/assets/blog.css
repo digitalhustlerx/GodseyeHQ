@@ -1,4 +1,4 @@
-/* Godseye blog shared styles — dark theme, gold accents (design tokens) */
+/* Godseye blog shared styles | dark theme, gold accents (design tokens) */
 :root{
   --bg:#0A0A0A; --surface:#121212; --card:#161616; --border:rgba(255,255,255,.08);
   --gold:#C4A484; --text:#F2F2F2; --muted:#939393; --gold-dim:#8a6f50;
