@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GodsEye — Which Tier Fits You?</title>
+  <meta name="description" content="Three ways to run GodsEye. See what each tier can actually do. Pick the one that matches how you work.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#0A0A0A; --surface:#121212; --elevated:#181818;
+      --gold:#C4A484; --gold-hover:#b39272; --gold-dim:#8a6f50;
+      --text:#F2F2F2; --muted:#939393; --border:rgba(255,255,255,0.1);
+      --green:#4ade80; --red:#f87171; --amber:#fbbf24;
+      --font-display:'Georgia',serif; --font-sans:'Inter',sans-serif; --font-mono:'JetBrains Mono',monospace;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      background:var(--bg); color:var(--text); font-family:var(--font-sans);
+      min-height:100vh; padding:60px 20px 40px;
+    }
+    .wrap { max-width:1080px; margin:0 auto; }
+    /* Header */
+    .header { text-align:center; margin-bottom:48px; }
+    .eyebrow {
+      display:inline-flex; align-items:center; gap:8px; padding:8px 16px;
+      background:rgba(196,164,132,0.08); border:1px solid rgba(196,164,132,0.3);
+      border-radius:999px; font-family:var(--font-mono); font-size:11px;
+      letter-spacing:0.2em; text-transform:uppercase; color:var(--gold); margin-bottom:20px;
+    }
+    h1 { font-family:var(--font-display); font-weight:300; font-size:44px; letter-spacing:-0.02em; line-height:1.1; }
+    h1 em { color:var(--gold); font-style:italic; }
+    .sub { color:var(--muted); font-weight:300; font-size:16px; max-width:640px; margin:14px auto 0; line-height:1.6; }
+    /* Tier cards */
+    .tiers { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-bottom:40px; }
+    .tier {
+      background:var(--surface); border:1px solid var(--border); border-radius:20px;
+      padding:26px; position:relative; transition:all .25s ease; display:flex; flex-direction:column;
+    }
+    .tier:hover { transform:translateY(-4px); border-color:rgba(196,164,132,0.4); box-shadow:0 16px 40px rgba(0,0,0,0.4), 0 0 24px rgba(196,164,132,0.08); }
+    .tier.featured { background:linear-gradient(160deg, rgba(196,164,132,0.10), var(--surface) 55%); border-color:rgba(196,164,132,0.45); }
+    .tier-badge {
+      position:absolute; top:-12px; left:50%; transform:translateX(-50%);
+      font-family:var(--font-mono); font-size:9px; letter-spacing:0.18em; text-transform:uppercase;
+      background:var(--gold); color:#0A0A0A; padding:5px 14px; border-radius:999px; font-weight:700;
+    }
+    .tier-num { font-family:var(--font-mono); font-size:11px; letter-spacing:0.2em; color:var(--gold-dim); text-transform:uppercase; margin-bottom:6px; }
+    .tier h2 { font-family:var(--font-display); font-weight:400; font-size:26px; margin-bottom:6px; }
+    .tier-price { font-family:var(--font-mono); font-size:13px; color:var(--gold); font-weight:500; margin-bottom:14px; }
+    .tier-desc { font-size:13px; color:var(--muted); font-weight:300; line-height:1.6; margin-bottom:18px; }
+    .tier-divider { border:none; border-top:1px solid var(--border); margin:0 0 16px; }
+    .tier-list { list-style:none; flex:1; }
+    .tier-list li { display:flex; gap:10px; align-items:flex-start; font-size:13px; color:rgba(255,255,255,0.75); margin-bottom:11px; line-height:1.5; font-weight:300; }
+    .dot { width:6px; height:6px; border-radius:50%; background:var(--gold); margin-top:7px; flex-shrink:0; }
+    .tier-cta { margin-top:20px; }
+    .tier-cta a {
+      display:block; text-align:center; padding:13px; border-radius:12px;
+      font-family:var(--font-mono); font-size:11px; letter-spacing:0.14em; text-transform:uppercase; font-weight:700;
+      text-decoration:none; transition:all .2s ease;
+      background:rgba(255,255,255,0.05); border:1px solid var(--border); color:var(--text);
+    }
+    .tier.featured .tier-cta a { background:var(--gold); color:#0A0A0A; border-color:var(--gold); }
+    .tier-cta a:hover { background:var(--gold-hover); color:#0A0A0A; border-color:var(--gold-hover); }
+    /* Comparison table */
+    .compare-wrap { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:30px; }
+    .compare-wrap h3 { font-family:var(--font-display); font-weight:400; font-size:22px; margin-bottom:22px; text-align:center; }
+    table { width:100%; border-collapse:collapse; font-size:13px; }
+    th { text-align:left; font-family:var(--font-mono); font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--gold); padding:12px 12px; border-bottom:1px solid var(--border); }
+    th.tierh { text-align:center; }
+    td { padding:12px; border-bottom:1px solid rgba(255,255,255,0.05); color:rgba(255,255,255,0.7); font-weight:300; }
+    td.feat { color:var(--text); font-weight:400; }
+    td.c { text-align:center; font-weight:500; }
+    .yes { color:var(--green); }
+    .no { color:var(--red); }
+    .part { color:var(--amber); }
+    tr:hover td { background:rgba(196,164,132,0.04); }
+    /* Note */
+    .note { margin-top:24px; text-align:center; font-size:12px; color:var(--muted); font-weight:300; }
+    .note a { color:var(--gold); text-decoration:none; }
+    .note a:hover { text-decoration:underline; }
+    @media(max-width:820px) {
+      .tiers { grid-template-columns:1fr; gap:22px; }
+      h1 { font-size:34px; }
+      .compare-wrap { padding:18px; overflow-x:auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="header">
+      <div class="eyebrow">👁️ GodsEye · Tiers</div>
+      <h1>Pick the tier that <em>matches how you work.</em></h1>
+      <p class="sub">Same agent, three levels of control. Start safe with your own site, or hand us the whole stack. See exactly what each tier does before you choose.</p>
+    </div>
+
+    <!-- TIERS -->
+    <div class="tiers">
+      <div class="tier">
+        <div class="tier-num">Starter</div>
+        <h2>Your Agent</h2>
+        <div class="tier-price">$9–12 / mo</div>
+        <hr class="tier-divider">
+        <ul class="tier-list">
+          <li><span class="dot"></span>Connects to your WordPress site as-is, on your hosting</li>
+          <li><span class="dot"></span>Drafts posts & pages, manages media & comments</li>
+          <li><span class="dot"></span>Reads SEO status, plugins, themes, site health</li>
+          <li><span class="dot"></span>Manages WooCommerce products & orders</li>
+          <li><span class="dot"></span>Safe by design — everything drafts, nothing ships without you</li>
+        </ul>
+        <div class="tier-cta"><a href="https://godseye.digitalhustlerx.com/start">Start with Starter</a></div>
+      </div>
+
+      <div class="tier featured">
+        <div class="tier-badge">Most control</div>
+        <div class="tier-num">Pro</div>
+        <h2>Your Operator</h2>
+        <div class="tier-price">Extended bridge</div>
+        <hr class="tier-divider">
+        <ul class="tier-list">
+          <li><span class="dot"></span>Everything in Starter, plus full publish (with your OK)</li>
+          <li><span class="dot"></span>Installs & activates plugins and themes</li>
+          <li><span class="dot"></span>Edits pages in Elementor / your page builder</li>
+          <li><span class="dot"></span>Manages backups, restore, & on-demand tasks</li>
+          <li><span class="dot"></span>Runs scheduled autonomous maintenance</li>
+          <li><span class="dot"></span>The jump from assistant to operator</li>
+        </ul>
+        <div class="tier-cta"><a href="https://godseye.digitalhustlerx.com/pricing">Go Pro</a></div>
+      </div>
+
+      <div class="tier">
+        <div class="tier-num">God Mode</div>
+        <h2>We Run It</h2>
+        <div class="tier-price">Premium · managed</div>
+        <hr class="tier-divider">
+        <ul class="tier-list">
+          <li><span class="dot"></span>We host, provision, and secure your VPS</li>
+          <li><span class="dot"></span>We install WordPress + the agent + everything needed</li>
+          <li><span class="dot"></span>Your site has a full-time AI ops team</li>
+          <li><span class="dot"></span>Updates, hardening, & health handled for you</li>
+          <li><span class="dot"></span>You run the business; we run the stack</li>
+        </ul>
+        <div class="tier-cta"><a href="mailto:selfhost@godseye.shop?subject=God%20Mode">Talk to us about God Mode</a></div>
+      </div>
+    </div>
+
+    <!-- COMPARISON -->
+    <div class="compare-wrap">
+      <h3>Side-by-side: what each tier does</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Capability</th>
+            <th class="tierh">Starter</th>
+            <th class="tierh">Pro</th>
+            <th class="tierh">God Mode</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="feat">Create drafts</td><td class="c yes">✓</td><td class="c yes">✓</td><td class="c yes">✓</td></tr>
+          <tr><td class="feat">Publish posts / pages (with your approval)</td><td class="c part">draft only</td><td class="c yes">✓</td><td class="c yes">✓</td></tr>
+          <tr><td class="feat">Edit raw content / Gutenberg blocks</td><td class="c part">sanitized</td><td class="c yes">✓</td><td class="c yes">✓</td></tr>
+          <tr><td class="feat">Install / activate plugins</td><td class="c no">✕ view only</td><td class="c yes">✓</td><td class="c yes">✓</td></tr>
+          <tr><td class="feat">Install / switch themes</td><td class="c no">✕ view only</td><td class="c yes">✓</td><td class="c yes">✓</td></tr>
+          <tr><td class="feat">Elementor / page-builder edits</td><td class="c no">✕</td><td class="c yes">✓</td><td class="c yes">✓</td></tr>
+          <tr><td class="feat">Direct server config (php.ini, .htaccess)</td><td class="c no">✕</td><td class="c yes">✓</td><td class="c yes">✓</td></tr>
+          <tr><td class="feat">Database queries / admin</td><td class="c no">✕</td><td class="c yes">✓</td><td class="c yes">✓</td></tr>
+          <tr><td class="feat">Cron management</td><td class="c part">view</td><td class="c yes">✓</td><td class="c yes">✓</td></tr>
+          <tr><td class="feat">Backup + restore</td><td class="c no">✕</td><td class="c yes">✓</td><td class="c yes">✓</td></tr>
+          <tr><td class="feat">Security hardening (active blocking)</td><td class="c part">detect</td><td class="c yes">✓</td><td class="c yes">✓</td></tr>
+          <tr><td class="feat">Scheduled autonomous tasks</td><td class="c no">✕</td><td class="c yes">✓</td><td class="c yes">✓</td></tr>
+          <tr><td class="feat">We host + manage your whole stack</td><td class="c no">✕</td><td class="c no">✕</td><td class="c yes">✓</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="note">
+      One agent, your choice of control. <a href="https://godseye.digitalhustlerx.com">Back to GodsEye home</a>
+    </p>
+  </div>
+</body>
+</html>
