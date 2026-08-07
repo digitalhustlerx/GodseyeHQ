@@ -88,7 +88,7 @@ export default function Layout({ children }: { children: ReactNode }) {
     <div className="min-h-screen bg-[#0A0A0A] text-[#F2F2F2] flex flex-col font-sans selection:bg-[#C4A484]/30 selection:text-[#d9c4af]">
       {/* Top Banner */}
       <div className="bg-white/5 border-b border-white/10 text-center py-2.5 px-4 text-xs font-mono text-[#C4A484] uppercase tracking-widest">
-        👁️ GodsEye v2.0 — From Private Beta to Public Release
+        👁️ Official launch approaching — First 100 joiners get 50% off for a year. Join the waitlist.
       </div>
 
       {/* Navigation */}
@@ -267,7 +267,7 @@ export default function Layout({ children }: { children: ReactNode }) {
               </span>
             </div>
             <p className="text-xs text-white/50 font-light leading-relaxed">
-              Your all-in-one AI agent for WordPress. Content, commerce, security, and automations — all through conversation.
+              An AI agent that orchestrates a fleet of agents to run your business. It manages clients, content, orders, and analytics — all through conversation.
             </p>
 
             {/* Social Links */}

@@ -4,37 +4,37 @@ import { useState, useEffect, useCallback, useRef, type TouchEvent } from "react
 import { PRICING_PLANS } from "../mockData";
 import WaitlistModal from "../components/WaitlistModal";
 
-// ─── HERO SLIDES (psychology combo: 7→5→1→8→10) ───────────────────────────
+// ─── HERO SLIDES (Vicky version — plain, human, non-technical) ─────────────
 const HERO_SLIDES = [
   {
-    // Slide 1 — SIMPLICITY
-    badge: "IT'S JUST A CHAT",
-    h1: <>It's just another chat on your phone.<br /><span className="italic text-[#C4A484]">That runs your entire business.</span></>,
-    p: "You already know how to use Telegram. You already chat with people every day. This is the same thing — except the person on the other end is your AI agent. You tell it what you need. It does it. Clients, content, orders, analytics — whatever your business needs. No website required. No computer required. Just plug your domain in and start.",
+    // Slide 1 — THE HOOK
+    badge: "HIRE AI AGENTS FOR YOUR BUSINESS",
+    h1: <>Hire AI agents that work 24 hours, 365 days.<br /><span className="italic text-[#C4A484]">Better reliability than any human.</span></>,
+    p: "Your store manager. Your content writer. Your administrator. Your receptionist. Your support agent. Whatever you point it at, it becomes — for less than one part-timer costs. No salaries. No sick days. No drama. Just work, done right, all the time.",
   },
   {
-    // Slide 2 — RELIEF
-    badge: "NEVER GETS TIRED",
-    h1: <>You're tired of doing everything yourself.<br /><span className="italic text-[#C4A484]">Here's someone who never gets tired.</span></>,
-    p: "The replies. The follow-ups. The content. The orders. The scheduling. The admin. Your AI agent takes all of it — lives in your Telegram, works 24/7, and handles the load you've been carrying alone. It grows with you, learns how you like things done, and gets better every day. You don't have to hold it all together anymore.",
+    // Slide 2 — THE CONVERSATION
+    badge: "LIVES ON TELEGRAM",
+    h1: <>You don't need a website. You don't need a dashboard.<br /><span className="italic text-[#C4A484]">You need someone handling things. So you don't have to.</span></>,
+    p: "Everything happens in a group chat — on Telegram, where you already are. Your agent sets it up, sorts your business into sections, and gets to work. Booking clients. Replying to messages. Posting on social. Sending reminders. Tracking orders. You check in when you want. The rest of the time, it's handling things you'd otherwise stress over.",
   },
   {
-    // Slide 3 — GREED
-    badge: "EVERYTHING FOR LESS THAN A PHONE BILL",
-    h1: <>Everything your business needs.<br /><span className="italic text-[#C4A484]">For less than a phone bill.</span></>,
-    p: "An AI agent that lives in your Telegram. It manages your clients. Posts your content. Tracks your orders. Reads your numbers and tells you what they mean — just ask it a question and it answers. Hiring one person costs thousands. This costs $9. And it never sleeps, never complains, and works 365 days a year.",
+    // Slide 3 — THE ROLES
+    badge: "ONE HIRE. EVERY ROLE.",
+    h1: <>It becomes whatever you want it to be.<br /><span className="italic text-[#C4A484]">Point it at a problem. It solves it.</span></>,
+    p: "Your receptionist — replying to clients and booking appointments. Your social media manager — posting your work, writing captions, scheduling content. Your administrator — tracking orders, organizing files, sending reminders. Your personal assistant — reminding you, researching for you, handling whatever you throw at it. One agent. Or a fleet of them. Orchestrated, autonomous, always working.",
   },
   {
-    // Slide 4 — POWER
-    badge: "ONE AGENT. MANY AGENTS. ALL YOURS.",
-    h1: <>You're the boss.<br /><span className="italic text-[#C4A484]">Your agents do the work.</span></>,
-    p: "Hire one AI agent. When the work piles up, it spawns more — a writer, a seller, a researcher, a support rep, an analyst. They work inside a group chat on your Telegram, handle different parts of your business, and report back to you. You approve ideas. They execute. You steer. They move.",
+    // Slide 4 — THE ONE-MAN ARMY
+    badge: "BUILT FOR ONE-MAN ARMIES",
+    h1: <>You're doing the work of five people.<br /><span className="italic text-[#C4A484]">Now you don't have to.</span></>,
+    p: "You sell lashes. You do hair. You run a store. You manage clients. You're the marketing, the admin, the customer service — all at once. Your agent takes every role off your plate. You stay lean. You stay creative. Everything else gets handled — 24/7, 365.",
   },
   {
-    // Slide 5 — BELONGING
-    badge: "REGULAR PEOPLE USE THIS",
-    h1: <>Regular people are running businesses<br /><span className="italic text-[#C4A484]">with an AI agent in their pocket.</span></>,
-    p: "Not coders. Not tech bros. Lash techs, hairstylists, shop owners, consultants, tutors, freelancers. People who sell things and serve clients and were drowning in the business side. They hired an AI agent. It lives in their Telegram. It handles everything. Now they focus on their craft. The agent handles the rest.",
+    // Slide 5 — THE SIMPLE TRUTH
+    badge: "BUILD WHATEVER YOU WANT TO BUILD",
+    h1: <>Tell it what you need.<br /><span className="italic text-[#C4A484]">It builds it. Handles it. Runs it.</span></>,
+    p: "You don't need to be technical. You don't need to understand websites or plugins or dashboards. You just tell your agent what your business does and what you need help with — and it starts. It converses with you, understands your style, and gets to work. Building whatever you want to build. Handling whatever you don't want to. That's it.",
   },
 ];
 
