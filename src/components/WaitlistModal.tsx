@@ -7,6 +7,7 @@ interface WaitlistSession {
   isFounder: boolean;
   referralCode?: string;
   referralToken?: string;
+  founderCode?: string;
 }
 
 interface WaitlistModalProps {
@@ -18,16 +19,19 @@ interface WaitlistModalProps {
 
 export default function WaitlistModal({ open, onClose, onSuccess, referralParam }: WaitlistModalProps) {
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [status, setStatus] = useState<"form" | "success" | "existing">("form");
   const [waitlistCount, setWaitlistCount] = useState(0);
+  const [founderCode, setFounderCode] = useState("");
   const [referralLink, setReferralLink] = useState("");
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (!open) {
       setEmail("");
+      setPhone("");
       setError("");
       setStatus("form");
       setSubmitting(false);
@@ -52,6 +56,8 @@ export default function WaitlistModal({ open, onClose, onSuccess, referralParam 
       // first-touch attribution works on signup.
       const body: Record<string, string> = { email: trimmed };
       if (referralParam) body.referredBy = referralParam;
+      const phoneT = phone.trim();
+      if (phoneT) body.phone = phoneT;
 
       const res = await fetch("/api/waitlist", {
         method: "POST",
@@ -61,6 +67,14 @@ export default function WaitlistModal({ open, onClose, onSuccess, referralParam 
 
       const data = await res.json();
       const isExisting = data.message === "Already on the waitlist!";
+      const code = (data?.founder_code as string) || "";
+
+      // GODSEYE-ANALYTICS: fire a waitlist_signup custom event for the dashboard.
+      // Uses Umami's global fn; safe no-op if blocked/unavailable.
+      try {
+        const u = (window as any).umami;
+        if (u?.track) u.track(isExisting ? "waitlist_existing" : "waitlist_signup", { source: referralParam ? "referral" : "direct" });
+      } catch {}
 
       // Fetch waitlist count for founder status
       let count = 0;
@@ -77,6 +91,7 @@ export default function WaitlistModal({ open, onClose, onSuccess, referralParam 
       const refLink = token ? referralUrl(token) : "";
 
       setWaitlistCount(count);
+      setFounderCode(code);
       setReferralLink(refLink);
       setStatus(isExisting ? "existing" : "success");
 
@@ -86,6 +101,7 @@ export default function WaitlistModal({ open, onClose, onSuccess, referralParam 
         isFounder: count < 100,
         referralCode: token || undefined,
         referralToken: token || undefined,
+        founderCode: code || undefined,
       });
     } catch {
       setError("Could not reach the waitlist server. Please try again.");
@@ -149,6 +165,17 @@ export default function WaitlistModal({ open, onClose, onSuccess, referralParam 
                 {error && <p className="text-red-400 text-xs mt-1.5">{error}</p>}
               </div>
 
+              <div>
+                <input
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="Phone (optional — get the launch-day SMS)"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-[#C4A484]/50 focus:ring-1 focus:ring-[#C4A484]/30 transition-all"
+                  disabled={submitting}
+                />
+              </div>
+
               <button
                 type="submit"
                 disabled={submitting}
@@ -169,7 +196,7 @@ export default function WaitlistModal({ open, onClose, onSuccess, referralParam 
             </form>
 
             <p className="text-white/30 text-[10px] text-center mt-4">
-              No spam. We'll only email you about your bot access and founder status.
+              No spam. We'll email you your founder code and alert you on launch day.
             </p>
           </>
         )}
@@ -192,8 +219,16 @@ export default function WaitlistModal({ open, onClose, onSuccess, referralParam 
                 : `You're #${waitlistCount} on the list.`}
             </p>
 
+            {founderCode && (
+              <div className="bg-white/5 border border-[#C4A484]/30 rounded-xl p-4 space-y-1.5">
+                <p className="text-[10px] uppercase tracking-widest text-[#C4A484] font-bold font-mono">Your founder code</p>
+                <p className="text-2xl font-bold tracking-[0.2em] text-[#C4A484] font-mono">{founderCode}</p>
+                <p className="text-white/40 text-[11px]">Use this on launch day for 50% off your first year. We've emailed it to you too.</p>
+              </div>
+            )}
+
             <p className="text-white/40 text-xs leading-relaxed bg-white/5 rounded-xl p-4">
-              Check your email. We'll send you a private invite link to start your session with the bot. Your bot access details will arrive within minutes.
+              Check your email. We'll send you a private invite link to start your session with the bot, and alert you on launch day.
             </p>
 
             {/* Referral section (GOD-8 §4 waitlist banner copy) */}

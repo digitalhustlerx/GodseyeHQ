@@ -4,39 +4,229 @@ import { useState, useEffect, useCallback, useRef, type TouchEvent } from "react
 import { PRICING_PLANS } from "../mockData";
 import WaitlistModal from "../components/WaitlistModal";
 
+// ─── HERO SLIDES (psychology combo: 7→5→1→8→10) ───────────────────────────
 const HERO_SLIDES = [
   {
-    badge: "From Private Beta to Public Release",
-    h1: <>Your site's AI agent.<br /><span className="italic text-[#C4A484]">Everything, by just talking.</span></>,
-    p: "GodsEye is an all-in-one agent for your WordPress site. Content creation, store management, security monitoring, automations — all through conversation in Telegram. Instead of buying another plugin, just ask."
+    // Slide 1 — SIMPLICITY
+    badge: "IT'S JUST A CHAT",
+    h1: <>It's just another chat on your phone.<br /><span className="italic text-[#C4A484]">That runs your entire business.</span></>,
+    p: "You already know how to use Telegram. You already chat with people every day. This is the same thing — except the person on the other end is your AI agent. You tell it what you need. It does it. Clients, content, orders, analytics — whatever your business needs. No website required. No computer required. Just plug your domain in and start.",
   },
   {
-    badge: "Stop Buying Plugins. Just Ask.",
-    h1: <>One agent replaces<br /><span className="italic text-[#C4A484]">a dozen tools.</span></>,
-    p: "SEO tools, form builders, analytics dashboards, automation plugins — GodsEye replaces them all. The average WordPress site spends $1,200+/yr on plugins. You just need one."
+    // Slide 2 — RELIEF
+    badge: "NEVER GETS TIRED",
+    h1: <>You're tired of doing everything yourself.<br /><span className="italic text-[#C4A484]">Here's someone who never gets tired.</span></>,
+    p: "The replies. The follow-ups. The content. The orders. The scheduling. The admin. Your AI agent takes all of it — lives in your Telegram, works 24/7, and handles the load you've been carrying alone. It grows with you, learns how you like things done, and gets better every day. You don't have to hold it all together anymore.",
   },
   {
-    badge: "Proactive, Not Reactive",
-    h1: <>Your site heals itself<br /><span className="italic text-[#C4A484]">before you know it's broken.</span></>,
-    p: "Real-time security monitoring catches broken pages, plugin conflicts, and slowdowns before they cost you customers. While others react to problems, you're already ahead."
-  }
+    // Slide 3 — GREED
+    badge: "EVERYTHING FOR LESS THAN A PHONE BILL",
+    h1: <>Everything your business needs.<br /><span className="italic text-[#C4A484]">For less than a phone bill.</span></>,
+    p: "An AI agent that lives in your Telegram. It manages your clients. Posts your content. Tracks your orders. Reads your numbers and tells you what they mean — just ask it a question and it answers. Hiring one person costs thousands. This costs $9. And it never sleeps, never complains, and works 365 days a year.",
+  },
+  {
+    // Slide 4 — POWER
+    badge: "ONE AGENT. MANY AGENTS. ALL YOURS.",
+    h1: <>You're the boss.<br /><span className="italic text-[#C4A484]">Your agents do the work.</span></>,
+    p: "Hire one AI agent. When the work piles up, it spawns more — a writer, a seller, a researcher, a support rep, an analyst. They work inside a group chat on your Telegram, handle different parts of your business, and report back to you. You approve ideas. They execute. You steer. They move.",
+  },
+  {
+    // Slide 5 — BELONGING
+    badge: "REGULAR PEOPLE USE THIS",
+    h1: <>Regular people are running businesses<br /><span className="italic text-[#C4A484]">with an AI agent in their pocket.</span></>,
+    p: "Not coders. Not tech bros. Lash techs, hairstylists, shop owners, consultants, tutors, freelancers. People who sell things and serve clients and were drowning in the business side. They hired an AI agent. It lives in their Telegram. It handles everything. Now they focus on their craft. The agent handles the rest.",
+  },
 ];
+
+// ─── USE CASE BLOCKS ──────────────────────────────────────────────────────
+const USE_CASES = [
+  {
+    icon: "📱",
+    title: "Managing Clients",
+    line: "Replying to messages. Booking appointments. Sending reminders. Following up.",
+    body: "Your agent handles every conversation — in your tone, on your schedule. Clients get replies in minutes, not hours. You never lose a client to slow response again.",
+  },
+  {
+    icon: "📸",
+    title: "Social Media",
+    line: "Posts your work. Writes captions. Schedules content. Tracks engagement.",
+    body: "Your Instagram, TikTok, and Facebook run themselves. Your agent posts your work, writes captions that sound like you, and tells you what's getting traction.",
+  },
+  {
+    icon: "📦",
+    title: "Orders & Inventory",
+    line: "Tracks orders. Updates products. Sends confirmations. Manages stock.",
+    body: "Your agent runs your online store from a chat. New orders? Processed. Stock running low? You get a nudge. No spreadsheets. No admin panels. Just ask.",
+  },
+  {
+    icon: "🧾",
+    title: "Admin & Organization",
+    line: "Files, invoices, receipts, reminders. Nothing falls through the cracks.",
+    body: "Your agent keeps everything organized. When something needs attention, it pings you. When something can be handled without you, it just does it.",
+  },
+  {
+    icon: "📊",
+    title: "Your Numbers, Explained",
+    line: "Ask a question. Get a plain-English answer.",
+    body: "\"How's my store doing this month?\" \"Which product is selling best?\" Your agent reads your data and answers like a consultant would — with clear insights, not graphs.",
+  },
+  {
+    icon: "🛡️",
+    title: "Always Watching",
+    line: "Monitors your business 24/7. Fixes problems before they cost you.",
+    body: "Broken page? Fixed before you notice. Slow loading? Caught and reported. You wake up to a message: \"Fixed this overnight. All good.\"",
+  },
+];
+
+// ─── PROACTIVE NUDGES (the differentiator) ──────────────────────────────────
+const NUDGES = [
+  "Your top product got 40 new views today. Want me to run a 10% promo for the next 48 hours? Say yes and I'll set it up.",
+  "Sarah booked an appointment 3 weeks ago and hasn't been back. Want me to send her a reminder with a 15% return discount?",
+  "Your last 3 Instagram posts got 2x more engagement than usual. Want me to post more in that style? I drafted 3 already.",
+  "Your store traffic dropped 20% since Tuesday. I checked — your homepage is loading slowly. I can fix it now if you approve.",
+];
+
+// ─── AGENT FLEET ───────────────────────────────────────────────────────────
+const AGENT_FLEET = [
+  { icon: "📝", name: "Content Writer", desc: "Drafts posts, product descriptions, emails" },
+  { icon: "📣", name: "Social Manager", desc: "Posts, schedules, tracks engagement" },
+  { icon: "🔍", name: "Lead Finder", desc: "Searches for new customers, enriches data, exports lists" },
+  { icon: "💬", name: "Support Rep", desc: "Replies to customers, handles tickets, follows up" },
+  { icon: "📊", name: "Analyst", desc: "Reads your numbers, explains them, suggests improvements" },
+  { icon: "🛡️", name: "Security Watch", desc: "Monitors your site 24/7, fixes issues automatically" },
+];
+
+// ─── AUDIENCE BLOCKS ──────────────────────────────────────────────────────
+const AUDIENCES = [
+  {
+    icon: "🧑‍🎨",
+    title: "The Craftsperson",
+    quote: "I do lashes. I do hair. I don't do spreadsheets.",
+    body: "Your agent handles the business side — clients, bookings, social, orders — so you can focus on your craft. No website needed. Just Telegram.",
+  },
+  {
+    icon: "💼",
+    title: "The Solopreneur",
+    quote: "I'm a one-person army.",
+    body: "Your agent fills every seat — receptionist, writer, analyst, admin, support. You stay lean, look professional, and get more done than people with full teams.",
+  },
+  {
+    icon: "🏪",
+    title: "The Store Owner",
+    quote: "I sell things. Online and off.",
+    body: "Your agent processes orders, updates products, manages inventory, runs promos, and reads your sales data to tell you what's working.",
+  },
+  {
+    icon: "🏢",
+    title: "The Agency",
+    quote: "I manage multiple clients.",
+    body: "Spin up dedicated agents per client. White-label the experience. Scale without adding headcount. Every client feels like they have a full team.",
+  },
+  {
+    icon: "💻",
+    title: "The Developer",
+    quote: "I want to self-host and extend it.",
+    body: "Full open-source option. Run it on your own VPS. Bring your own API keys. Extend with MCP. It's your infrastructure, not a black box.",
+  },
+];
+
+// ─── COST COMPARISON ──────────────────────────────────────────────────────
+const COST_COMPARISON = [
+  { tool: "Virtual assistant", cost: "$200-500/mo" },
+  { tool: "Social media scheduler", cost: "$15-50/mo" },
+  { tool: "Email marketing tool", cost: "$20-100/mo" },
+  { tool: "Analytics dashboard", cost: "$10-50/mo" },
+  { tool: "Customer support tool", cost: "$15-80/mo" },
+  { tool: "Website management plugin", cost: "$10-50/mo" },
+];
+
+// ─── FAQS ─────────────────────────────────────────────────────────────────
+const FAQS = [
+  {
+    q: "Do I need a website?",
+    a: "No. Your agent works from Telegram alone. If you have a website, it can manage that too — but it's not required.",
+  },
+  {
+    q: "Do I need to be technical?",
+    a: "Not at all. If you can send a text message, you can use Godseye. It's just a chat.",
+  },
+  {
+    q: "How is this different from ChatGPT or other AI tools?",
+    a: "ChatGPT talks to you. Godseye talks to you AND does the work. It replies to your clients. Posts your content. Processes your orders. Reads your analytics. It doesn't just give advice — it executes.",
+  },
+  {
+    q: "Can it really manage my whole business?",
+    a: "It manages the parts you tell it to. Start with one thing — say, replying to clients. When you're comfortable, add more. It scales with you.",
+  },
+  {
+    q: "What if it makes a mistake?",
+    a: "You're always in control. It suggests, you approve. And if something goes wrong, it tells you and fixes it. It learns from every interaction.",
+  },
+  {
+    q: "Is my data safe?",
+    a: "Yes. You can self-host on your own server with your own keys. Even on our cloud, your data is isolated and never shared. Your business stays your business.",
+  },
+  {
+    q: "What does \"spawn more agents\" mean?",
+    a: "When your workload grows, your main agent creates specialists — a content writer, a lead finder, a support rep. They work inside your group chat, handle specific tasks, and report back to you.",
+  },
+  {
+    q: "How fast does it start?",
+    a: "Immediately. Plug your domain in (or skip it), and your agent is ready in your Telegram within a minute.",
+  },
+  {
+    q: "Can I cancel anytime?",
+    a: "Yes. No contracts. No lock-in. Cancel and your agent stops. Your hours don't expire — they're yours.",
+  },
+  {
+    q: "What if I need help?",
+    a: "Text your agent. If it can't help, text us. Support is built into the same chat.",
+  },
+];
+
+// ═══════════════════════════════════════════════════════════════════════════
+// GODSEYE-WAITLIST: target launch date for the countdown. Change this one value
+// (ISO string) to move the countdown. When null, the countdown section hides.
+const LAUNCH_AT = "2026-09-07T00:00:00Z"; // ~30 days out — update as launch firms up
 
 export default function LandingPage() {
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [currentSlide, setCurrentSlide] = useState(0);
-  // direction tracks how we got here so the slide animation moves the right way
   const [slideDir, setSlideDir] = useState<"next" | "prev">("next");
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
-
-  // GOD-9: waitlist referral surface. Read the opaque ref token from the URL so
-  // someone arriving via a friend's referral link attributes on signup.
   const [searchParams] = useSearchParams();
   const refParam = searchParams.get("ref") || undefined;
   const [showWaitlist, setShowWaitlist] = useState(
     () => typeof window !== "undefined" && !!refParam
   );
+
+  // GODSEYE-WAITLIST: live countdown to launch. Updates every second.
+  const [countdown, setCountdown] = useState(() => {
+    const target = new Date(LAUNCH_AT).getTime();
+    const now = Date.now();
+    const diff = Math.max(0, target - now);
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    return { d, h, m, s, done: diff <= 0 };
+  });
+
+  useEffect(() => {
+    const t = setInterval(() => {
+      const target = new Date(LAUNCH_AT).getTime();
+      const diff = Math.max(0, target - Date.now());
+      setCountdown({
+        d: Math.floor(diff / 86400000),
+        h: Math.floor((diff % 86400000) / 3600000),
+        m: Math.floor((diff % 3600000) / 60000),
+        s: Math.floor((diff % 60000) / 1000),
+        done: diff <= 0,
+      });
+    }, 1000);
+    return () => clearInterval(t);
+  }, []);
 
   const goToSlide = useCallback((idx: number, dir: "next" | "prev") => {
     setSlideDir(dir);
@@ -57,7 +247,6 @@ export default function LandingPage() {
     });
   }, []);
 
-  // Swipe toward previous direction — drag left/right across the hero
   const onTouchStart = useCallback((e: TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
     touchStartY.current = e.touches[0].clientY;
@@ -69,67 +258,46 @@ export default function LandingPage() {
     const dy = e.changedTouches[0].clientY - touchStartY.current;
     touchStartX.current = null;
     touchStartY.current = null;
-    // Ignore vertical scrolls; only treat clear horizontal swipes as slide changes
     if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy) * 1.2) return;
     if (dx < 0) nextSlide();
     else prevSlide();
   }, [nextSlide, prevSlide]);
 
-  // Auto-advance every 15 seconds (slow, so the hero gets to breathe)
   useEffect(() => {
-    const timer = setInterval(nextSlide, 15000);
+    const timer = setInterval(nextSlide, 5000);
     return () => clearInterval(timer);
   }, [nextSlide]);
 
-  const FAQS = [
-    {
-      q: "How does GodsEye work?",
-      a: "GodsEye is an AI agent that connects to your WordPress site through a lightweight plugin. Instead of logging into wp-admin and clicking through menus, you just tell your agent what to do in Telegram — write posts, check orders, update prices, monitor security. It handles it."
-    },
-    {
-      q: "Is it secure to connect my site?",
-      a: "Yes. GodsEye uses WordPress Application Passwords — your main admin password is never shared or stored. The connection is encrypted via HTTPS, and the plugin restricts operations to safe, standard WordPress APIs."
-    },
-    {
-      q: "What can the agent actually do?",
-      a: "Everything you'd do in wp-admin, plus things no plugin can do: write content, analyze your store data, monitor security, set up automations, suggest improvements, and build features on request. If you can describe it, GodsEye can probably do it."
-    },
-    {
-      q: "Do I need to find my Telegram User ID?",
-      a: "No. When you sign up, your Telegram account is linked automatically. Just start the bot and follow the prompts."
-    },
-    {
-      q: "Can I cancel anytime?",
-      a: "Yes, from your account dashboard. Remaining credits stay in your wallet and never expire."
-    },
-    {
-      q: "What is God Mode?",
-      a: "Everything unlimited plus a dedicated VPS, your own API keys, and full server architecture control. Perfect for agencies and power users who want full control."
-    },
-    {
-      q: "How is this different from hiring a WordPress developer?",
-      a: "A developer charges $50-150/hour and takes hours to respond. GodsEye handles the same tasks instantly, 24/7, for a fraction of the cost. It also catches problems before they happen — something no developer does."
-    },
-    {
-      q: "Can I use it with Claude Desktop, Cursor, or ChatGPT?",
-      a: "Yes. GodsEye supports the Model Context Protocol (MCP). Power users can expose their WordPress site directly inside AI clients like Claude Desktop, Cursor, or developer IDEs."
-    }
-  ];
-
   return (
     <div className="space-y-24 pb-20">
-      {/* Hero Slider */}
+      {/* ═══ 1. HERO SLIDER ═══ */}
       <section
         className="px-4 pt-16 md:pt-24 max-w-7xl mx-auto relative"
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
       >
+        {/* ── Hero ambience layer (Phase 1: sci-fi premium) ── */}
+        <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none" aria-hidden="true">
+          <div className="hero-grid absolute inset-0"></div>
+          <div className="animate-heroGlow absolute left-1/2 top-[8%] -translate-x-1/2 w-[720px] h-[520px] bg-[#C4A484]/10 rounded-full blur-[120px]"></div>
+          <div className="animate-heroGlow absolute left-[12%] top-[28%] w-[340px] h-[340px] bg-[#C4A484]/[0.06] rounded-full blur-[90px]" style={{ animationDelay: "2.5s" }}></div>
+          {/* Glowing eye orb */}
+          <div className="absolute right-[10%] top-[20%] hidden lg:flex items-center justify-center">
+            <div className="relative w-28 h-28">
+              <div className="animate-eyePulse absolute inset-0 rounded-full border border-[#C4A484]/40"></div>
+              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#C4A484]/25 to-transparent flex items-center justify-center">
+                <span className="text-4xl">👁️</span>
+              </div>
+            </div>
+          </div>
+          {/* Floating gold dust particles */}
+          {[...Array(7)].map((_, i) => (
+            <span key={i} className="particle" style={{ left: `${8 + i * 13 + (i % 3) * 5}%`, width: `${2 + (i % 3)}px`, height: `${2 + (i % 3)}px`, animationDuration: `${6 + (i % 4) * 2}s`, animationDelay: `${i * 1.3}s` }}></span>
+          ))}
+        </div>
+
         <div className="text-center max-w-3xl mx-auto">
-          {/* Current Slide with directional slide animation */}
-          <div
-            key={currentSlide}
-            className={`space-y-8 ${slideDir === "next" ? "animate-slideInNext" : "animate-slideInPrev"}`}
-          >
+          <div key={currentSlide} className={`space-y-8 ${slideDir === "next" ? "animate-slideInNext" : "animate-slideInPrev"}`}>
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white/5 border border-white/10 rounded-full w-fit mx-auto">
               <span className="w-2 h-2 rounded-full bg-[#C4A484]"></span>
               <span className="text-[10px] uppercase tracking-widest text-white/80 font-mono font-bold">{HERO_SLIDES[currentSlide].badge}</span>
@@ -139,21 +307,11 @@ export default function LandingPage() {
               <h1 className="text-5xl md:text-8xl font-light tracking-tighter leading-[0.95] text-[#F2F2F2] mb-4 font-display">
                 {HERO_SLIDES[currentSlide].h1}
               </h1>
-
-              {/* Slide Navigation Arrows — centered on the header line */}
-              <button
-                onClick={prevSlide}
-                aria-label="Previous slide"
-                className="flex absolute -left-3 sm:-left-8 lg:-left-14 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 rounded-full border border-white/20 bg-white/5 hover:bg-white/15 hover:border-white/40 text-[#F2F2F2] items-center justify-center transition-all cursor-pointer z-10"
-              >
-                <ChevronLeft className="w-5 h-5 md:w-6 md:h-6 animate-arrowNudgePrev" />
+              <button onClick={prevSlide} aria-label="Previous slide" className="flex absolute -left-3 sm:-left-8 lg:-left-14 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 rounded-full border border-white/20 bg-white/5 hover:bg-white/15 hover:border-white/40 text-[#F2F2F2] items-center justify-center transition-all cursor-pointer z-10">
+                <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
               </button>
-              <button
-                onClick={nextSlide}
-                aria-label="Next slide"
-                className="flex absolute -right-3 sm:-right-8 lg:-right-14 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 rounded-full border border-white/20 bg-white/5 hover:bg-white/15 hover:border-white/40 text-[#F2F2F2] items-center justify-center transition-all cursor-pointer z-10"
-              >
-                <ChevronRight className="w-5 h-5 md:w-6 md:h-6 animate-arrowNudge" />
+              <button onClick={nextSlide} aria-label="Next slide" className="flex absolute -right-3 sm:-right-8 lg:-right-14 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 rounded-full border border-white/20 bg-white/5 hover:bg-white/15 hover:border-white/40 text-[#F2F2F2] items-center justify-center transition-all cursor-pointer z-10">
+                <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
               </button>
             </div>
 
@@ -162,169 +320,275 @@ export default function LandingPage() {
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-              <Link
-                to="/start"
-                className="w-full sm:w-auto bg-[#C4A484] hover:bg-[#b59574] text-black px-10 py-4 rounded-full font-bold text-xs uppercase tracking-widest transition-all shadow-md text-center"
+              <button
+                onClick={() => setShowWaitlist(true)}
+                className="btn-shine w-full sm:w-auto bg-[#C4A484] hover:bg-[#b59574] text-black px-10 py-4 rounded-full font-bold text-xs uppercase tracking-widest transition-all shadow-md text-center cursor-pointer"
               >
-                Get started
-              </Link>
+                Get On The Waitlist →
+              </button>
               <button
                 onClick={() => setShowWaitlist(true)}
                 className="w-full sm:w-auto bg-transparent hover:bg-white/5 border border-white/20 text-[#F2F2F2] px-10 py-4 rounded-full font-bold text-xs uppercase tracking-widest transition-all text-center cursor-pointer"
               >
-                Join the waitlist
+                Hire Your Agent
               </button>
-              <Link
-                to="/features"
-                className="w-full sm:w-auto bg-transparent hover:bg-white/5 border border-white/20 text-[#F2F2F2] px-10 py-4 rounded-full font-bold text-xs uppercase tracking-widest transition-all text-center"
-              >
-                See How It Works
-              </Link>
             </div>
 
             <p className="text-[10px] uppercase tracking-wider text-white/40 font-semibold font-mono">
-              No credit card required • 50 free credits every month • Cancel anytime
+              No website required · Just Telegram · First 100 get 50% off for a year
             </p>
           </div>
 
-          {/* Slide Navigation Dots */}
+          {/* Slide Dots */}
           <div className="flex items-center justify-center gap-3 mt-10">
             {HERO_SLIDES.map((_, idx) => (
-              <button
-                key={idx}
-                onClick={() => goToSlide(idx, idx > currentSlide ? "next" : "prev")}
-                className={`h-1.5 rounded-full transition-all duration-500 cursor-pointer ${
-                  idx === currentSlide ? "w-8 bg-[#C4A484]" : "w-3 bg-white/20 hover:bg-white/40"
-                }`}
-                aria-label={`Slide ${idx + 1}`}
-              />
+              <button key={idx} onClick={() => goToSlide(idx, idx > currentSlide ? "next" : "prev")} className={`h-1.5 rounded-full transition-all duration-500 cursor-pointer ${idx === currentSlide ? "w-8 bg-[#C4A484]" : "w-3 bg-white/20 hover:bg-white/40"}`} aria-label={`Slide ${idx + 1}`} />
             ))}
           </div>
         </div>
       </section>
 
-      {/* How It Works */}
+      {/* ═══ 1.5 COUNTDOWN TO LAUNCH ═══ */}
+      <section className="px-4 max-w-3xl mx-auto">
+        <div className="rounded-3xl border border-[#C4A484]/25 bg-[#121212] px-6 py-10 text-center space-y-5">
+          <span className="text-[10px] uppercase tracking-widest text-[#C4A484] font-semibold font-mono">
+            ⏳ Godseye goes live in
+          </span>
+          <div className="grid grid-cols-4 gap-3 max-w-md mx-auto">
+            {[
+              { v: countdown.d, label: "Days" },
+              { v: countdown.h, label: "Hours" },
+              { v: countdown.m, label: "Minutes" },
+              { v: countdown.s, label: "Seconds" },
+            ].map((b) => (
+              <div key={b.label} className="bg-black/40 rounded-2xl border border-white/10 py-4">
+                <div className="text-3xl md:text-4xl font-light text-[#F2F2F2] tabular-nums" style={{ fontFamily: "'Georgia', serif" }}>
+                  {String(b.v).padStart(2, "0")}
+                </div>
+                <div className="text-[9px] uppercase tracking-widest text-white/40 font-mono mt-1">{b.label}</div>
+              </div>
+            ))}
+          </div>
+          {countdown.done ? (
+            <button
+              onClick={() => setShowWaitlist(true)}
+              className="bg-[#C4A484] text-black px-8 py-3 rounded-full font-bold text-xs uppercase tracking-widest hover:bg-[#b59574] transition-all cursor-pointer"
+            >
+              We're Live — Get Started →
+            </button>
+          ) : (
+            <button
+              onClick={() => setShowWaitlist(true)}
+              className="bg-[#C4A484] text-black px-8 py-3 rounded-full font-bold text-xs uppercase tracking-widest hover:bg-[#b59574] transition-all cursor-pointer"
+            >
+              Join the Founders List →
+            </button>
+          )}
+          <p className="text-[11px] text-white/40 font-light">
+            First <strong className="text-[#C4A484]">100</strong> to join lock in <strong className="text-[#C4A484]">50% off</strong> for their first year.
+          </p>
+        </div>
+      </section>
+
+      {/* ═══ 2. WHAT DO YOU NEED HELP WITH? ═══ */}
+      <section className="px-4 max-w-7xl mx-auto space-y-14">
+        <div className="text-center max-w-2xl mx-auto space-y-3">
+          <span className="text-[10px] uppercase tracking-widest text-[#C4A484] font-semibold font-mono">What do you need help with?</span>
+          <h2 className="text-3xl md:text-5xl font-light tracking-tighter text-[#F2F2F2]" style={{ fontFamily: "'Georgia', serif" }}>
+            Point it there. It starts immediately.
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {USE_CASES.map((uc, i) => (
+            <div key={i} className="p-6 bg-[#121212] border border-white/10 rounded-2xl space-y-3.5 hover:bg-white/5 transition-all">
+              <div className="text-xl">{uc.icon}</div>
+              <h4 className="text-sm font-semibold text-white">{uc.title}</h4>
+              <p className="text-xs text-[#C4A484] font-medium leading-relaxed">{uc.line}</p>
+              <p className="text-xs text-white/60 leading-relaxed font-light">{uc.body}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ═══ 3. HOW IT WORKS ═══ */}
       <section className="px-4 py-16 bg-gradient-to-br from-[#0A0A0A] to-[#121212] border-y border-white/10">
         <div className="max-w-7xl mx-auto space-y-14">
           <div className="text-center max-w-2xl mx-auto space-y-3">
-            <span className="text-[10px] uppercase tracking-widest text-[#C4A484] font-semibold font-mono">Simple Steps</span>
+            <span className="text-[10px] uppercase tracking-widest text-[#C4A484] font-semibold font-mono">How it works</span>
             <h2 className="text-3xl md:text-5xl font-light tracking-tighter text-[#F2F2F2]" style={{ fontFamily: "'Georgia', serif" }}>
-              Setup in under 60 seconds
+              Three steps. Under 60 seconds.
             </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-white/5 border border-white/10 p-6 rounded-2xl space-y-4">
               <div className="w-10 h-10 rounded-full border border-white/20 bg-white/5 text-[#C4A484] flex items-center justify-center font-light text-base">01</div>
-              <h3 className="text-sm uppercase tracking-wider font-semibold text-white">⬇️ Install the Plugin</h3>
-              <p className="text-xs text-white/60 leading-relaxed font-light">
-                Download the GodsEye plugin, upload it to your WordPress dashboard, and activate it.
-              </p>
+              <h3 className="text-sm uppercase tracking-wider font-semibold text-white">Plug your domain in</h3>
+              <p className="text-xs text-white/60 leading-relaxed font-light">Tell your agent where your business lives. Got a website? Connect it. Don't have one? No problem — your agent works from Telegram alone.</p>
+              <p className="text-[10px] text-white/40 font-mono">Takes 30 seconds</p>
             </div>
             <div className="bg-white/5 border border-white/10 p-6 rounded-2xl space-y-4">
               <div className="w-10 h-10 rounded-full border border-white/20 bg-white/5 text-[#C4A484] flex items-center justify-center font-light text-base">02</div>
-              <h3 className="text-sm uppercase tracking-wider font-semibold text-white">💬 Connect via Telegram</h3>
-              <p className="text-xs text-white/60 leading-relaxed font-light">
-                Send <code className="bg-white/5 px-2 py-1 rounded text-[#C4A484] text-[10px] font-mono border border-white/10">/connect</code> to the bot and follow the prompt.
-              </p>
+              <h3 className="text-sm uppercase tracking-wider font-semibold text-white">It sets up your space</h3>
+              <p className="text-xs text-white/60 leading-relaxed font-light">Your agent creates a group chat for your business — organized into sections: Tasks, Customers, Files, Analytics, Settings. Then deploys the right agents.</p>
+              <p className="text-[10px] text-white/40 font-mono">Automatic. You don't do anything.</p>
             </div>
             <div className="bg-white/5 border border-white/10 p-6 rounded-2xl space-y-4">
               <div className="w-10 h-10 rounded-full border border-white/20 bg-white/5 text-[#C4A484] flex items-center justify-center font-light text-base">03</div>
-              <h3 className="text-sm uppercase tracking-wider font-semibold text-white">⚡ Chat to Manage</h3>
-              <p className="text-xs text-white/60 leading-relaxed font-light">
-                Send messages like "Make a draft post on AI trends" or "Show WooCommerce stats."
-              </p>
+              <h3 className="text-sm uppercase tracking-wider font-semibold text-white">Just talk to it</h3>
+              <p className="text-xs text-white/60 leading-relaxed font-light">Text your agent like you'd text a person. Tell it what you need. Ask it questions. Approve its suggestions. It handles the rest — 24/7, 365.</p>
+              <p className="text-[10px] text-white/40 font-mono">That's it. You're running.</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Capabilities */}
-      <section className="px-4 max-w-7xl mx-auto space-y-14">
+      {/* ═══ 4. THE AGENT THAT DOESN'T WAIT (PROACTIVE NUDGES) ═══ */}
+      <section className="px-4 max-w-5xl mx-auto space-y-14">
         <div className="text-center max-w-2xl mx-auto space-y-3">
-          <span className="text-[10px] uppercase tracking-widest text-[#C4A484] font-semibold font-mono">Capabilities</span>
+          <span className="text-[10px] uppercase tracking-widest text-[#C4A484] font-semibold font-mono">This is what makes it different</span>
           <h2 className="text-3xl md:text-5xl font-light tracking-tighter text-[#F2F2F2]" style={{ fontFamily: "'Georgia', serif" }}>
-            One agent. Everything your site needs.
+            It doesn't just answer.
           </h2>
-          <p className="text-xs md:text-sm text-white/60 font-light">
-            GodsEye replaces a dozen plugins and tools. Content, commerce, security, automations — all handled by one agent that never sleeps.
+          <p className="text-base text-[#C4A484] italic">It thinks ahead.</p>
+        </div>
+
+        <div className="space-y-4 max-w-2xl mx-auto">
+          {NUDGES.map((nudge, i) => (
+            <div key={i} className="bg-[#121212] border border-white/10 rounded-2xl p-5 flex items-start gap-3 hover:border-[#C4A484]/30 transition-all">
+              <div className="w-8 h-8 rounded-full bg-[#C4A484]/10 border border-[#C4A484]/30 flex items-center justify-center shrink-0 text-sm">💬</div>
+              <p className="text-xs md:text-sm text-white/80 leading-relaxed font-light">{nudge}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="text-center max-w-xl mx-auto">
+          <p className="text-sm text-white/60 leading-relaxed font-light">
+            You approve. It's done. That's what it looks like when an agent grows with your business.
           </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="p-6 bg-[#121212] border border-white/10 rounded-2xl space-y-3.5 hover:bg-white/5 transition-all">
-            <div className="text-xl">🧠</div>
-            <h4 className="text-sm font-semibold text-white">Content Creator</h4>
-            <p className="text-xs text-white/60 leading-relaxed font-light">
-              Give it a topic — it writes the post, formats it, and schedules it. Blog posts, product descriptions, landing page copy. No blank page, no writer's block.
-            </p>
-          </div>
-          <div className="p-6 bg-[#121212] border border-white/10 rounded-2xl space-y-3.5 hover:bg-white/5 transition-all">
-            <div className="text-xl">🛒</div>
-            <h4 className="text-sm font-semibold text-white">Store Manager</h4>
-            <p className="text-xs text-white/60 leading-relaxed font-light">
-              Check orders, update products, adjust prices, generate coupons. Run your entire WooCommerce store through conversation.
-            </p>
-          </div>
-          <div className="p-6 bg-[#121212] border border-white/10 rounded-2xl space-y-3.5 hover:bg-white/5 transition-all">
-            <div className="text-xl">🛡️</div>
-            <h4 className="text-sm font-semibold text-white">Proactive Security</h4>
-            <p className="text-xs text-white/60 leading-relaxed font-light">
-              Monitors your site health 24/7. Catches broken pages, plugin conflicts, and slowdowns before they cost you sales. Recalibrates automatically.
-            </p>
-          </div>
-          <div className="p-6 bg-[#121212] border border-white/10 rounded-2xl space-y-3.5 hover:bg-white/5 transition-all">
-            <div className="text-xl">⚡</div>
-            <h4 className="text-sm font-semibold text-white">Automations</h4>
-            <p className="text-xs text-white/60 leading-relaxed font-light">
-              Set recurring tasks in plain English. "Every Monday, draft a roundup post." "Alert me when stock drops below 10." Your site runs itself.
-            </p>
-          </div>
-          <div className="p-6 bg-[#121212] border border-white/10 rounded-2xl space-y-3.5 hover:bg-white/5 transition-all">
-            <div className="text-xl">📊</div>
-            <h4 className="text-sm font-semibold text-white">Business Analyst</h4>
-            <p className="text-xs text-white/60 leading-relaxed font-light">
-              Ask "How's my store doing?" and get a real answer. GodsEye synthesizes your dashboard data into plain-English insights and recommendations.
-            </p>
-          </div>
-          <div className="p-6 bg-[#121212] border border-white/10 rounded-2xl space-y-3.5 hover:bg-white/5 transition-all">
-            <div className="text-xl">🎨</div>
-            <h4 className="text-sm font-semibold text-white">Visual Editor</h4>
-            <p className="text-xs text-white/60 leading-relaxed font-light">
-              Change prices, update text, swap images on your landing pages. No builder UI, no clicking through menus. Just tell it what to change.
-            </p>
-          </div>
-        </div>
-
-        <div className="text-center pt-4">
-          <Link to="/features" className="text-xs text-[#C4A484] hover:text-[#b59574] font-semibold uppercase tracking-wider">
-            Explore all features →
-          </Link>
         </div>
       </section>
 
-      {/* Pricing Teaser */}
+      {/* ═══ 5. ONE AGENT OR A WHOLE TEAM (FLEET) ═══ */}
+      <section className="px-4 max-w-7xl mx-auto space-y-14">
+        <div className="text-center max-w-2xl mx-auto space-y-3">
+          <span className="text-[10px] uppercase tracking-widest text-[#C4A484] font-semibold font-mono">Scale on demand</span>
+          <h2 className="text-3xl md:text-5xl font-light tracking-tighter text-[#F2F2F2]" style={{ fontFamily: "'Georgia', serif" }}>
+            Start with one. Spawn more when you grow.
+          </h2>
+          <p className="text-xs md:text-sm text-white/60 font-light">Your agent brings in help when the workload demands it.</p>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 max-w-5xl mx-auto">
+          {AGENT_FLEET.map((agent, i) => (
+            <div key={i} className="bg-[#121212] border border-white/10 rounded-2xl p-5 text-center space-y-2 hover:border-[#C4A484]/30 transition-all">
+              <div className="text-2xl">{agent.icon}</div>
+              <h4 className="text-xs font-semibold text-white">{agent.name}</h4>
+              <p className="text-[10px] text-white/50 leading-snug font-light">{agent.desc}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="text-center max-w-xl mx-auto">
+          <p className="text-sm text-white/60 leading-relaxed font-light">
+            They work inside your group chat. Report back to you. Coordinate with each other. You're the boss. They're your team. All from Telegram.
+          </p>
+        </div>
+      </section>
+
+      {/* ═══ 6. CONNECTS TO WHAT YOU USE (INTEGRATIONS) ═══ */}
+      <section className="px-4 py-16 bg-gradient-to-br from-[#0A0A0A] to-[#121212] border-y border-white/10">
+        <div className="max-w-5xl mx-auto text-center space-y-8">
+          <div className="space-y-3">
+            <span className="text-[10px] uppercase tracking-widest text-[#C4A484] font-semibold font-mono">Integrations</span>
+            <h2 className="text-3xl md:text-5xl font-light tracking-tighter text-[#F2F2F2]" style={{ fontFamily: "'Georgia', serif" }}>
+              Plug into your stack
+            </h2>
+            <p className="text-xs text-white/60 font-light">Your agent connects to the tools your business already uses.</p>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            {["🌐 WordPress", "🛒 Online Store", "📊 Google Analytics", "📧 Email", "🐦 Social Media", "💬 Customer Support", "🔌 + anything via MCP"].map((int, i) => (
+              <span key={i} className="px-4 py-2 bg-white/5 border border-white/10 rounded-full text-xs text-white/70 font-medium">{int}</span>
+            ))}
+          </div>
+
+          <div className="bg-white/5 border border-[#C4A484]/20 rounded-2xl p-6 max-w-2xl mx-auto mt-8">
+            <p className="text-sm text-white/80 font-light">🔒 <strong className="text-[#C4A484]">Your data stays yours.</strong> Self-host on your own server with your own keys. Nothing leaves your infrastructure. Full control. Zero surprises.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ 7. WHO IS THIS FOR? ═══ */}
+      <section className="px-4 max-w-7xl mx-auto space-y-14">
+        <div className="text-center max-w-2xl mx-auto space-y-3">
+          <span className="text-[10px] uppercase tracking-widest text-[#C4A484] font-semibold font-mono">Who uses Godseye?</span>
+          <h2 className="text-3xl md:text-5xl font-light tracking-tighter text-[#F2F2F2]" style={{ fontFamily: "'Georgia', serif" }}>
+            Anyone who runs anything.
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {AUDIENCES.map((aud, i) => (
+            <div key={i} className="p-6 bg-[#121212] border border-white/10 rounded-2xl space-y-3 hover:bg-white/5 transition-all">
+              <div className="text-2xl">{aud.icon}</div>
+              <h4 className="text-sm font-semibold text-white">{aud.title}</h4>
+              <p className="text-xs text-[#C4A484] italic">"{aud.quote}"</p>
+              <p className="text-xs text-white/60 leading-relaxed font-light">{aud.body}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ═══ 8. STOP WASTING MONEY ═══ */}
+      <section className="px-4 max-w-4xl mx-auto space-y-14">
+        <div className="text-center space-y-3">
+          <span className="text-[10px] uppercase tracking-widest text-[#C4A484] font-semibold font-mono">Cost comparison</span>
+          <h2 className="text-3xl md:text-5xl font-light tracking-tighter text-[#F2F2F2]" style={{ fontFamily: "'Georgia', serif" }}>
+            One agent replaces all of this.
+          </h2>
+          <p className="text-xs text-white/60 font-light">The average business pays for tools they barely use.</p>
+        </div>
+
+        <div className="bg-[#121212] border border-white/10 rounded-2xl overflow-hidden">
+          {COST_COMPARISON.map((item, i) => (
+            <div key={i} className={`flex items-center justify-between px-6 py-4 ${i !== COST_COMPARISON.length - 1 ? "border-b border-white/10" : ""}`}>
+              <span className="text-xs md:text-sm text-white/70 font-light">{item.tool}</span>
+              <div className="flex items-center gap-3">
+                <span className="text-xs text-white/40 line-through font-light">{item.cost}</span>
+                <span className="text-xs text-[#C4A484] font-bold">✓ Included</span>
+              </div>
+            </div>
+          ))}
+          <div className="flex items-center justify-between px-6 py-5 bg-[#C4A484]/5 border-t border-[#C4A484]/20">
+            <span className="text-sm font-bold text-white">Total with Godseye</span>
+            <span className="text-lg font-black text-[#C4A484]">$9-29/mo</span>
+          </div>
+        </div>
+
+        <div className="text-center max-w-xl mx-auto">
+          <p className="text-sm text-white/60 leading-relaxed font-light">
+            You're spending hundreds a month on fragmented tools. Godseye replaces all of them for the price of one. And it actually does the work — not just gives you a dashboard to do it yourself.
+          </p>
+        </div>
+      </section>
+
+      {/* ═══ 9. PRICING TEASER ═══ */}
       <section className="px-4 max-w-7xl mx-auto space-y-12">
         <div className="text-center max-w-2xl mx-auto space-y-4">
-          <span className="text-[10px] uppercase tracking-widest text-[#C4A484] font-semibold font-mono">Simple Billing</span>
+          <span className="text-[10px] uppercase tracking-widest text-[#C4A484] font-semibold font-mono">Pricing</span>
           <h2 className="text-3xl md:text-5xl font-light tracking-tighter text-[#F2F2F2]" style={{ fontFamily: "'Georgia', serif" }}>
-            Flexible plans for any scale
+            Hire by the hour. Or put it on retainer.
           </h2>
-          <p className="text-xs md:text-sm text-white/60 font-light">
-            Start free. Upgrade when you need more. Cancel anytime.
-          </p>
+          <p className="text-xs md:text-sm text-white/60 font-light">Buy hours when you need them. Or keep an agent on standby. Cancel anytime.</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-5xl mx-auto">
           {PRICING_PLANS.filter(p => p.id !== 'free').map((plan) => (
-            <div
-              key={plan.id}
-              className={`relative bg-[#121212] rounded-3xl border p-6 flex flex-col justify-between transition-all duration-300 ${plan.isPopular ? 'border-[#C4A484] shadow-lg shadow-[#C4A484]/5 ring-1 ring-[#C4A484]/30 bg-gradient-to-br from-[#0A0A0A] to-[#151515]' : 'border-white/10 hover:border-white/20'}`}
-            >
+            <div key={plan.id} className={`relative bg-[#121212] rounded-3xl border p-6 flex flex-col justify-between transition-all duration-300 ${plan.isPopular ? 'border-[#C4A484] shadow-lg shadow-[#C4A484]/5 ring-1 ring-[#C4A484]/30 bg-gradient-to-br from-[#0A0A0A] to-[#151515]' : 'border-white/10 hover:border-white/20'}`}>
               {plan.isPopular && (
-                <span className="absolute top-0 right-1/2 translate-x-1/2 -translate-y-1/2 bg-[#C4A484] text-black font-mono uppercase text-[9px] font-bold px-3 py-1 rounded-full tracking-wider border border-[#b29373]">
-                  Most Popular
-                </span>
+                <span className="absolute top-0 right-1/2 translate-x-1/2 -translate-y-1/2 bg-[#C4A484] text-black font-mono uppercase text-[9px] font-bold px-3 py-1 rounded-full tracking-wider border border-[#b29373]">Most Popular</span>
               )}
               <div className="space-y-4">
                 <div>
@@ -349,7 +613,7 @@ export default function LandingPage() {
               </div>
               <div className="pt-4">
                 <Link to="/pricing" className={`block text-center w-full ${plan.isPopular ? 'bg-[#C4A484] hover:bg-[#b59574] text-black' : 'bg-white/5 hover:bg-white/10 text-white border border-white/10'} text-[10px] uppercase tracking-widest font-bold py-3.5 rounded-full transition-all`}>
-                  Get {plan.name}
+                  Hire {plan.name}
                 </Link>
               </div>
             </div>
@@ -357,18 +621,47 @@ export default function LandingPage() {
         </div>
 
         <div className="text-center">
-          <Link to="/pricing" className="text-xs text-[#C4A484] hover:text-[#b59574] font-semibold uppercase tracking-wider">
-            See full comparison →
-          </Link>
+          <p className="text-[10px] uppercase tracking-wider text-white/40 font-mono mb-2">Or buy hours</p>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <span className="px-4 py-2 bg-white/5 border border-white/10 rounded-full text-xs text-white/70">1h Trial — $9</span>
+            <span className="px-4 py-2 bg-white/5 border border-white/10 rounded-full text-xs text-white/70">10h Pack — $69</span>
+            <span className="px-4 py-2 bg-white/5 border border-white/10 rounded-full text-xs text-white/70">50h Pack — $249</span>
+            <span className="px-4 py-2 bg-white/5 border border-white/10 rounded-full text-xs text-white/70">100h Pack — $399</span>
+          </div>
+          <Link to="/pricing" className="inline-block mt-4 text-xs text-[#C4A484] hover:text-[#b59574] font-semibold uppercase tracking-wider">See full pricing →</Link>
         </div>
       </section>
 
-      {/* FAQ */}
+      {/* ═══ 10. PLUG IT IN (FORM) ═══ */}
+      <section className="px-4 max-w-2xl mx-auto">
+        <div className="bg-gradient-to-br from-[#0A0A0A] to-[#121212] border border-white/10 rounded-3xl p-8 md:p-12 text-center space-y-6 relative overflow-hidden shadow-xl">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-[#C4A484]/5 rounded-full blur-3xl"></div>
+
+          <div className="space-y-3 relative">
+            <span className="text-[10px] uppercase tracking-widest text-[#C4A484] font-semibold font-mono">Get started</span>
+            <h2 className="text-3xl md:text-5xl font-light tracking-tighter text-[#F2F2F2]" style={{ fontFamily: "'Georgia', serif" }}>
+              Plug it in.
+            </h2>
+            <p className="text-xs text-white/60 font-light">Tell us what you do. We'll handle the rest.</p>
+          </div>
+
+          <div className="space-y-3 max-w-md mx-auto">
+            <button onClick={() => setShowWaitlist(true)} className="block w-full bg-[#C4A484] hover:bg-[#b59574] text-black px-8 py-4 rounded-full font-bold text-xs uppercase tracking-widest transition-all shadow-md cursor-pointer">
+              Get My AI Agent →
+            </button>
+            <p className="text-[10px] uppercase tracking-wider text-white/40 font-mono">
+              No credit card required · Cancel anytime · Your data stays yours
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ 11. FAQ ═══ */}
       <section className="px-4 max-w-4xl mx-auto space-y-12">
         <div className="text-center space-y-3">
-          <span className="text-[10px] uppercase tracking-widest text-[#C4A484] font-semibold font-mono">Knowledge Base</span>
+          <span className="text-[10px] uppercase tracking-widest text-[#C4A484] font-semibold font-mono">Questions</span>
           <h2 className="text-3xl md:text-5xl font-light tracking-tighter text-[#F2F2F2]" style={{ fontFamily: "'Georgia', serif" }}>
-            Frequently Asked Questions
+            Questions
           </h2>
         </div>
 
@@ -390,38 +683,23 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Final CTA */}
-      <section className="px-4 max-w-5xl mx-auto">
-        <div className="bg-gradient-to-br from-[#0A0A0A] to-[#121212] border border-white/10 rounded-3xl p-8 md:p-12 text-center space-y-6 relative overflow-hidden shadow-xl">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#C4A484]/5 rounded-full blur-3xl"></div>
-
-          <h3 className="text-3xl md:text-5xl font-light tracking-tighter text-[#F2F2F2] max-w-2xl mx-auto" style={{ fontFamily: "'Georgia', serif" }}>
-            Take control of your WordPress site.
-          </h3>
-          <p className="text-xs md:text-sm text-white/60 leading-relaxed max-w-xl mx-auto font-light">
-            Connect your site in 60 seconds. Get 50 free credits every month. No credit card, no developers, no setup fees.
+      {/* ═══ 12. FOOTER ═══ */}
+      <section className="px-4 max-w-7xl mx-auto border-t border-white/10 pt-12 pb-8">
+        <div className="text-center space-y-4">
+          <p className="text-sm text-white/60 font-light italic" style={{ fontFamily: "'Georgia', serif" }}>
+            Godseye — your business, running from a chat.
           </p>
-          <div className="pt-3">
-            <Link to="/start" className="inline-flex items-center gap-2 bg-[#F2F2F2] text-[#0A0A0A] hover:bg-white px-8 py-4 rounded-full font-bold text-xs uppercase tracking-widest shadow-md transition-all active:scale-95">
-              Get started
-            </Link>
+          <div className="flex flex-wrap items-center justify-center gap-4 text-[10px] uppercase tracking-wider text-white/40 font-mono">
+            <Link to="/start" className="hover:text-[#C4A484]">How It Works</Link>
+            <Link to="/pricing" className="hover:text-[#C4A484]">Pricing</Link>
+            <Link to="/features" className="hover:text-[#C4A484]">Features</Link>
+            <Link to="/docs" className="hover:text-[#C4A484]">Docs</Link>
           </div>
-          <div className="flex justify-center gap-6 pt-4 text-[10px] text-white/40 font-mono uppercase tracking-wider">
-            <span>Secure payment • Cancel anytime</span>
-            <span>•</span>
-            <span>Unused credits roll over</span>
-          </div>
+          <p className="text-[10px] text-white/30 font-mono">© 2026 Godseye. Built by DigitalHustlerX.</p>
         </div>
       </section>
 
-      {/* GOD-9: waitlist referral banner/signup surface */}
-      <WaitlistModal
-        open={showWaitlist}
-        onClose={() => setShowWaitlist(false)}
-        onSuccess={() => setShowWaitlist(false)}
-        referralParam={refParam}
-      />
+      <WaitlistModal open={showWaitlist} onClose={() => setShowWaitlist(false)} onSuccess={() => setShowWaitlist(false)} referralParam={refParam} />
     </div>
   );
 }

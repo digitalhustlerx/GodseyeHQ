@@ -42,6 +42,8 @@ const wlMigrate: Array<[string, string]> = [
   ["plan", "TEXT"],
   ["credits_remaining", "INTEGER"],
   ["conversions_source", "TEXT"],
+  ["phone", "TEXT"],
+  ["founder_code", "TEXT"],
 ];
 for (const [col, type] of wlMigrate) {
   if (!wlCols.has(col)) {
@@ -300,6 +302,7 @@ CREATE TABLE IF NOT EXISTS users (
   credits_remaining REAL DEFAULT 50,
   credits_monthly REAL DEFAULT 50,
   telegram_id TEXT,
+  plan_expires_at TEXT,
   created_at TEXT DEFAULT (datetime('now'))
 );
 CREATE TABLE IF NOT EXISTS sessions (
@@ -311,10 +314,10 @@ CREATE TABLE IF NOT EXISTS sessions (
 );
 `);
 
-// ===== Plugin purchases (pay-before-download: email + zip) =====
-// One row per checkout intent. On a verified Flutterwave `charge.success`
-// webhook the row flips to `paid` and a one-time `download_token` is issued so
-// the customer can pull the plugin zip. The token is also mailed to them.
+// ===== Plugin purchases (pay-before-download) =====
+// One row per checkout intent. On a verified Polar webhook the row flips to
+// `paid` and a one-time `download_token` is issued so the customer can pull the
+// plugin zip. The token is also mailed to them.
 db.exec(`
 CREATE TABLE IF NOT EXISTS purchases (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -340,6 +343,43 @@ if (!PCH.some((c) => c.name === "referrer_token")) {
   db.exec("ALTER TABLE purchases ADD COLUMN referrer_token TEXT");
 }
 
+// ===== GodBridge: connected WordPress sites =====
+// One row per installed+connected plugin site. The `backend_secret` is minted at
+// connect time by the plugin, sent back once, and STORED ONLY AS A SHA-256 HASH
+// here so a DB leak never exposes a usable bridge secret.
+db.exec(`
+CREATE TABLE IF NOT EXISTS bridge_sites (
+  id TEXT PRIMARY KEY,
+  license_key TEXT NOT NULL,
+  site_url TEXT NOT NULL,
+  backend_secret_hash TEXT NOT NULL,
+  site_name TEXT DEFAULT '',
+  wp_version TEXT DEFAULT '',
+  plugin_version TEXT DEFAULT '',
+  created_at TEXT DEFAULT (datetime('now')),
+  updated_at TEXT DEFAULT (datetime('now')),
+  UNIQUE (license_key, site_url)
+);
+`);
+db.exec("CREATE INDEX IF NOT EXISTS bridge_sites_license_idx ON bridge_sites (license_key);");
+
+// Constant-time secret verify helper (avoids length-timing on the compare).
+function bridgeSecretMatches(storedHash: string, candidate: string): boolean {
+  if (!storedHash || !candidate) return false;
+  const candidateHash = crypto.createHash("sha256").update(candidate).digest("hex");
+  return crypto.timingSafeEqual(
+    Buffer.from(storedHash, "hex"),
+    Buffer.from(candidateHash, "hex")
+  );
+}
+
+// Cold-start: an optional subscription expiry on users so taste/free plans can
+// go cold (account goes inactive) until the customer re-subscribes.
+const UCOLS = db.prepare("PRAGMA table_info(users)").all() as Array<{ name: string }>;
+if (!UCOLS.some((c) => c.name === "plan_expires_at")) {
+  db.exec("ALTER TABLE users ADD COLUMN plan_expires_at TEXT");
+}
+
 // Password hashing with Node's built-in scrypt (salt:hash)
 function hashPassword(password: string): string {
   const salt = crypto.randomBytes(16).toString("hex");
@@ -352,6 +392,22 @@ function verifyPassword(password: string, stored: string): boolean {
   const test = crypto.scryptSync(password, salt, 64).toString("hex");
   return crypto.timingSafeEqual(Buffer.from(test), Buffer.from(hash));
 }
+
+// Subscription health for the cold-start funnel.
+//   active  -> within plan window and has a paid/non-ephemeral plan or credits
+//   cold    -> plan window lapsed (subscription expired) -> needs re-subscribe
+//   free    -> never paid, on the free tier
+function planStatus(user: any): "active" | "cold" | "free" {
+  if (!user) return "free";
+  if (user.plan_id && user.plan_id !== "free") {
+    if (user.plan_expires_at) {
+      // Lapsed paid/taste plan -> cold until re-subscribed.
+      if (String(user.plan_expires_at) <= new Date().toISOString()) return "cold";
+    }
+    return "active";
+  }
+  return "free";
+}
 // Session lifetime: 30 days
 const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000;
 function createSession(userId: number): string {
@@ -360,11 +416,11 @@ function createSession(userId: number): string {
   db.prepare("INSERT INTO sessions (token, user_id, expires_at) VALUES (?, ?, ?)").run(token, userId, expires);
   return token;
 }
-function userFromRequest(req: any): { id: number; email: string; name: string; plan: string; plan_id: string; credits_remaining: number } | null {
+function userFromRequest(req: any): { id: number; email: string; name: string; plan: string; plan_id: string; credits_remaining: number; plan_expires_at: string | null } | null {
   const token = req.headers?.cookie?.match(/(?:^|;\s*)godseye_session=([^;]+)/)?.[1];
   if (!token) return null;
   const row = db.prepare(`
-    SELECT u.id, u.email, u.name, u.plan, u.plan_id, u.credits_remaining
+    SELECT u.id, u.email, u.name, u.plan, u.plan_id, u.credits_remaining, u.plan_expires_at
     FROM sessions s JOIN users u ON u.id = s.user_id
     WHERE s.token = ? AND s.expires_at > datetime('now')
   `).get(token) as any;
@@ -439,12 +495,20 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
 
   // ===== Waitlist API (SQLite) =====
   app.post("/api/waitlist", (req, res) => {
-    const { email, referredBy, ref } = req.body;
+    const { email, referredBy, ref, phone } = req.body;
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return res.status(400).json({ error: "Valid email required" });
     }
+    // GODSEYE-WAITLIST: restrict length + strip non-numeric for safety; optional.
+    const phoneNorm = String(phone || "")
+      .replace(/[^\d+]/g, "")
+      .slice(0, 20) || null;
     const referralCode = Buffer.from(email).toString("base64").replace(/[^a-zA-Z0-9]/g, "").slice(0, 8).toLowerCase();
     const emailLower = String(email).toLowerCase().trim();
+
+    // GODSEYE-FOUNDER: first 100 get a unique founder discount code (auto-generated,
+    // e.g. FDR-XXXXXXXX). Reused if the email already has one (idempotent).
+    const founderCode = `FDR-${crypto.randomBytes(4).toString("hex").toUpperCase()}`;
 
     // GOD-9: resolve the inviter from the referral link token (first-touch attribution).
     // Any of ref / referredBy may carry the inviter's token or code.
@@ -469,8 +533,39 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
         (inviter && getOrCreateReferrer(inviter.email).token) ||
         referredBy ||
         null;
-      const stmt = db.prepare("INSERT INTO waitlist (email, referred_by, referral_code) VALUES (?, ?, ?)");
-      const info = stmt.run(emailLower, persistedReferrer, referralCode);
+      const stmt = db.prepare(
+        "INSERT INTO waitlist (email, referred_by, referral_code, phone, founder_code) VALUES (?, ?, ?, ?, ?)"
+      );
+      const info = stmt.run(emailLower, persistedReferrer, referralCode, phoneNorm, founderCode);
+
+      // GODSEYE-FOUNDER: instant welcome email confirming the founder bonus. If the
+      // local SMTP relay is unavailable it fails silently — the spot is still saved.
+      const founderCount = (db.prepare("SELECT COUNT(*) as c FROM waitlist").get() as { c: number }).c;
+      sendMail({
+        to: emailLower,
+        subject: `You're #${founderCount} — your Godseye founder bonus is secured`,
+        text:
+          `Welcome to the Godseye founders' waitlist.\n\n` +
+          `You're #${founderCount} on the list. As one of the first 100, your founder benefits are locked in:\n` +
+          `• 50% off any plan for your first year\n` +
+          `• Priority launch access + private invite\n` +
+          (phoneNorm ? `• Launch-day SMS alert to ${phoneNorm}\n` : "") +
+          `\nYour personal founder code for launch day: ${founderCode}\n` +
+          `Keep this email — we'll message you the moment we go live.\n\n` +
+          `— Godseye`,
+        html:
+          `<p>Welcome to the <strong>Godseye</strong> founders' waitlist.</p>` +
+          `<p>You're <strong>#${founderCount}</strong> on the list. As one of the first 100, your founder benefits are locked in:</p>` +
+          `<ul>` +
+          `<li><strong>50% off</strong> any plan for your first year</li>` +
+          `<li><strong>Priority</strong> launch access + private invite</li>` +
+          (phoneNorm ? `<li>Launch-day <strong>SMS alert</strong> to ${phoneNorm}</li>` : "") +
+          `</ul>` +
+          `<p>Your personal founder code for launch day:</p>` +
+          `<p style="display:inline-block;background:#C4A48420;border:1px solid #C4A484;color:#C4A484;font-family:monospace;font-weight:bold;letter-spacing:2px;padding:10px 16px;border-radius:8px">${founderCode}</p>` +
+          `<p>Keep this email — we'll message you the moment we go live.</p>` +
+          `<p>— Godseye</p>`,
+      }).then((r) => console.log(`[Waitlist] welcome email to ${emailLower}:`, r.ok ? `ok${r.size ? ` (${r.size}B)` : ""}` : r.error)).catch(() => {});
 
       // GOD-15: wire the waitlist -> paid email sequence for this new joiner.
       // send_at offsets computed relative to now (see src/lib/drip.ts). This is
@@ -490,7 +585,8 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
               .run(getOrCreateReferrer(inviter.email).token, emailLower);
           }
         }
-        return res.json({ message: "Already on the waitlist!", referral_code: referralCode, referral_token: self.token });
+        const existingRow = db.prepare("SELECT founder_code FROM waitlist WHERE email = ?").get(emailLower) as any;
+        return res.json({ message: "Already on the waitlist!", referral_code: referralCode, referral_token: self.token, founder_code: existingRow?.founder_code || null });
       }
       return res.status(500).json({ error: "Could not register. Try again." });
     }
@@ -508,10 +604,45 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
 
     // GOD-9: the new user immediately gets their own referral token to share.
     const self = getOrCreateReferrer(emailLower);
-    res.json({ message: "You're on the list!", referral_code: referralCode, referral_token: self.token });
+    res.json({ message: "You're on the list!", referral_code: referralCode, referral_token: self.token, founder_code: founderCode });
   });
 
   // GOD-9: return this user's opaque referral token (create lazily on first read).
+  // GOD-9: referral link for the bridge plugin's "Bring your team" tab.
+  // The plugin only holds a license key, so the referral system's email-keyed
+  // API needs a license-key entry point. If the license key is itself the owner
+  // email (the common case for a customer license), resolve it directly and
+  // shape the reply to what the plugin's JS expects: { ok, referral_link, stats }.
+  app.get("/api/referral/link", (req, res) => {
+    const licenseKey = String(req.query.licenseKey || "").trim().toLowerCase();
+    if (!licenseKey) {
+      return res.json({ ok: false, error: "licenseKey required" });
+    }
+    const email = licenseKey; // license key == owner email for the current customer model
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.json({ ok: false, error: "License key isn't a valid owner email — re-connect with your license email" });
+    }
+    const self = getOrCreateReferrer(email);
+    syncRewardsLedger(self.email);
+    const disc = pendingReferralDiscount(self.email);
+    const stats = db.prepare(
+      "SELECT COUNT(*) as paid, 0 as waiting FROM referral_events WHERE inviter_id=? AND stage='paid' AND status='credited'"
+    ).get(self.id) as { paid: number; waiting: number };
+    const referral_link = `${(process.env.APP_URL || "https://godseye.digitalhustlerx.com")}/?ref=${self.token}`;
+    res.json({
+      ok: true,
+      referral_link,
+      email: self.email,
+      stats: {
+        rewards: {
+          paid_count: stats.paid,
+          waiting: stats.waiting,
+          ladder: rewardLadderFor(self.id),
+        },
+      },
+    });
+  });
+
   app.get("/api/referral", (req, res) => {
     const email = ((req.query.email as string) || "").trim().toLowerCase();
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -684,17 +815,20 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
     // surface any pending referral_discount as a line on the next invoice.
     syncRewardsLedger(user.email);
     const discount = pendingReferralDiscount(user.email);
+    const status = planStatus(user);
     res.json({
       user,
       subscription: {
         plan: user.plan,
         plan_id: user.plan_id,
         credits_remaining: user.credits_remaining,
+        plan_expires_at: user.plan_expires_at,
         referral_discount: discount.referral_discount,
         referral_discount_label: discount.line_label,
         rewards: discount.rewards,
       },
-      next_step: user.plan === "free" ? "subscribe" : "active",
+      next_step: status === "cold" ? "resubscribe" : status === "free" ? "subscribe" : "active",
+      plan_status: status,
     });
   });
 
@@ -729,11 +863,22 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
   // CEO-approved pricing (from the roadmap purchase path).
   const PLAN_PRICES: Record<string, { price: number; label: string }> = {
     starter: { price: 9, label: "Starter" },
+    taste: { price: 1, label: "Taste" },
     pro: { price: 29, label: "Pro" },
     godmode: { price: 99, label: "God Mode" },
     topup: { price: 10, label: "Wallet Top-Up" },
     "pack-starter": { price: 9, label: "Starter Pack" },
     "pack-pro": { price: 29, label: "Pro Pack" },
+  };
+  // Godseye checkout uses Polar (per the Jul-31 decision: Polar = primary).
+  // Maps plan/product key -> Polar product id (verified live).
+  const POLAR_PRODUCT_IDS: Record<string, string> = {
+    starter: "bc746111-be41-4f7e-8e75-ed3d7eb1e7e3",
+    pro: "a31bba8d-5ef6-4033-93c4-24acdb46a30f",
+    godmode: "b13480b8-f4ae-4051-aa1c-36ac31303ce7",
+    topup: "873e9805-d7ea-4f1d-a344-832896cf0ac9",
+    "pack-starter": "28aef4c4-4cf3-4128-8d61-8212c9057afd",
+    "pack-pro": "a758d371-2b37-4f12-9c10-4a9402995b0e",
   };
   const DOWNLOAD_DIR = path.join(process.cwd(), "dist");
   const PLUGIN_ZIP = "godseye-plugin.zip";
@@ -744,7 +889,7 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
     return { token, expires };
   }
 
-  // Create a Flutterwave hosted payment link and record the purchase intent.
+  // Create a Polar hosted checkout link and record the purchase intent.
   app.post("/api/create-checkout", async (req, res) => {
     try {
       let { email, plan_name, plan_id, price } = req.body;
@@ -762,43 +907,42 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
         return res.status(400).json({ error: "A valid email is required" });
       }
 
-      const flwKey = process.env.FLW_SECRET_KEY;
-      if (!flwKey) {
-        console.error("FLW_SECRET_KEY not set in environment");
+      const polarKey = process.env.POLAR_ACCESS_TOKEN;
+      if (!polarKey) {
+        console.error("POLAR_ACCESS_TOKEN not set in environment");
         return res.status(500).json({ error: "Payment provider not configured" });
       }
 
       const planDef = PLAN_PRICES[plan_id];
       const numericPrice = Number(price) || (planDef ? planDef.price : 0);
       const label = plan_name || (planDef ? planDef.label : plan_id);
+      const productId = POLAR_PRODUCT_IDS[plan_id];
+      if (!productId) {
+        console.error("Unknown plan_id:", plan_id);
+        return res.status(400).json({ error: `Unknown plan: ${plan_id}` });
+      }
 
       const tx_ref = `godseye-${plan_id}-${Date.now()}-${crypto.randomBytes(3).toString("hex")}`;
-      const redirect_url = `${process.env.APP_URL || "https://godseye.digitalhustlerx.com"}/start?success=true&plan=${plan_id}&tx_ref=${tx_ref}`;
+      const success_url = `${process.env.APP_URL || "https://godseye.digitalhustlerx.com"}/start?success=true&plan=${plan_id}&tx_ref=${tx_ref}`;
 
-      const response = await fetch(`${FLW_BASE}/payments`, {
+      const response = await fetch("https://api.polar.sh/api/v1/checkouts/", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${flwKey}`,
+          Authorization: `Bearer ${polarKey}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          tx_ref,
-          amount: numericPrice,
-          currency: "USD",
-          redirect_url,
-          customer: { email: String(email).toLowerCase().trim() },
-          customizations: {
-            title: "GodsEye",
-            description: `${label} Plan — $${numericPrice}/mo`,
-          },
-          meta: { plan_id, plan_name: label, tx_ref },
+          product_id: productId,
+          success_url,
+          customer_email: String(email).toLowerCase().trim(),
+          metadata: { plan_id, plan_name: label, tx_ref },
         }),
       });
 
       const data = await response.json();
-      if (!response.ok || data.status !== "success" || !data.data?.link) {
-        console.error("[Flutterwave] Payment link creation failed:", data);
-        return res.status(500).json({ error: (data && (data.message || data.detail)) || "Failed to create payment link" });
+      if (!response.ok) {
+        console.error("[Polar] Checkout creation failed:", data);
+        return res.status(500).json({ error: (data && data.detail) || "Failed to create Polar checkout" });
       }
 
       // Record intent now; flip to paid only when the webhook verifies payment.
@@ -816,35 +960,39 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
          VALUES (?, ?, ?, ?, ?, 'pending', ?, ?, ?)`
       ).run(String(email).toLowerCase().trim(), plan_id, label, numericPrice, tx_ref, tokenInfo.token, tokenInfo.expires, referrerToken);
 
-      const checkoutUrl = data.data.link; // may include ?tx_ref already; encode ours too
-      const sep = checkoutUrl.includes("?") ? "&" : "?";
-      res.json({ checkout_url: `${checkoutUrl}${sep}tx_ref=${tx_ref}`, checkout_id: tx_ref, tx_ref, plan_id, amount: numericPrice });
+      res.json({
+        checkout_url: data.url,
+        checkout_id: data.id,
+        tx_ref,
+        plan_id,
+        amount: numericPrice,
+      });
     } catch (error: any) {
-      console.error("[Flutterwave] Error:", error);
+      console.error("[Polar] Error:", error);
       res.status(500).json({ error: error.message || "Failed to create checkout" });
     }
   });
 
-  // Webhook — verify signature, then flip purchase to paid, issue the download
-  // token, email the download link, and (for logged-in users) activate the plan.
-  app.post("/api/flw-webhook", (req, res) => {
-    const secretHash = process.env.FLW_WEBHOOK_HASH;
-    const receivedHash = req.headers?.["verif-hash"] || "";
-    if (secretHash && secretHash !== receivedHash) {
-      console.error("[Flutterwave] Webhook signature mismatch");
-      return res.status(401).json({ error: "Invalid signature" });
-    }
-
+  // Webhook — verify Polar event, then flip purchase to paid, issue the download
+  // token, email the download link, and (for logged-in users) activate the plan
+  // + start the subscription window (cold-start). Runs the SAME fulfillment body
+  // as before; only the event parser changed from Flutterwave to Polar.
+  app.post("/api/polar-webhook", (req, res) => {
     const event = req.body || {};
+    const eventType = event.type || "";
     const data = event.data || {};
-    const eventStatus = data.status || "";
 
-    // We only act on confirmed successful charges.
-    if (eventStatus === "successful") {
-      const txRef = data.tx_ref;
+    // We only act on confirmed, successful checkouts / orders.
+    const isPaid =
+      (eventType === "checkout.completed" || eventType === "order.created") &&
+      String(data.status || "").toLowerCase() !== "failed";
+
+    if (isPaid) {
+      // Polar carries our internal ref in metadata.tx_ref (set at checkout creation).
+      const txRef = data.metadata?.tx_ref;
       const flwId = data.id ? String(data.id) : undefined;
-      const email = data.customer?.email || data.email;
-      const meta = data.meta || {};
+      const email = data.customer_email || data.customer?.email || data.email;
+      const meta = data.metadata || {};
 
       if (txRef) {
         const purchase = db.prepare("SELECT * FROM purchases WHERE tx_ref = ?").get(txRef) as any;
@@ -856,15 +1004,21 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
             `UPDATE purchases SET status='paid', flw_txn_id=?, download_token=?, download_token_expires=?, paid_at=datetime('now') WHERE tx_ref=?`
           ).run(flwId || null, tokenInfo.token, tokenInfo.expires, txRef);
 
-          // Activate plan for existing users (credits per plan).
-          const creditsMap: Record<string, number> = { starter: 500, pro: 2000, godmode: 10000 };
+          // Activate plan for existing users (credits per plan), and start the
+          // subscription window so taste/paid plans go cold after it lapses.
+          const creditsMap: Record<string, number> = { taste: 100, starter: 500, pro: 2000, godmode: 10000 };
           const planId = purchase.plan_id || meta.plan_id;
           const credits = creditsMap[planId];
           if (email && credits) {
             const user = db.prepare("SELECT id FROM users WHERE email=?").get(String(email).toLowerCase().trim());
             if (user) {
-              db.prepare("UPDATE users SET plan=?, plan_id=?, credits_remaining=COALESCE(?, credits_remaining) WHERE id=?")
-                .run(planId, planId, credits, (user as any).id);
+              // Taste = a short one-time trial (~7 days) so it goes cold fast and
+              // nudges re-subscription. Paid monthly plans get a 30-day window.
+              const windowDays = planId === "taste" ? 7 : 30;
+              const expires = new Date(Date.now() + windowDays * 24 * 60 * 60 * 1000).toISOString();
+              db.prepare(
+                "UPDATE users SET plan=?, plan_id=?, credits_remaining=COALESCE(?, credits_remaining), plan_expires_at=? WHERE id=?"
+              ).run(planId, planId, credits, expires, (user as any).id);
             }
           }
 
@@ -933,14 +1087,63 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
             subject: `Your GodsEye plugin download — ${purchase.plan_name}`,
             text,
             html,
-          }).then((r) => console.log(`[Flutterwave] download email to ${showEmail}:`, r.ok ? `ok${r.size ? ` (${r.size}B)` : ""}` : r.error));
+          }).then((r) => console.log(`[Polar] download email to ${showEmail}:`, r.ok ? `ok${r.size ? ` (${r.size}B)` : ""}` : r.error));
 
-          console.log(`[Flutterwave] Payment confirmed & download ready for ${showEmail} (tx_ref=${txRef})`);
+          console.log(`[Polar] Payment confirmed & download ready for ${showEmail} (tx_ref=${txRef})`);
         }
       }
     }
 
     res.json({ received: true });
+  });
+
+  // ===== GodBridge plugin handshake =====
+  // POST connect: the plugin (rest.php connect_site) sends its saved license key
+  // + site URL. We mint a per-site backend_secret, return the RAW secret ONCE,
+  // and keep only its hash. Verify later uses the secret against that hash.
+  app.post("/api/sites/connect", (req, res) => {
+    const { licenseKey, siteUrl, siteName, wpVersion, pluginVersion } = req.body || {};
+    const licenseKeyNorm = String(licenseKey || "").trim();
+    const siteUrlNorm = String(siteUrl || "").trim();
+    if (!licenseKeyNorm || !siteUrlNorm) {
+      return res.status(400).json({ error: "licenseKey and siteUrl are required" });
+    }
+    if (!/^https?:\/\//i.test(siteUrlNorm)) {
+      return res.status(400).json({ error: "siteUrl must be a valid http(s) URL" });
+    }
+
+    // Stable id: hash of license+url so the same site reconnecting maps to one row.
+    const siteId = crypto.createHash("sha256").update(`${licenseKeyNorm}\n${siteUrlNorm}`).digest("hex").slice(0, 32);
+    const existing = db.prepare("SELECT * FROM bridge_sites WHERE id = ?").get(siteId) as any;
+
+    let backendSecret: string;
+    if (existing) {
+      backendSecret = crypto.randomBytes(24).toString("hex");
+      const hash = crypto.createHash("sha256").update(backendSecret).digest("hex");
+      db.prepare(
+        `UPDATE bridge_sites SET backend_secret_hash=?, site_name=?, wp_version=?, plugin_version=?, updated_at=datetime('now') WHERE id=?`
+      ).run(hash, String(siteName || "").slice(0, 255), String(wpVersion || "").slice(0, 64), String(pluginVersion || "").slice(0, 64), siteId);
+    } else {
+      backendSecret = crypto.randomBytes(24).toString("hex");
+      const hash = crypto.createHash("sha256").update(backendSecret).digest("hex");
+      db.prepare(
+        `INSERT INTO bridge_sites (id, license_key, site_url, backend_secret_hash, site_name, wp_version, plugin_version)
+         VALUES (?, ?, ?, ?, ?, ?, ?)`
+      ).run(siteId, licenseKeyNorm, siteUrlNorm, hash, String(siteName || "").slice(0, 255), String(wpVersion || "").slice(0, 64), String(pluginVersion || "").slice(0, 64));
+    }
+
+    res.json({ site: { id: siteId, backendSecret, connectionStatus: "connected" } });
+  });
+
+  // POST verify: plugin re-confirms it successfully stored the secret. Constant-time.
+  app.post("/api/sites/verify", (req, res) => {
+    const { siteId, backendSecret } = req.body || {};
+    if (!siteId || !backendSecret) {
+      return res.status(400).json({ error: "siteId and backendSecret are required" });
+    }
+    const row = db.prepare("SELECT backend_secret_hash FROM bridge_sites WHERE id = ?").get(siteId) as any;
+    const ok = !!row && bridgeSecretMatches(row.backend_secret_hash, String(backendSecret));
+    res.json({ site: { connectionStatus: ok ? "connected" : "failed" } });
   });
 
   // Tokenized download — serves the plugin zip for a paid purchase.
