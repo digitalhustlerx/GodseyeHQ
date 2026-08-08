@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GodsEye — An Orchestrated AI Agentic System</title>
-<meta name="description" content="Hire a fleet of AI agents that live on Telegram and run every aspect of your business 24/7 — whatever you point them at. Join the waitlist for early access and founder pricing.">
+<title>GodsEye — Orchestrator of AI Agents</title>
+<meta name="description" content="GodsEye is an agentic system that orchestrates fleets of AI agents on demand to build, manage, and run your entire business 24/7. Join the waitlist for early access.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -12,23 +12,23 @@
 :root{--bg:#0A0A0A;--surface:#121212;--elevated:#181818;--gold:#C4A484;--gold-hover:#b39272;--gold-dim:#8a6f50;--text:#F2F2F2;--muted:#939393;--dim:#636363;--border:rgba(255,255,255,0.1);--serif:Georgia,'Times New Roman',serif;--sans:'Inter',Arial,sans-serif;--ds:'Space Grotesk',sans-serif;--dm:'JetBrains Mono',monospace}
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden}
-.wrap{max-width:820px;margin:0 auto;padding:70px 24px;position:relative}
-.bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:60px}
-.brand{font-family:var(--ds);font-weight:700;letter-spacing:.04em;font-size:18px}.brand span{color:var(--gold)}
-/* subtle animated fleet glow behind header */
+.wrap{max-width:820px;margin:0 auto;padding:60px 24px 40px;position:relative}
 .glow{position:fixed;top:-100px;left:50%;transform:translateX(-50%);width:640px;height:420px;background:radial-gradient(ellipse at center,rgba(196,164,132,.12),transparent 70%);pointer-events:none;z-index:-1;animation:fadeFloat 8s ease-in-out infinite}
-@keyframes fadeFloat{0%,100%{opacity:.7;transform:translateX(-50%) translateY(0)}50%{opacity:1;transform:translateX(-50%) translateY(-14px)}}
-.eyebrow{font-family:var(--dm);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:18px;text-align:center}
-h1{font-family:var(--serif);font-weight:300;font-size:52px;line-height:1.1;letter-spacing:-0.01em;margin-bottom:22px;text-align:center;max-width:800px;margin-left:auto;margin-right:auto}
-h1 em{color:var(--gold);font-style:italic}
-.sub{color:var(--muted);font-weight:300;font-size:18px;line-height:1.75;margin-bottom:14px;text-align:center;max-width:640px;margin-left:auto;margin-right:auto}
+@keyframes fadeFloat{0%,100%{opacity:.7}50%{opacity:1}}
+.bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.brand{font-family:var(--ds);font-weight:700;letter-spacing:.04em;font-size:18px}.brand span{color:var(--gold)}
+.bloglink{font-family:var(--dm);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);text-decoration:none;border:1px solid rgba(196,164,132,.3);padding:8px 14px;border-radius:999px;transition:background .2s}
+.bloglink:hover{background:rgba(196,164,132,.1)}
+.eyebrow{font-family:var(--dm);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
+/* Orchestrator line + fleets line */
+.orchestrator{font-family:var(--ds);font-weight:600;font-size:44px;line-height:1.05;letter-spacing:-0.02em;margin-bottom:14px}
+.orchestrator .gold{color:var(--gold)}
+.fleetline{font-family:var(--serif);font-weight:300;font-size:30px;line-height:1.15;color:var(--text);margin-bottom:24px;max-width:720px}
+.fleetline em{color:var(--gold);font-style:italic}
+.sub{color:var(--muted);font-weight:300;font-size:17px;line-height:1.75;margin-bottom:40px;max-width:640px}
 .sub strong{color:var(--text);font-weight:400}
-/* fleet role chips */
-.roles{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:28px 0 44px}
-.role{font-family:var(--dm);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border:1px solid var(--border);border-radius:999px;padding:8px 16px;background:var(--surface);transition:color .2s,border-color .2s}
-.role:hover{color:var(--gold);border-color:rgba(196,164,132,.4)}
-/* capture card */
-.capture{background:linear-gradient(160deg, rgba(196,164,132,0.10), var(--surface) 55%);border:1px solid rgba(196,164,132,0.35);border-radius:22px;padding:34px;margin-bottom:30px}
+/* capture */
+.capture{background:linear-gradient(160deg, rgba(196,164,132,0.10), var(--surface) 55%);border:1px solid rgba(196,164,132,0.35);border-radius:22px;padding:34px;margin-bottom:40px}
 .capture .cb{font-family:var(--dm);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;text-align:center}
 .capture h2{font-family:var(--serif);font-weight:300;font-size:26px;margin-bottom:10px;text-align:center}
 .capture .note{color:var(--muted);font-weight:300;font-size:14px;line-height:1.7;margin-bottom:22px;text-align:center}
@@ -39,46 +39,49 @@ button{border:none;cursor:pointer;font-family:var(--dm);font-weight:700;letter-s
 button:hover{background:var(--gold-hover)}
 button:disabled{opacity:.5;cursor:not-allowed}
 .secure{font-family:var(--dm);font-size:11px;color:var(--dim);margin-top:12px;text-align:center}
-/* perks */
-.perks{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:12px}
-.perk{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px}
-.perk .ic{font-size:20px;margin-bottom:10px}
-.perk .t{font-family:var(--serif);font-weight:300;font-size:17px;margin-bottom:6px}
-.perk .d{color:var(--muted);font-weight:300;font-size:13.5px;line-height:1.6}
-/* connect strip */
-.connects{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:26px 0 4px}
-.connect{font-family:var(--dm);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold-dim);border:1px dashed rgba(196,164,132,.3);border-radius:10px;padding:9px 14px;background:transparent}
 .hidden{display:none}
 .err{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.4);border-radius:14px;padding:14px;color:#fca5a5;font-size:13px;margin-top:12px;text-align:center}
+/* value points */
+.values{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:44px}
+.value{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px}
+.value .ic{font-size:22px;margin-bottom:12px}
+.value .t{font-family:var(--serif);font-weight:300;font-size:18px;margin-bottom:8px}
+.value .d{color:var(--muted);font-weight:300;font-size:13.5px;line-height:1.65}
+/* runs forever strip */
+.run{color:var(--dim);font-weight:300;font-size:14px;line-height:1.7;margin-bottom:44px;max-width:640px}
+.run strong{color:var(--gold);font-weight:400}
+/* supported platforms marquee */
+.platforms{margin-top:6px}
+.platforms .label{font-family:var(--dm);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);text-align:center;margin-bottom:18px}
+.marquee{overflow:hidden;white-space:nowrap;position:relative;-webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
+.marquee-track{display:inline-block;white-space:nowrap;animation:scroll 26s linear infinite}
+.marquee-track span{font-family:var(--dm);font-size:13px;letter-spacing:.05em;color:var(--muted);border:1px solid var(--border);background:var(--surface);border-radius:10px;padding:12px 20px;margin:0 8px;display:inline-block}
+@keyframes scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 .foot{text-align:center;margin-top:44px;font-family:var(--dm);font-size:12px;color:var(--dim)}
 .foot a{color:var(--gold);text-decoration:none}.foot a:hover{text-decoration:underline}
-@media(max-width:600px){h1{font-size:36px}.perks{grid-template-columns:1fr}.wrap{padding:48px 20px}}
+.socials{display:flex;justify-content:center;gap:18px;margin-top:22px}
+.socials a{font-family:var(--dm);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);text-decoration:none}
+.socials a:hover{color:var(--gold)}
+@media(max-width:600px){.orchestrator{font-size:32px}.fleetline{font-size:24px}.values{grid-template-columns:1fr}.wrap{padding:44px 20px 32px}}
 </style>
 <script defer src="https://godseye.digitalhustlerx.com/tracker.js"></script>
 </head>
 <body>
 <div class="glow"></div>
 <div class="wrap">
-  <div class="bar"><div class="brand">GODS<span>EYE</span></div></div>
+  <div class="bar">
+    <div class="brand">GODS<span>EYE</span></div>
+    <a class="bloglink" href="https://godseye.digitalhustlerx.com/blog/what-is-an-ai-business-agent">Read the blog →</a>
+  </div>
 
   <div class="eyebrow">Early access · Founder pricing</div>
-  <h1>One orchestrator. A fleet of agents. Your business, <em>automated.</em></h1>
-  <p class="sub">GodsEye is an agentic system that spawns workers on demand to build, manage, and run your business. Connect GitHub, Vercel, your store, or your site. One agent directs it all.</p>
-
-  <div class="roles">
-    <span class="role">Receptionist</span>
-    <span class="role">Content writer</span>
-    <span class="role">Social manager</span>
-    <span class="role">Order tracker</span>
-    <span class="role">Support rep</span>
-    <span class="role">Numbers &amp; insights</span>
-    <span class="role">Site upkeep</span>
-    <span class="role">+ anything you point it at</span>
-  </div>
+  <div class="orchestrator">Orchestrator, <span class="gold">Godseye</span></div>
+  <div class="fleetline">a fleet of AI agents running <em>24/7</em> to manage your business</div>
+  <p class="sub">Godseye is an agentic system that orchestrates fleets of AI agents on demand — to build, manage, and run your entire business while you sleep. It manages your online presence, your store, your socials, your leads, your support. All of it.</p>
 
   <div id="captureBox" class="capture">
     <div class="cb">Join the waitlist</div>
-    <h2>Built for the cutting edge.</h2>
+    <h2>Get in before the fleet fills.</h2>
     <p class="note">The first 100 in lock the founder rate. Drop your email and we will ping you the moment you can bring it on board.</p>
     <div class="form">
       <div class="field"><input type="email" id="emailInput" placeholder="you@company.com" autocomplete="email"></div>
@@ -88,23 +91,35 @@ button:disabled{opacity:.5;cursor:not-allowed}
     <div id="errBox" class="err hidden"></div>
   </div>
 
-  <div class="perks">
-    <div class="perk"><div class="ic">🫧</div><div class="t">Tell it once, never again</div><div class="d">Show a task once. The whole fleet learns it and just keeps doing it, on schedule.</div></div>
-    <div class="perk"><div class="ic">🧠</div><div class="t">Thinks while you sleep</div><div class="d">Between sessions it reviews what happened and comes back sharper with better suggestions.</div></div>
-    <div class="perk"><div class="ic">🛡️</div><div class="t">You stay the boss</div><div class="d">It only touches what you let it. Everything ships through you. Cut access any time, in a word.</div></div>
-    <div class="perk"><div class="ic">💸</div><div class="t">Founder price</div><div class="d">Early list means a locked-in discount when it launches.</div></div>
+  <!-- Optimized bottom section: how the system benefits you -->
+  <div class="values">
+    <div class="value"><div class="ic">🎯</div><div class="t">Looks for leads, constantly</div><div class="d">The fleet searches for prospects daily and reaches them for you — so you are always first to a new customer.</div></div>
+    <div class="value"><div class="ic">🗣️</div><div class="t">Answers your customers</div><div class="d">Support, bookings, follow-ups. It replies in your tone, in minutes, so you never lose a client to silence.</div></div>
+    <div class="value"><div class="ic">🌐</div><div class="t">Your whole online presence</div><div class="d">From your website to your store to your socials — one system manages it all and keeps everything consistent.</div></div>
+    <div class="value"><div class="ic">🌱</div><div class="t">Grows with your business</div><div class="d">Show it your process once. It never forgets. It learns how you work and only gets smoother from there.</div></div>
+    <div class="value"><div class="ic">🔭</div><div class="t">Always looking out for you</div><div class="d">Proactive and in the forefront — it spots problems and opportunities before they reach you.</div></div>
+    <div class="value"><div class="ic">🧠</div><div class="t">It thinks while you sleep</div><div class="d">Between sessions it reviews what happened and comes back with sharper suggestions.</div></div>
   </div>
 
-  <div class="connects">
-    <span class="connect">Connect WordPress</span>
-    <span class="connect">Connect GitHub</span>
-    <span class="connect">Connect your store</span>
-    <span class="connect">Connect your site</span>
+  <p class="run"><strong>Runs 24/7.</strong> Unlike a human, it never gets tired, never has an off day, never clocks out. This is what entrepreneurs are using right now to stay ahead of their competition — reaching leads and closing deals while everyone else is still catching up.</p>
+
+  <div class="platforms">
+    <div class="label">Supported platforms</div>
+    <div class="marquee">
+      <div class="marquee-track">
+        <span>WordPress</span><span>Elementor</span><span>WooCommerce</span><span>Shopify</span><span>GitHub</span><span>Vercel</span><span>Telegram</span><span>Instagram</span><span>TikTok</span><span>Facebook</span><span>X / Twitter</span><span>Email</span><span>Google Analytics</span><span>More</span>
+        <span>WordPress</span><span>Elementor</span><span>WooCommerce</span><span>Shopify</span><span>GitHub</span><span>Vercel</span><span>Telegram</span><span>Instagram</span><span>TikTok</span><span>Facebook</span><span>X / Twitter</span><span>Email</span><span>Google Analytics</span><span>More</span>
+      </div>
+    </div>
   </div>
 
-  <div style="text-align:center;margin-top:24px"><a href="https://godseye.digitalhustlerx.com/blog/what-is-an-ai-business-agent" style="color:var(--gold);font-family:var(--dm);font-size:12px;text-decoration:none">Read the blog &rarr;</a></div>
   <div class="foot">
     <a href="https://t.me/GodseyeXbot">@GodseyeXbot</a> · <a href="https://godseye.digitalhustlerx.com">godseye.digitalhustlerx.com</a>
+    <div class="socials">
+      <a href="https://x.com/digitalhustlerx">X / Twitter</a>
+      <a href="https://github.com/digitalhustlerx/GodseyeHQ">GitHub</a>
+      <a href="https://t.me/GodseyeXbot">Telegram</a>
+    </div>
   </div>
 </div>
 
@@ -121,7 +136,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
       box.classList.add('hidden');
       const success=document.createElement('div');
       success.className='capture'; success.style.textAlign='center';
-      success.innerHTML='<div class="cb">You are in 🎉</div><h2 style="text-align:center">Welcome to the fleet.</h2><p class="note">Your spot is locked. We will email you the moment GodsEye is ready to meet your business, plus your founder bonus.</p><div class="secure">Founder code: <strong>'+(d.founderCode||d.founder_code||'locked at launch')+'</strong></div>';
+      success.innerHTML='<div class="cb">You are in 🎉</div><h2 style="text-align:center">Welcome to the fleet.</h2><p class="note">Your spot is locked. We will email you the moment GodsEye is ready, plus your founder bonus.</p><div class="secure">Founder code: <strong>'+(d.founderCode||d.founder_code||'locked at launch')+'</strong></div>';
       box.parentNode.insertBefore(success,box.nextSibling);
     }catch(e){errBox.textContent=e.message;errBox.classList.remove('hidden');btn.disabled=false;btn.textContent='Get on the list →';}
   });
