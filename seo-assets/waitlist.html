@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GodsEye — Early Access</title>
+<meta name="description" content="Meet GodsEye, the AI agent that runs your business from Telegram. It works the office, it learns as it works, and it stays in your control. Join the waitlist for early access and founder pricing.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0A0A0A;--surface:#121212;--elevated:#181818;--gold:#C4A484;--gold-hover:#b39272;--gold-dim:#8a6f50;
+  --text:#F2F2F2;--muted:#939393;--dim:#636363;--border:rgba(255,255,255,0.1);
+  --serif:Georgia,'Times New Roman',serif;--sans:'Inter',Arial,sans-serif;--ds:'Space Grotesk',sans-serif;--dm:'JetBrains Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;-webkit-font-smoothing:antialiased}
+.wrap{max-width:720px;margin:0 auto;padding:70px 24px}
+.bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:56px}
+.brand{font-family:var(--ds);font-weight:700;letter-spacing:.04em;font-size:18px}.brand span{color:var(--gold)}
+.eyebrow{font-family:var(--dm);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:18px}
+/* Big headings = Georgia, weight 300 (matches the main site) */
+h1{font-family:var(--serif);font-weight:300;font-size:44px;line-height:1.12;letter-spacing:-0.01em;margin-bottom:20px}
+h1 em{color:var(--gold);font-style:italic}
+.sub{color:var(--muted);font-weight:300;font-size:17px;line-height:1.75;margin-bottom:36px;max-width:580px}
+/* capture card */
+.capture{background:linear-gradient(160deg, rgba(196,164,132,0.10), var(--surface) 55%);border:1px solid rgba(196,164,132,0.35);border-radius:22px;padding:32px;margin-bottom:28px}
+.capture .cb{font-family:var(--dm);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:12px}
+.capture h2{font-family:var(--serif);font-weight:300;font-size:26px;margin-bottom:10px}
+.capture .note{color:var(--muted);font-weight:300;font-size:14px;line-height:1.7;margin-bottom:22px}
+.form{display:flex;flex-direction:column;gap:12px}
+.field input{width:100%;background:#0d0d0d;border:1px solid var(--border);border-radius:12px;padding:15px 16px;color:var(--text);font-family:var(--sans);font-size:15px}
+.field input:focus{outline:none;border-color:var(--gold)}
+button{border:none;cursor:pointer;font-family:var(--dm);font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:12px;padding:16px;border-radius:12px;background:var(--gold);color:#0A0A0A;transition:background .2s}
+button:hover{background:var(--gold-hover)}
+button:disabled{opacity:.5;cursor:not-allowed}
+.secure{font-family:var(--dm);font-size:11px;color:var(--dim);margin-top:12px;text-align:center}
+/* perks */
+.perks{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:12px}
+.perk{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px}
+.perk .ic{font-size:20px;margin-bottom:10px}
+.perk .t{font-family:var(--serif);font-weight:300;font-size:17px;margin-bottom:6px}
+.perk .d{color:var(--muted);font-weight:300;font-size:13.5px;line-height:1.6}
+/* success / error */
+.hidden{display:none}
+.success{background:var(--elevated);border:1px solid rgba(74,222,128,.4);border-radius:18px;padding:30px;text-align:center}
+.success .big{font-family:var(--serif);font-weight:300;font-size:28px;color:#4ade80;margin-bottom:12px}
+.success p{color:var(--text);font-weight:300;font-size:15px;line-height:1.7;margin-bottom:14px}
+.success .code{font-family:var(--dm);font-size:14px;color:var(--gold);background:rgba(196,164,132,.1);border:1px dashed rgba(196,164,132,.4);border-radius:10px;padding:12px;display:inline-block}
+.err{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.4);border-radius:14px;padding:14px;color:#fca5a5;font-size:13px;margin-top:12px}
+.foot{text-align:center;margin-top:40px}
+.foot a{color:var(--gold);text-decoration:none;font-family:var(--dm);font-size:12px}.foot a:hover{text-decoration:underline}
+
+/* Thank-you popup, fade in */
+.popup-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);z-index:50;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .5s ease}
+.popup-backdrop.show{opacity:1;pointer-events:auto}
+.popup-card{background:var(--surface);border:1px solid rgba(196,164,132,0.4);border-radius:22px;padding:36px;max-width:420px;width:100%;text-align:center;transform:scale(0.94);transition:transform .45s cubic-bezier(0.22,1,0.36,1);box-shadow:0 24px 60px -20px rgba(196,164,132,0.25)}
+.popup-backdrop.show .popup-card{transform:scale(1)}
+.popup-card .ring{width:56px;height:56px;border-radius:50%;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.5);display:flex;align-items:center;justify-content:center;margin:0 auto 18px}
+.popup-card h2{font-family:var(--serif);font-weight:300;font-size:26px;margin-bottom:12px}
+.popup-card p{color:var(--muted);font-weight:300;font-size:14px;line-height:1.7;margin-bottom:20px}
+.popup-card .code{font-family:var(--dm);font-size:14px;color:var(--gold);background:rgba(196,164,132,.1);border:1px dashed rgba(196,164,132,.4);border-radius:10px;padding:12px;display:inline-block;margin-bottom:20px}
+.popup-card .close{width:100%}
+@media(max-width:520px){h1{font-size:32px}.perks{grid-template-columns:1fr}.wrap{padding:48px 20px}}
+</style>
+<script defer src="/tracker.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <div class="bar"><div class="brand">GODS<span>EYE</span></div></div>
+
+  <div class="eyebrow">Early access · Founder pricing</div>
+  <h1>Your <em>business</em>, run by an AI agent.</h1>
+  <p class="sub">GodsEye is a living agent that sits inside your Telegram and handles your whole office. It books clients, replies to messages, posts your content, tracks orders, chases reminders, and keeps everything moving. You tell it once. It never forgets.</p>
+
+  <!-- Capture form -->
+  <div id="captureBox" class="capture">
+    <div class="cb">Join the waitlist</div>
+    <h2>Get in early.</h2>
+    <p class="note">The first people in lock the founder rate. Drop your email and we will ping you the moment you can bring it on board, plus your personal bonus.</p>
+    <div class="form">
+      <div class="field"><input type="email" id="emailInput" placeholder="you@company.com" autocomplete="email"></div>
+      <button id="submitBtn" type="button">Join the waitlist →</button>
+    </div>
+    <div class="secure">🔒 No spam. Unsubscribe anytime.</div>
+    <div id="errBox" class="err hidden"></div>
+  </div>
+
+  <!-- Perks -->
+  <div class="perks">
+    <div class="perk"><div class="ic">💬</div><div class="t">Tell it once, it handles the rest</div><div class="d">Show it a task one time. It learns, and from then on it just does it, on schedule, without you asking twice.</div></div>
+    <div class="perk"><div class="ic">🧠</div><div class="t">It thinks while you sleep</div><div class="d">Between sessions it reviews what happened, spots what could go better, and comes back with sharper suggestions.</div></div>
+    <div class="perk"><div class="ic">🛡️</div><div class="t">You stay in control</div><div class="d">It only touches what you let it. Everything ships through you. Cut its access any time, in a word.</div></div>
+    <div class="perk"><div class="ic">💸</div><div class="t">Founder price</div><div class="d">Early list means a locked-in discount when it launches.</div></div>
+  </div>
+
+  <div class="foot">
+    <a href="https://t.me/GodseyeXbot">@GodseyeXbot</a> · <a href="https://godseye.digitalhustlerx.com/waitlist.html">godseye.digitalhustlerx.com</a>
+  </div>
+</div>
+
+<!-- Thank-you popup -->
+<div id="popup" class="popup-backdrop" role="dialog" aria-modal="true" aria-labelledby="popupTitle">
+  <div class="popup-card">
+    <div class="ring">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 7"/></svg>
+    </div>
+    <h2 id="popupTitle">You&rsquo;re in. 🎉</h2>
+    <p>Your spot is locked in. We will email you the moment GodsEye is ready to meet your business, plus your founder bonus.</p>
+    <div class="code" id="popupCode">Locking your founder code…</div>
+    <button class="close" id="popupClose">Done</button>
+  </div>
+</div>
+
+<script>
+const box=document.getElementById('captureBox');
+const errBox=document.getElementById('errBox');
+const btn=document.getElementById('submitBtn');
+const emailIn=document.getElementById('emailInput');
+const popup=document.getElementById('popup');
+const popupCode=document.getElementById('popupCode');
+
+btn.addEventListener('click', async ()=>{
+  const email=emailIn.value.trim();
+  errBox.classList.add('hidden');
+  if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    errBox.textContent='Please enter a valid email.'; errBox.classList.remove('hidden'); return;
+  }
+  btn.disabled=true; btn.textContent='Joining…';
+  try{
+    const r=await fetch('/api/waitlist',{
+      method:'POST',
+      headers:{'content-type':'application/json'},
+      body:JSON.stringify({email})
+    });
+    const d=await r.json();
+    if(!r.ok) throw new Error(d.error||'Something went wrong');
+    // d.founderCode or d.founder_code carries the discount code
+    const code=(d.founderCode||d.founder_code||'locked at launch');
+    popupCode.textContent=('Founder code: '+code);
+    // Fade the thank-you popup in over the page
+    popup.classList.add('show');
+  }catch(e){
+    errBox.textContent=e.message; errBox.classList.remove('hidden');
+    btn.disabled=false; btn.textContent='Join the waitlist →';
+  }
+});
+// Enter key submits
+emailIn.addEventListener('keydown',e=>{ if(e.key==='Enter') btn.click(); });
+popup.addEventListener('click',e=>{ if(e.target===popup) popup.classList.remove('show'); });
+document.getElementById('popupClose').addEventListener('click',()=>popup.classList.remove('show'));
+</script>
+</body>
+</html>

@@ -15,10 +15,15 @@ echo "[3/5] Restoring static SEO + organic asset tree into dist/..."
 # token visualisation
 cp /root/godseye-repo/seo-assets/token-wrapped.png        dist/token-wrapped.png
 cp /root/godseye-repo/seo-assets/token-visualization.html dist/token-visualization.html
-# proof docs (from labs/main)
-git show labs/main:docs/GODSEYE-INSIGHT-REPORT.md > dist/Godseye-Insight-Report.md 2>/dev/null || true
-git show labs/main:docs/GODSEYE-TIER-MATRIX.md    > dist/Godseye-Tier-Matrix.md    2>/dev/null || true
-git show labs/main:docs/GODSEYE-CASE-STUDY.md     > dist/Godseye-Case-Study.md     2>/dev/null || true
+cp /root/godseye-repo/seo-assets/token-wrapped.html       dist/token-wrapped.html
+# brand/launch HTML pages (human-readable; .md legacy is redirect-only)
+cp /root/godseye-repo/seo-assets/godseye-tiers.html          dist/godseye-tiers.html
+cp /root/godseye-repo/seo-assets/godseye-insight-report.html dist/godseye-insight-report.html
+cp /root/godseye-repo/seo-assets/godseye-launch-posts.html   dist/godseye-launch-posts.html
+cp /root/godseye-repo/seo-assets/waitlist.html               dist/waitlist.html
+cp /root/godseye-repo/seo-assets/tracker.js                  dist/tracker.js
+# NOTE: .md source docs are NOT copied to dist. Legacy .md URLs 301-redirect
+# in nginx to the .html pages above (see godseye.digitalhustlerx.com config).
 # SEO fundamentals
 cp /root/godseye-repo/seo-assets/robots.txt   dist/robots.txt
 cp /root/godseye-repo/seo-assets/sitemap.xml  dist/sitemap.xml

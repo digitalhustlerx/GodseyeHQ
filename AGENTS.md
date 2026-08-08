@@ -46,17 +46,28 @@ Everything else is legacy:
 ├── package.json                   ← Deps: React, Vite, Tailwind, Lucide, express
 ├── vite.config.ts                 ← Vite config
 ├── PRD.md                         ← Product Requirements Document (READ THIS)
+├── GODSEYE-PRODUCT-STANDARD.md    ← Commercial, onboarding, licence + content source of truth (READ THIS)
 ├── HANDOFF.md                     ← Handoff documentation (READ THIS)
 ├── AGENTS.md                      ← THIS FILE
 ├── COMMERCIAL_LICENSE.md          ← Commercial licensing terms
 ├── supabase-migration-godseyehq.sql ← DB schema migration
 ├── README.md                      ← GitHub-facing README (OMP already wrote this)
 ├── LICENSE                        ← AGPL-3.0
-└── dist/                          ← BUILT OUTPUT — nginx serves this
-    ├── index.html
-    ├── assets/
-    └── server.cjs
+├── dist/                          ← BUILT OUTPUT — nginx serves this
+│   ├── index.html
+│   ├── assets/
+│   └── server.cjs
+├── wp-plugin/                     ← God's Eye WordPress bridge plugin (PHP)
+│   ├── godseye-bridge/            ← source of truth: rest.php routes, admin.php UI
+│   │   ├── godseye-bridge.php     ← main (v1.2.0)
+│   │   ├── includes/rest.php      ← 19 godseye/v1 REST routes + HMAC auth
+│   │   ├── includes/admin.php     ← Connect + "Bring your team" tabs
+│   │   ├── uninstall.php          ← cleans settings on plugin delete
+│   │   └── readme.txt
+│   └── dist/godseye-bridge-1.2.0.zip  ← distributable plugin zip
 ```
+
+> **Plugin ↔ backend contract (v1.2.0):** the plugin connects via `POST /api/sites/connect` + `/api/sites/verify` (in `server.ts`), and the admin referral tab calls `GET /api/referral/link`. All three must exist in `server.ts` — do not remove. `scripts/deploy.sh` rebuilds `dist/godseye-plugin.zip` from `wp-plugin/` automatically (the file `/api/plugin-download` serves).
 
 ---
 

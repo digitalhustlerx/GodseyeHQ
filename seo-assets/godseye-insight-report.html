@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GodsEye — 30-Day Field Report: How a Power User Runs an AI Agent</title>
+<meta name="description" content="Real telemetry from 30 days of autonomous AI-agent operation. A solo founder, one agent, 2.26B tokens.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0A0A0A;--surface:#121212;--elevated:#181818;--gold:#C4A484;--gold-hover:#b39272;--gold-dim:#8a6f50;
+  --text:#F2F2F2;--muted:#939393;--dim:#636363;--border:rgba(255,255,255,0.1);
+  --ds:'Space Grotesk',sans-serif;--db:'Inter',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--db);line-height:1.75;-webkit-font-smoothing:antialiased}
+.wrap{max-width:760px;margin:0 auto;padding:60px 24px 90px}
+.bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:52px}
+.brand{font-family:var(--ds);font-weight:700;letter-spacing:.05em}.brand span{color:var(--gold)}
+.eyebrow{font-family:var(--ds);font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:18px}
+h1{font-family:Georgia,serif;font-weight:300;font-size:38px;line-height:1.2;margin-bottom:14px}
+.meta{color:var(--dim);font-size:13px;margin-bottom:40px}
+/* headline box */
+.headline{background:linear-gradient(160deg,rgba(196,164,132,0.12),var(--surface) 60%);border:1px solid rgba(196,164,132,0.35);border-radius:18px;padding:28px;margin-bottom:34px}
+.headline .tag{font-family:var(--ds);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:12px}
+.headline p{font-family:Georgia,serif;font-weight:300;font-size:20px;line-height:1.6;color:var(--text)}
+.headline b{color:var(--gold);font-weight:400}
+h2{font-family:Georgia,serif;font-weight:300;font-size:25px;margin:42px 0 8px}
+.caption{color:var(--dim);font-size:13px;margin-bottom:18px}
+.stat{display:flex;align-items:baseline;gap:10px;padding:12px 0;border-bottom:1px solid var(--border)}
+.stat .num{font-family:var(--ds);font-weight:600;font-size:22px;color:var(--gold);white-space:nowrap}
+.stat .lab{color:var(--text);font-weight:300;font-size:15px}
+.stat .read{color:var(--muted);font-weight:300;font-size:14px;margin-left:auto;text-align:right;max-width:340px}
+ul{list-style:none;margin:8px 0}
+li{color:var(--text);font-weight:300;font-size:15px;padding:7px 0 7px 22px;position:relative;border-bottom:1px solid rgba(255,255,255,.05)}
+li:before{content:"›";color:var(--gold);position:absolute;left:4px;font-weight:600}
+.quote{background:var(--surface);border-left:3px solid var(--gold);border-radius:0 12px 12px 0;padding:18px 22px;color:var(--text);font-weight:300;font-size:16px;line-height:1.7;margin:24px 0;font-family:Georgia,serif}
+.code{font-family:var(--ds);background:var(--elevated);border:1px solid var(--border);border-radius:12px;padding:16px 20px;font-size:14px;line-height:1.9;color:var(--gold);white-space:pre-wrap;margin:16px 0}
+.foot{color:var(--dim);font-size:13px;font-style:italic;margin-top:44px;line-height:1.6}
+</style>
+<script defer src="/tracker.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <div class="bar"><div class="brand">GODS<span>EYE</span></div></div>
+  <div class="eyebrow">Deep-Dive Field Report</div>
+  <h1>How a power user actually runs an AI agent.</h1>
+  <p class="meta">Source: real telemetry · 30 days of autonomous + interactive operation (Jul 04 – Aug 03, 2026). Every number is actual usage — not a benchmark, not a projection.</p>
+
+  <div class="headline">
+    <div class="tag">The headline — read this first</div>
+    <p>A solo founder ran a full multi-project software business on an AI agent for 30 days. The operation processed <b>2.26 billion tokens</b>, executed <b>48,185 real actions</b>, and ran <b>133 daily sessions</b> — at a measured compute cost of roughly <b>$49 for the month</b>. For every action the founder took, the agent took <b>8 more on its own</b>.</p>
+  </div>
+
+  <h2>1 · Who the data says you are</h2>
+  <p class="caption">The profile: "The conductor" — trusts delegation, optimizes cost, acts more than talks.</p>
+  <div class="stat"><span class="num">8.1×</span><span class="lab">Autonomy ratio</span><span class="read">agent actions per 1 of yours</span></div>
+  <div class="stat"><span class="num">89.6%</span><span class="lab">Model loyalty</span><span class="read">one workhorse, 14 alternates tried</span></div>
+  <div class="stat"><span class="num">50.7%</span><span class="lab">Terminal actions</span><span class="read">it's hands, not a toy</span></div>
+  <div class="stat"><span class="num">133/day</span><span class="lab">Sessions</span><span class="read">deep work + rapid checks</span></div>
+
+  <h2>2 · The autonomy engine</h2>
+  <p class="caption">A one-person "virtual company" — a system of delegable, autonomous agents.</p>
+  <ul>
+    <li><b>989M tokens (44%)</b> spent by autonomous background agents running without you present</li>
+    <li><b>8+ virtual staff</b>, each with a defined job (supervisor, money-scanner, monitors, scouts)</li>
+    <li><b>87 distinct skills, 1,083 loads, 269 edits</b> — a self-evolving playbook</li>
+  </ul>
+
+  <h2>3 · Hands, not a chatbot</h2>
+  <p class="caption">Over half the agent's work is direct system manipulation — automation, not conversation.</p>
+  <div class="stat"><span class="num">50.7%</span><span class="lab">terminal</span><span class="read">runs builds, deploys, tests</span></div>
+  <div class="stat"><span class="num">8.8%</span><span class="lab">read_file</span><span class="read">audits code, checks state</span></div>
+  <div class="stat"><span class="num">8.2%</span><span class="lab">session recall</span><span class="read">remembers so you don't re-explain</span></div>
+  <div class="stat"><span class="num">5.5%</span><span class="lab">web research</span><span class="read">pricing, intel</span></div>
+
+  <h2>4 · The economics</h2>
+  <div class="code">Input tokens:      115.7M
+Output tokens:      16.2M
+Compute cost (30d): ~$49
+Cost per day:       ~$1.64
+Cost per session:   ~$0.012</div>
+  <div class="quote">The single most persuasive number here: an entire solo-business operation, 30 days, for the cost of a cup of coffee per day.</div>
+
+  <h2>5 · The scale multiplier</h2>
+  <div class="code">Basic user:  ~400K tokens/day,  ~$3/month
+Power user:   ~75M tokens/day,  ~$564/month (fully-loaded)
+Ratio:        ~188×
+Autonomy:     8.1 agent-actions per 1 human action</div>
+  <p style="color:var(--muted);font-weight:300;font-size:15px">Even at 188× a basic user, the cost stays in the tens-to-hundreds range for a month. The agent grows with you without exploding your bill.</p>
+
+  <h2>6 · Capability proof</h2>
+  <ul>
+    <li><b>4,001 sessions, 48,185 tool actions, 87,147 messages</b> of real production load</li>
+    <li><b>Multi-project orchestration</b> carried simultaneously (SaaS build, checkout, Telegram bot, WP plugin + more)</li>
+    <li><b>Self-healing:</b> the agent autonomously diagnosed and fixed production issues (a broken bot token, a leak, a polling bug)</li>
+  </ul>
+
+  <h2>7 · The honest caveats</h2>
+  <ul>
+    <li>Throughput ≠ completion — the data shows enormous doing, but shipping took discipline; the agent can't force it</li>
+    <li>Autonomy compounds — more agents burn more background tokens (44% autonomous)</li>
+    <li>Budget toward the fully-loaded number, not the clean one; schedule background agents to need</li>
+  </ul>
+
+  <div class="quote">A power user isn't defined by asking more questions — but by delegating more execution. One agent carried a full multi-project business for 30 days and ~48,000 real actions for about $49 of measured compute. The agent is a department, not a tool.</div>
+
+  <p class="foot">Compiled from Hermes runtime telemetry, 30-day window. Honest caveat: self-reported usage metrics prove execution capacity and cost efficiency, not revenue or business result — included for credibility.</p>
+</div>
+</body>
+</html>

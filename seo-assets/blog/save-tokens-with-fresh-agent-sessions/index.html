@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="How to save tokens and get better results from an AI agent by starting fresh sessions, avoiding context drift, and carrying forward only the useful task brief." />
+<meta property="og:title" content="How to save tokens with fresh AI agent sessions" />
+<meta property="og:description" content="Why starting a new session can reduce context rot, prevent drift, and make your next agent task clearer." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://godseye.digitalhustlerx.com/blog/save-tokens-with-fresh-agent-sessions/" />
+<title>How to save tokens with fresh AI agent sessions | Godseye</title>
+<link rel="stylesheet" href="/blog/assets/blog.css" />
+</head>
+<body>
+<div class="wrap">
+  <header class="top"><a class="logo" href="/">GODS<span>EYE</span></a>
+    <nav><a href="/">Home</a><a href="/pricing">Pricing</a><a href="/blog/">Blog</a><a href="https://t.me/GodseyeXbot">Telegram Bot</a></nav></header>
+  <hr class="rule" />
+
+  <h1>How to save tokens with fresh AI agent sessions</h1>
+  <p class="meta">Field notes from the Godseye team · 6 min read <span class="pill">Workflow</span></p>
+
+  <p>Long conversations feel productive, but they can become expensive and confusing. Every old decision, failed attempt, pasted file, and abandoned idea adds weight to the next task. Eventually the agent has to search through yesterday’s context to understand today’s job. That is where token waste, context rot, and drift begin.</p>
+
+  <div class="box"><strong>The practical habit:</strong> when one task is finished and a genuinely new task begins, start a fresh session. In Hermes, that can mean using <code>/new</code>. Carry over a short brief—not the entire conversation.</div>
+
+  <h2>What context rot looks like</h2>
+  <p>Context rot is when useful information gets buried under obsolete information. The agent may still remember the project, but it has to distinguish current instructions from old plans, temporary workarounds, and decisions that no longer apply.</p>
+  <ul>
+    <li>The task quietly changes halfway through a session.</li>
+    <li>Old assumptions compete with the new requirement.</li>
+    <li>The agent repeats exploration you already completed.</li>
+    <li>Responses become longer because more history must be considered.</li>
+    <li>A small correction from earlier gets mistaken for the current source of truth.</li>
+  </ul>
+
+  <h2>Why /new helps</h2>
+  <p>A new session gives the next task a clean workspace. It reduces the amount of context the agent must process, makes the objective easier to see, and lowers the chance that an old branch will pull the work in the wrong direction.</p>
+  <p>This is not about losing everything. It is about separating tasks. Finished work can be summarized, saved in a file, committed to Git, or linked as a reference. The new session then receives only what it needs.</p>
+
+  <h2>What to carry into a fresh session</h2>
+  <p>Use a compact handoff with five parts:</p>
+  <ol>
+    <li><strong>Goal:</strong> what must be completed.</li>
+    <li><strong>Relevant location:</strong> repository, page, file, or URL.</li>
+    <li><strong>Current state:</strong> what already works.</li>
+    <li><strong>Constraints:</strong> things that must not change.</li>
+    <li><strong>Verification:</strong> how success should be checked.</li>
+  </ol>
+  <p>For example: “Add a blog article to the Godseye repo. Static blog source is in <code>seo-assets/blog</code>. Keep the dark/gold style. Add the homepage card and sitemap entry. Run the deploy script and verify the live URL.” That is much cheaper and clearer than replaying an entire planning conversation.</p>
+
+  <h2>Separate planning from execution</h2>
+  <p>Planning and implementation are different jobs. First decide what should happen. Then start a fresh session to make the change. This prevents half-finished ideas, alternative copy, and rejected approaches from becoming accidental instructions.</p>
+  <p>The same applies to debugging. Once the bug is understood and fixed, begin a new session for the next feature instead of letting the old error trail dominate the conversation.</p>
+
+  <h2>Keep durable knowledge outside the chat</h2>
+  <p>Use project files, documentation, commits, and short handoff notes for information that should survive a session. The chat is excellent for reasoning through the current task; it is not always the best database for every decision ever made.</p>
+  <ul class="checklist">
+    <li>Save final requirements in the project documentation.</li>
+    <li>Commit completed code so the next task starts from a known state.</li>
+    <li>Keep a short product or design source of truth.</li>
+    <li>Link to the relevant file instead of pasting giant files repeatedly.</li>
+    <li>Start fresh when the objective changes materially.</li>
+  </ul>
+
+  <h2>Fresh does not mean forgetful</h2>
+  <p>The goal is not to make the agent rediscover the project every time. The goal is to give it a deliberate brief: enough context to act correctly, without the noise of unrelated work. Fresh sessions create cleaner boundaries, better focus, and often lower usage.</p>
+
+  <div class="callout">
+    <h3>Finish one task. Start the next one clean.</h3>
+    <p>When the work changes, use <code>/new</code>, provide a compact handoff, and let the agent focus on the job in front of it.</p>
+    <a class="btn" href="https://godseye.digitalhustlerx.com/pricing">Join the waitlist</a>
+    <a class="btn ghost" href="https://godseye.digitalhustlerx.com/blog/">Read more guides</a>
+  </div>
+
+  <footer class="foot"><span>© 2026 Godseye</span><span><a href="https://godseye.digitalhustlerx.com">godseye.digitalhustlerx.com</a></span></footer>
+</div>
+</body>
+</html>

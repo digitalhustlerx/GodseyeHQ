@@ -52,6 +52,25 @@ for (const [col, type] of wlMigrate) {
 }
 db.exec(`CREATE INDEX IF NOT EXISTS waitlist_paid_idx ON waitlist (paid_at) WHERE paid_at IS NOT NULL;`);
 
+// ===== Local behavior tracking (self-hosted, no third-party) =====
+// Tiny, own-infra event log: pageview / click / scroll / time-on-page / submit.
+// Fired by the /api/track endpoint from a ~2KB snippet injected into the HTML
+// pages. Everything stored locally in the same SQLite DB. Aggregatable.
+db.exec(`
+CREATE TABLE IF NOT EXISTS track_events (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  event TEXT NOT NULL,          -- pageview | click | scroll | time | submit
+  page TEXT,                    -- path on the site
+  selector TEXT,                -- element (for clicks)
+  value REAL,                   -- scroll depth % or time ms
+  referrer TEXT,
+  ua TEXT,
+  ip TEXT,
+  created_at TEXT DEFAULT (datetime('now'))
+)`);
+db.exec(`CREATE INDEX IF NOT EXISTS track_events_event_idx ON track_events (event, created_at);`);
+
+
 // ===== GOD-15 (GOD-6): waitlist -> paid drip scheduler =====
 // Creates drip_jobs + drip_config and backfills the scheduler for any waitlist
 // rows that joined before this feature existed, so the 6-email sequence covers
@@ -607,6 +626,39 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
     res.json({ message: "You're on the list!", referral_code: referralCode, referral_token: self.token, founder_code: founderCode });
   });
 
+  // ===== Local behavior tracking (self-hosted, own infra) =====
+  // Accepts batched events from the tracker snippet. Logs pageview/click/scroll/
+  // time/submit into track_events. No third party; data stays on this box.
+  app.post("/api/track", (req, res) => {
+    const body = req.body || {};
+    const events = Array.isArray(body.events) ? body.events : body.events ? [body.events] : [body];
+    const ip = (req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "")
+      .toString().split(",")[0].trim() || "";
+    const ua = String(req.headers["user-agent"] || "").slice(0, 300);
+    const insert = db.prepare(
+      "INSERT INTO track_events (event, page, selector, value, referrer, ua, ip) VALUES (?, ?, ?, ?, ?, ?, ?)"
+    );
+    let n = 0;
+    for (const e of events) {
+      const ev = String(e.event || "").toLowerCase();
+      // GODSEYE-ADOPTION: popup_impression / popup_click are the waitlist
+      // adoption funnel events (fresh from today). Everything stays local.
+      if (!["pageview", "click", "scroll", "time", "submit", "popup_impression", "popup_click"].includes(ev)) continue;
+      insert.run(
+        ev,
+        String(e.page || req.headers.referer || "").slice(0, 300),
+        String(e.selector || "").slice(0, 200),
+        Number(e.value) || 0,
+        String(e.referrer || "").slice(0, 300) || null,
+        ua,
+        ip
+      );
+      n++;
+    }
+    if (n > 0) console.log(`[track] logged ${n} event(s)`);
+    res.json({ ok: true, logged: n });
+  });
+
   // GOD-9: return this user's opaque referral token (create lazily on first read).
   // GOD-9: referral link for the bridge plugin's "Bring your team" tab.
   // The plugin only holds a license key, so the referral system's email-keyed
@@ -734,6 +786,22 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
     }
 
     res.json({ count: row.count });
+  });
+
+  // GODSEYE-ADOPTION: live founder-spot math from the real DB so the popup never
+  // shows a fake number. First 100 get the founder rate; spotsLeft is clamped at 0.
+  app.get("/api/waitlist/stats", (_req, res) => {
+    const row = db.prepare("SELECT COUNT(*) as count FROM waitlist").get() as { count: number };
+    const SPOTS_TOTAL = 100;
+    const count = row.count;
+    res.json({
+      count,
+      spotsTotal: SPOTS_TOTAL,
+      spotsLeft: Math.max(0, SPOTS_TOTAL - count),
+      pct: Math.min(100, Math.round((count / SPOTS_TOTAL) * 100)),
+      waitlistOpen: true,
+      updatedAt: new Date().toISOString(),
+    });
   });
 
   // GOD-10 (GOD-6B): conversion write-back. Called by the payment path when a

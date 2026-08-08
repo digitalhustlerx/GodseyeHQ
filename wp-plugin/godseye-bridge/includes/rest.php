@@ -170,7 +170,14 @@ function godseye_bridge_connect_site() {
         return new WP_Error('godseye_connect_failed', $message);
     }
 
-    $settings['site_id'] = sanitize_text_field($body['site']['id']);
+    // F9 guard: don't let a second site overwrite an already-connected install's secret.
+    $new_site_id = sanitize_text_field($body['site']['id']);
+    if (!empty($settings['site_id']) && $settings['site_id'] !== $new_site_id) {
+        return new WP_Error('godseye_site_mismatch',
+            'This license is already linked to another site on this install.', array('status' => 409));
+    }
+
+    $settings['site_id'] = $new_site_id;
     $settings['backend_secret'] = sanitize_text_field($body['site']['backendSecret']);
     $settings['connection_status'] = sanitize_text_field($body['site']['connectionStatus']);
     $settings['last_synced_at'] = current_time('mysql');
@@ -239,6 +246,18 @@ function godseye_bridge_authorize_request(WP_REST_Request $request) {
         return new WP_Error('godseye_stale_request', 'Godseye bridge request expired.', array('status' => 403));
     }
 
+    // Replay shield: each request must carry a unique nonce, usable once within
+    // the 5-minute validity window. Reusing a nonce (replayed request) is rejected.
+    $nonce = (string) $request->get_header('x-godseye-nonce');
+    $nonce_key = 'godseye_nonce_' . hash('sha256', $site_id . '|' . $nonce);
+    if ('' === $nonce || 64 !== strlen($nonce) || get_transient($nonce_key)) {
+        return new WP_Error('godseye_replay', 'Missing or replayed Godseye bridge nonce.', array('status' => 403));
+    }
+    set_transient($nonce_key, 1, 301);
+
+    // Canonical signing body: if the caller sent a JSON object we sign the raw
+    // bytes verbatim (the exact str it transmitted) so the signer and verifier
+    // always agree. Empty GET bodies sign an empty string.
     $route = '/' . trim($request->get_route(), '/');
     $route = preg_replace('#^/godseye/v1#', '', $route);
     $body = $request->get_body();

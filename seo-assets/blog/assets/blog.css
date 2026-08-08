@@ -37,6 +37,7 @@ footer.foot{margin-top:50px; padding-top:24px; border-top:1px solid var(--border
 .cardlist{display:grid; gap:16px; margin-top:26px;}
 .article{background:var(--card); border:1px solid var(--border); border-radius:16px; padding:22px 24px; text-decoration:none; color:var(--text); display:block; transition:border-color .12s,transform .12s;}
 .article:hover{border-color:var(--gold-dim); transform:translateY(-2px);}
+.article.featured{border-color:rgba(196,164,132,.35);}
 .article .k{color:var(--gold); font-size:12px; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:8px;}
 .article h2{font-family:Georgia,serif; font-size:20px; margin:0 0 8px;}
 .article p{color:var(--muted); font-size:14px; margin:0;}

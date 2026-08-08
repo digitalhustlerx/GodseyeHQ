@@ -18,7 +18,7 @@ export default function LivePlayground({
     {
       id: "init",
       sender: "agent",
-      text: "👁️ Welcome to GodsEye! I am your WordPress AI Agent. Let's manage your site together.\n\nType a command below or tap any of the quick-action cards to see me in action!",
+      text: "👁️ Welcome to GodsEye! I am your AI agent, and I orchestrate a whole fleet of agents to run your business. Let's get your business running.\n\nType a command below or tap any of the quick-action cards to see me in action!",
       timestamp: "05:14 AM"
     }
   ]);

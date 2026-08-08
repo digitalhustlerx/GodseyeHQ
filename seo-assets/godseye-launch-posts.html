@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GodsEye — Launch Posts (tweak & post today)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0A0A0A;--surface:#121212;--elevated:#181818;--gold:#C4A484;--gold-hover:#b39272;
+  --text:#F2F2F2;--muted:#939393;--dim:#636363;--border:rgba(255,255,255,0.1);
+  --ds:'Space Grotesk',sans-serif;--db:'Inter',sans-serif;--dm:'JetBrains Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--db);min-height:100vh}
+.wrap{max-width:880px;margin:0 auto;padding:56px 22px 80px}
+.bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.brand{font-family:var(--ds);font-weight:700;letter-spacing:.04em;font-size:18px}.brand span{color:var(--gold)}
+.eyebrow{font-family:var(--dm);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:10px}
+h1{font-family:var(--ds);font-weight:600;font-size:30px;line-height:1.15;margin-bottom:10px}
+.sub{color:var(--muted);font-weight:300;font-size:14px;line-height:1.6;max-width:620px;margin-bottom:28px}
+/* post card */
+.post{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 24px;margin-bottom:18px}
+.post-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.chip{font-family:var(--dm);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(196,164,132,.3);background:rgba(196,164,132,.07);padding:4px 10px;border-radius:999px}
+.copy{font-size:14px;color:var(--text);font-weight:300;line-height:1.7;margin-bottom:6px}
+.copy b{color:var(--gold);font-weight:500}
+.link{font-family:var(--dm);font-size:12px;color:var(--gold);word-break:break-word;margin:6px 0 2px}
+.link a{color:var(--gold);text-decoration:none}.link a:hover{text-decoration:underline}
+.plat{font-family:var(--dm);font-size:11px;color:var(--dim);margin-top:7px}
+/* tweak box */
+.tweak{margin-top:12px;border-top:1px dashed var(--border);padding-top:12px}
+.tweak label{font-family:var(--dm);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px}
+.tweak textarea{width:100%;min-height:76px;background:#0d0d0d;border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--text);font-family:var(--db);font-size:13px;line-height:1.5;resize:vertical}
+.tweak textarea:focus{outline:none;border-color:var(--gold)}
+.row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.btn{font-family:var(--dm);font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:8px 14px;border-radius:9px;border:1px solid var(--border);background:rgba(255,255,255,.05);color:var(--text);cursor:pointer;font-weight:600}
+.btn:hover{background:var(--gold);color:#0A0A0A;border-color:var(--gold)}
+/* note */
+.note{margin-top:26px;background:var(--elevated);border:1px solid var(--border);border-radius:14px;padding:16px 20px;font-size:12px;color:var(--muted);font-weight:300;line-height:1.6}
+</style>
+<script defer src="/tracker.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <div class="bar"><div class="brand">GODS<span>EYE</span></div><div class="eyebrow">Launch Queue</div></div>
+  <h1>GodsEye launch posts — ready to post today.</h1>
+  <p class="sub">Each post = a one-click promo. Pick a message, edit it in the box if you want, copy, and post. Links verified live. Mixed-for-combos at the bottom if you want to bundle a couple.</p>
+
+  <!-- POST 1 -->
+  <div class="post">
+    <div class="post-head"><span class="chip">Launch · The Story</span></div>
+    <div class="copy">I ran a <b>whole business on one AI agent</b> for 30 days.<br>2.47 billion tokens. 51,249 real actions. The agent did <b>14.9 things for every 1 I did</b> — while I slept.</div>
+    <div class="link">📊 See the numbers → <a href="https://godseye.digitalhustlerx.com/token-wrapped.html">godseye.digitalhustlerx.com/token-wrapped.html</a></div>
+    <div class="tweak"><label>Tweak / edit this post</label><textarea>I ran a whole business on one AI agent for 30 days.
+2.47B tokens · 51,249 actions · it worked while I slept.</textarea><div class="row"><button class="btn" onclick="copyT(this)">Copy</button><button class="btn" onclick="resetT(this)">Reset</button></div></div>
+  </div>
+
+  <!-- POST 2 -->
+  <div class="post">
+    <div class="post-head"><span class="chip">Templates · Tried-and-true</span></div>
+    <div class="copy">Pick a niche profile and <b>your agent already knows your world.</b> Solo dev, marketer, agency, ecommerce, real estate — 8 pre-loaded profiles. No setup, start today.</div>
+    <div class="link">🚀 Choose your template → <a href="https://godseye.digitalhustlerx.com/templates">godseye.digitalhustlerx.com/templates</a></div>
+    <div class="tweak"><label>Tweak / edit this post</label><textarea>Your AI agent already knows your niche. Solo dev, agency, ecommerce, real estate — 8 pre-loaded profiles. Pick one, start today.</textarea><div class="row"><button class="btn" onclick="copyT(this)">Copy</button><button class="btn" onclick="resetT(this)">Reset</button></div></div>
+  </div>
+
+  <!-- POST 3 -->
+  <div class="post">
+    <div class="post-head"><span class="chip">Proof · Real usage</span></div>
+    <div class="copy">Read how GodsEye actually ran a WordPress site.<br><b>Field record, real numbers, honest caveats.</b> Not a demo — a log.</div>
+    <div class="link">📄 The insight report → <a href="https://godseye.digitalhustlerx.com/Godseye-Insight-Report.md">godseye.digitalhustlerx.com/Godseye-Insight-Report.md</a></div>
+    <div class="tweak"><label>Tweak / edit this post</label><textarea>Read how GodsEye actually ran a WordPress site for 30 days. Real numbers, real log, honest caveats. Not a demo.</textarea><div class="row"><button class="btn" onclick="copyT(this)">Copy</button><button class="btn" onclick="resetT(this)">Reset</button></div></div>
+  </div>
+
+  <!-- POST 4 -->
+  <div class="post">
+    <div class="post-head"><span class="chip">Chat with it</span></div>
+    <div class="copy">Message a <b>bot that runs your business</b> — from Telegram. Connect your site, talk to your agent, done.</div>
+    <div class="link">🤖 Start: <a href="https://t.me/GodseyeXbot">t.me/GodseyeXbot</a></div>
+    <div class="tweak"><label>Tweak / edit this post</label><textarea>Message a bot that runs your business. Connect your site in Telegram, talk to your agent, done. → t.me/GodseyeXbot</textarea><div class="row"><button class="btn" onclick="copyT(this)">Copy</button><button class="btn" onclick="resetT(this)">Reset</button></div></div>
+  </div>
+
+  <!-- POST 5 -->
+  <div class="post">
+    <div class="post-head"><span class="chip">Pricing · 3 ways to run it</span></div>
+    <div class="copy">Three ways to run GodsEye — <b>Your Agent, Your Operator, or We Run It.</b> Same product, your level of control. See what each actually does.</div>
+    <div class="link">💼 Pick a tier → <a href="https://godseye.digitalhustlerx.com/godseye-tiers.html">godseye.digitalhustlerx.com/godseye-tiers.html</a></div>
+    <div class="tweak"><label>Tweak / edit this post</label><textarea>Three ways to run GodsEye: Your Agent, Your Operator, or We Run It. Same agent, your level of control.</textarea><div class="row"><button class="btn" onclick="copyT(this)">Copy</button><button class="btn" onclick="resetT(this)">Reset</button></div></div>
+  </div>
+
+  <!-- COMBOS -->
+  <div class="post">
+    <div class="post-head"><span class="chip">Combo · bundle a couple</span></div>
+    <div class="copy"><b>Combo A (story + tool):</b> "Ran a whole business on one agent for 30 days → then picked a template and never looked back. <a href='https://godseye.digitalhustlerx.com/token-wrapped.html'>numbers</a> + <a href='https://godseye.digitalhustlerx.com/templates'>templates</a>"</div>
+    <div class="copy"><b>Combo B (proof + price):</b> "Read the real 30-day log → then see what it costs at each tier. <a href='https://godseye.digitalhustlerx.com/Godseye-Insight-Report.md'>report</a> + <a href='https://godseye.digitalhustlerx.com/godseye-tiers.html'>tiers</a>"</div>
+    <div class="copy"><b>Combo C (tool + chat):</b> "Pick a niche profile → then message the agent yourself. <a href='https://godseye.digitalhustlerx.com/templates'>profiles</a> + <a href='https://t.me/GodseyeXbot'>t.me/GodseyeXbot</a>"</div>
+  </div>
+
+  <div class="note">💡 <b>Tip:</b> every link above is verified live. Umami (the analytics) is tracking the site — post one, then check <a href="https://umami-analytics.62.84.186.1.sslip.io/">umami-analytics.62.84.186.1.sslip.io</a> later to see what got clicked. Post today, iterate from data.</div>
+</div>
+<script>
+function copyT(btn){
+  var ta = btn.closest('.tweak').querySelector('textarea');
+  ta.select(); ta.setSelectionRange(0,99999);
+  try{ navigator.clipboard.writeText(ta.value); }catch(e){ document.execCommand('copy'); }
+  btn.textContent = 'Copied ✓'; setTimeout(()=>btn.textContent='Copy',1500);
+}
+function resetT(btn){ var tw=btn.closest('.tweak'); var ta=tw.querySelector('textarea'); var originals={
+  'I ran a whole business on one AI agent for 30 days.': 'I ran a whole business on one AI agent for 30 days.\n2.47B tokens · 51,249 actions · it worked while I slept.',
+  'Your AI agent already knows your niche.': 'Your AI agent already knows your niche. Solo dev, agency, ecommerce, real estate — 8 pre-loaded profiles. Pick one, start today.',
+  'Read how GodsEye actually ran a WordPress site for 30 days.': 'Read how GodsEye actually ran a WordPress site for 30 days. Real numbers, real log, honest caveats. Not a demo.',
+  'Message a bot that runs your business.': 'Message a bot that runs your business. Connect your site in Telegram, talk to your agent, done.  → t.me/GodseyeXbot',
+  'Three ways to run GodsEye': 'Three ways to run GodsEye: Your Agent, Your Operator, or We Run It. Same agent, your level of control.'
+  };
+  var first = ta.value.split('\n')[0];
+  var found=Object.keys(originals).find(k=>first.includes(k));
+  ta.value = found?originals[found]:ta.value;
+}
+</script>
+</body>
+</html>

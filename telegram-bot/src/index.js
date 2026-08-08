@@ -72,6 +72,10 @@ function session(chatId) {
       pendingTaskId: null,
       // 0 = not onboarded; 1 = wizard awaiting "new or have-license"; 2 = awaiting license key entry
       onboardingStep: 0,
+      // Preview-first business onboarding. Real-domain execution remains gated
+      // behind an active subscription/license.
+      previewProfile: null,
+      previewTaskUsed: false,
       // Niche profile template (from /templates deep-link) + onboarding position.
       templateId: null,
       templateOnboardStep: -1,
@@ -151,8 +155,13 @@ function formatSite(site) {
 // ---------- Onboarding wizard ----------
 
 const WELCOME_KYBD = inlineKeyboard([
-  [{ text: "🔑 I have a license", callback_data: "ob:have_license" }],
-  [{ text: "🆕 I'm new", callback_data: "ob:new_user" }],
+  [{ text: "✨ Set up my business space", callback_data: "ob:preview" }],
+  [{ text: "🔑 I already have a license", callback_data: "ob:have_license" }],
+]);
+const PREVIEW_KYBD = inlineKeyboard([
+  [{ text: "⚡ Try a safe demo", callback_data: "preview:demo" }],
+  [{ text: "💳 Keep my agent working", callback_data: "preview:pricing" }],
+  [{ text: "🔑 Connect my paid workspace", callback_data: "ob:have_license" }],
 ]);
 const HAVE_LICENSE_KYBD = inlineKeyboard([
   [{ text: "🔗 Install / connect your WordPress site", callback_data: "ob:connect_site" }],
@@ -177,13 +186,27 @@ function welcomeText(state) {
   const lines = [
     "👁️ Welcome to Godseye.",
     "",
-    "I'm your agent. Connect your WordPress site here, then run it straight from this chat — create drafts, manage pages, comments, WooCommerce, and more.",
+    "I'm your business agent. You can talk to me right here on Telegram.",
+    "",
+    "I can help with your customers, content, store, website, numbers, and admin — then bring in more specialist agents when the work grows.",
   ];
   if (amConnected) {
     lines.push("", `You're ready to go. Connected site: \`${state.siteId || "see /sites"}\` — try a demo task.`);
   }
-  lines.push("", "How can we get you set up?");
+  lines.push("", "Start by telling me what you do and what you want off your plate first.");
   return lines.join("\n");
+}
+
+function previewWelcomeText() {
+  return [
+    "✨ Let's set up your business space.",
+    "",
+    "Reply in one line with:",
+    "1) what you do, and",
+    "2) the work you want help with first.",
+    "",
+    "Example: `I do hair and I need help replying to clients and posting on social.`",
+  ].join("\n");
 }
 
 function commandsText() {
@@ -204,6 +227,35 @@ function commandsText() {
 async function handleCallback(chatId, queryId, data) {
   const state = session(chatId);
   await answer(queryId);
+
+  if (data === "ob:preview") {
+    state.onboardingStep = 10;
+    return send(chatId, previewWelcomeText());
+  }
+
+  if (data === "preview:demo") {
+    if (!state.previewProfile) return send(chatId, previewWelcomeText());
+    if (state.previewTaskUsed) return send(chatId, "Your free preview task is already complete. Choose a plan to keep your agent working.", PREVIEW_KYBD);
+    state.previewTaskUsed = true;
+    return send(
+      chatId,
+      [
+        "⚡ Safe preview complete.",
+        "",
+        `Based on your business: ${state.previewProfile}`,
+        "",
+        "Your agent would organize this into a simple work plan, then handle the first task and bring you the result here.",
+        "",
+        "This preview does not connect to or change your real website, store, email, or social accounts.",
+        "Choose a plan when you want Godseye to work on the real thing.",
+      ].join("\n"),
+      PREVIEW_KYBD
+    );
+  }
+
+  if (data === "preview:pricing") {
+    return send(chatId, `Keep your agent working from $9/month (about $0.30/day), or buy focused work when you need it.\n\n${SIGNUP_URL}/pricing`, PREVIEW_KYBD);
+  }
 
   if (data === "ob:have_license") {
     state.onboardingStep = 2;
@@ -277,7 +329,11 @@ const COMMANDS_KYBD_FOR_START = COMMANDS_KYBD;
 
 async function handleCommand(chatId, text, fromCallback = true) {
   const state = session(chatId);
-  const [command, ...rest] = text.trim().split(/\s+/);
+  const [rawCommand, ...rest] = text.trim().split(/\s+/);
+  // Telegram appends @BotUsername when a command is sent in a group.
+  // Treat /start@GodseyeXbot exactly like /start so onboarding cannot be
+  // silently rejected depending on where the user tapped Start.
+  const command = rawCommand.toLowerCase().replace(/@godseyexbot$/, "");
 
   if (command === "/start" || command === "/help") {
     // Deep-link from the /templates gateway: t.me/GodseyeXbot?start=<template_id>
@@ -408,6 +464,27 @@ async function handleMessage(message) {
     // the wizard is awaiting one is treated as /connect with that key.
     if (state.onboardingStep === 2 && /^GS-[A-Z0-9-]{4,}$/i.test(text.trim())) {
       return await handleCommand(chatId, `/connect ${text.trim()}`);
+    }
+
+    if (state.onboardingStep === 10) {
+      state.previewProfile = text.trim();
+      state.onboardingStep = 11;
+      return await send(
+        chatId,
+        [
+          "✅ Got it. Your preview workspace is ready.",
+          "",
+          `Business profile: ${state.previewProfile}`,
+          "",
+          "You can try one safe demo now. It will not connect to or change your real business.",
+          "When you want live work on your domain, store, email, or social accounts, choose a paid plan first.",
+        ].join("\n"),
+        PREVIEW_KYBD
+      );
+    }
+
+    if (state.onboardingStep === 11 && state.previewProfile) {
+      return await send(chatId, "Choose an option below to continue your preview or connect a paid workspace.", PREVIEW_KYBD);
     }
 
     // Niche template onboarding: after a template deep-link, a free-text reply

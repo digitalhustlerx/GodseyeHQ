@@ -2,8 +2,8 @@
 Contributors: digital-viking
 Tags: ai, wordpress, automation, telegram
 Requires at least: 6.0
-Tested up to: 6.5
-Stable tag: 1.1.0
+Tested up to: 6.8
+Stable tag: 1.2.0
 License: AGPL-3.0
 
 Take control of your WordPress site from Telegram. One agent for content, security, WooCommerce, and more.
