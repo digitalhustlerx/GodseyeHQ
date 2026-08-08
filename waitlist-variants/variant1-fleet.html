@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GodsEye — A Fleet of AI Agents, 24/7</title>
+<meta name="description" content="Hire a fleet of AI agents that live on Telegram and run every aspect of your business 24/7 — whatever you point them at. Join the waitlist for early access and founder pricing.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0A0A0A;--surface:#121212;--elevated:#181818;--gold:#C4A484;--gold-hover:#b39272;--gold-dim:#8a6f50;--text:#F2F2F2;--muted:#939393;--dim:#636363;--border:rgba(255,255,255,0.1);--serif:Georgia,'Times New Roman',serif;--sans:'Inter',Arial,sans-serif;--ds:'Space Grotesk',sans-serif;--dm:'JetBrains Mono',monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+.wrap{max-width:820px;margin:0 auto;padding:70px 24px;position:relative}
+.bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:60px}
+.brand{font-family:var(--ds);font-weight:700;letter-spacing:.04em;font-size:18px}.brand span{color:var(--gold)}
+/* subtle animated fleet glow behind header */
+.glow{position:fixed;top:-100px;left:50%;transform:translateX(-50%);width:640px;height:420px;background:radial-gradient(ellipse at center,rgba(196,164,132,.12),transparent 70%);pointer-events:none;z-index:-1;animation:fadeFloat 8s ease-in-out infinite}
+@keyframes fadeFloat{0%,100%{opacity:.7;transform:translateX(-50%) translateY(0)}50%{opacity:1;transform:translateX(-50%) translateY(-14px)}}
+.eyebrow{font-family:var(--dm);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:18px;text-align:center}
+h1{font-family:var(--serif);font-weight:300;font-size:52px;line-height:1.1;letter-spacing:-0.01em;margin-bottom:22px;text-align:center;max-width:800px;margin-left:auto;margin-right:auto}
+h1 em{color:var(--gold);font-style:italic}
+.sub{color:var(--muted);font-weight:300;font-size:18px;line-height:1.75;margin-bottom:14px;text-align:center;max-width:640px;margin-left:auto;margin-right:auto}
+.sub strong{color:var(--text);font-weight:400}
+/* fleet role chips */
+.roles{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:28px 0 44px}
+.role{font-family:var(--dm);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border:1px solid var(--border);border-radius:999px;padding:8px 16px;background:var(--surface);transition:color .2s,border-color .2s}
+.role:hover{color:var(--gold);border-color:rgba(196,164,132,.4)}
+/* capture card */
+.capture{background:linear-gradient(160deg, rgba(196,164,132,0.10), var(--surface) 55%);border:1px solid rgba(196,164,132,0.35);border-radius:22px;padding:34px;margin-bottom:30px}
+.capture .cb{font-family:var(--dm);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;text-align:center}
+.capture h2{font-family:var(--serif);font-weight:300;font-size:26px;margin-bottom:10px;text-align:center}
+.capture .note{color:var(--muted);font-weight:300;font-size:14px;line-height:1.7;margin-bottom:22px;text-align:center}
+.form{display:flex;flex-direction:column;gap:12px;max-width:400px;margin:0 auto}
+.field input{width:100%;background:#0d0d0d;border:1px solid var(--border);border-radius:12px;padding:15px 16px;color:var(--text);font-family:var(--sans);font-size:15px;text-align:center}
+.field input:focus{outline:none;border-color:var(--gold)}
+button{border:none;cursor:pointer;font-family:var(--dm);font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:12px;padding:16px;border-radius:12px;background:var(--gold);color:#0A0A0A;transition:background .2s}
+button:hover{background:var(--gold-hover)}
+button:disabled{opacity:.5;cursor:not-allowed}
+.secure{font-family:var(--dm);font-size:11px;color:var(--dim);margin-top:12px;text-align:center}
+/* perks */
+.perks{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:12px}
+.perk{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px}
+.perk .ic{font-size:20px;margin-bottom:10px}
+.perk .t{font-family:var(--serif);font-weight:300;font-size:17px;margin-bottom:6px}
+.perk .d{color:var(--muted);font-weight:300;font-size:13.5px;line-height:1.6}
+/* connect strip */
+.connects{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:26px 0 4px}
+.connect{font-family:var(--dm);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold-dim);border:1px dashed rgba(196,164,132,.3);border-radius:10px;padding:9px 14px;background:transparent}
+.hidden{display:none}
+.err{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.4);border-radius:14px;padding:14px;color:#fca5a5;font-size:13px;margin-top:12px;text-align:center}
+.foot{text-align:center;margin-top:44px;font-family:var(--dm);font-size:12px;color:var(--dim)}
+.foot a{color:var(--gold);text-decoration:none}.foot a:hover{text-decoration:underline}
+@media(max-width:600px){h1{font-size:36px}.perks{grid-template-columns:1fr}.wrap{padding:48px 20px}}
+</style>
+<script defer src="https://godseye.digitalhustlerx.com/tracker.js"></script>
+</head>
+<body>
+<div class="glow"></div>
+<div class="wrap">
+  <div class="bar"><div class="brand">GODS<span>EYE</span></div></div>
+
+  <div class="eyebrow">Early access · Founder pricing</div>
+  <h1>A fleet of AI agents that <em>runs your business.</em></h1>
+  <p class="sub">They live on <strong>Telegram</strong>, work <strong>24/7</strong>, and handle whatever aspect of your business you point them at. One hire. A whole team. It never clocks out.</p>
+
+  <div class="roles">
+    <span class="role">Receptionist</span>
+    <span class="role">Content writer</span>
+    <span class="role">Social manager</span>
+    <span class="role">Order tracker</span>
+    <span class="role">Support rep</span>
+    <span class="role">Numbers &amp; insights</span>
+    <span class="role">Site upkeep</span>
+    <span class="role">+ anything you point it at</span>
+  </div>
+
+  <div id="captureBox" class="capture">
+    <div class="cb">Join the waitlist</div>
+    <h2>Get in before the fleet fills.</h2>
+    <p class="note">The first 100 in lock the founder rate. Drop your email and we will ping you the moment you can bring it on board.</p>
+    <div class="form">
+      <div class="field"><input type="email" id="emailInput" placeholder="you@company.com" autocomplete="email"></div>
+      <button id="submitBtn" type="button">Get on the list →</button>
+    </div>
+    <div class="secure">🔒 No spam. Unsubscribe anytime.</div>
+    <div id="errBox" class="err hidden"></div>
+  </div>
+
+  <div class="perks">
+    <div class="perk"><div class="ic">🫧</div><div class="t">Tell it once, never again</div><div class="d">Show a task once. The whole fleet learns it and just keeps doing it, on schedule.</div></div>
+    <div class="perk"><div class="ic">🧠</div><div class="t">Thinks while you sleep</div><div class="d">Between sessions it reviews what happened and comes back sharper with better suggestions.</div></div>
+    <div class="perk"><div class="ic">🛡️</div><div class="t">You stay the boss</div><div class="d">It only touches what you let it. Everything ships through you. Cut access any time, in a word.</div></div>
+    <div class="perk"><div class="ic">💸</div><div class="t">Founder price</div><div class="d">Early list means a locked-in discount when it launches.</div></div>
+  </div>
+
+  <div class="connects">
+    <span class="connect">Connect WordPress</span>
+    <span class="connect">Connect GitHub</span>
+    <span class="connect">Connect your store</span>
+    <span class="connect">Connect your site</span>
+  </div>
+
+  <div class="foot">
+    <a href="https://t.me/GodseyeXbot">@GodseyeXbot</a> · <a href="https://godseye.digitalhustlerx.com">godseye.digitalhustlerx.com</a>
+  </div>
+</div>
+
+<script>
+(function(){
+  const box=document.getElementById('captureBox'),errBox=document.getElementById('errBox'),btn=document.getElementById('submitBtn'),emailIn=document.getElementById('emailInput');
+  btn.addEventListener('click',async()=>{
+    const email=emailIn.value.trim(); errBox.classList.add('hidden');
+    if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){errBox.textContent='Please enter a valid email.';errBox.classList.remove('hidden');return;}
+    btn.disabled=true;btn.textContent='Joining…';
+    try{
+      const r=await fetch('https://godseye.digitalhustlerx.com/api/waitlist',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email})});
+      const d=await r.json(); if(!r.ok) throw new Error(d.error||'Something went wrong');
+      box.classList.add('hidden');
+      const success=document.createElement('div');
+      success.className='capture'; success.style.textAlign='center';
+      success.innerHTML='<div class="cb">You are in 🎉</div><h2 style="text-align:center">Welcome to the fleet.</h2><p class="note">Your spot is locked. We will email you the moment GodsEye is ready to meet your business, plus your founder bonus.</p><div class="secure">Founder code: <strong>'+(d.founderCode||d.founder_code||'locked at launch')+'</strong></div>';
+      box.parentNode.insertBefore(success,box.nextSibling);
+    }catch(e){errBox.textContent=e.message;errBox.classList.remove('hidden');btn.disabled=false;btn.textContent='Get on the list →';}
+  });
+  emailIn.addEventListener('keydown',e=>{if(e.key==='Enter')btn.click();});
+})();
+</script>
+</body>
+</html>
