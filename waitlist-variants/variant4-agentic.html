@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GodsEye — Orchestrator of AI Agents</title>
-<meta name="description" content="GodsEye is an agentic system that orchestrates fleets of AI agents on demand to build, manage, and run your entire business 24/7. Join the waitlist for early access.">
+<title>GodsEye — The Fleet of AI Agents for Your Business</title>
+<meta name="description" content="Godseye is a fleet of AI agents that lives on Telegram and runs your business 24/7. Join the waitlist for the first release.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -20,10 +20,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .bloglink{font-family:var(--dm);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);text-decoration:none;border:1px solid rgba(196,164,132,.3);padding:8px 14px;border-radius:999px;transition:background .2s}
 .bloglink:hover{background:rgba(196,164,132,.1)}
 .eyebrow{font-family:var(--dm);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
-/* Orchestrator line + fleets line */
-.orchestrator{font-family:var(--ds);font-weight:600;font-size:44px;line-height:1.05;letter-spacing:-0.02em;margin-bottom:14px}
-.orchestrator .gold{color:var(--gold)}
-.fleetline{font-family:var(--serif);font-weight:300;font-size:30px;line-height:1.15;color:var(--text);margin-bottom:24px;max-width:720px}
+/* Brand hierarchy: large headings stay Georgia, weight 300 */
+.orchestrator{font-family:var(--serif);font-weight:300;font-size:52px;line-height:1.05;letter-spacing:-0.02em;margin-bottom:14px}
+.orchestrator .gold{color:var(--gold);font-style:italic}
+.fleetline{font-family:var(--serif);font-weight:300;font-size:31px;line-height:1.18;color:var(--text);margin-bottom:24px;max-width:720px}
 .fleetline em{color:var(--gold);font-style:italic}
 .sub{color:var(--muted);font-weight:300;font-size:17px;line-height:1.75;margin-bottom:40px;max-width:640px}
 .sub strong{color:var(--text);font-weight:400}
@@ -52,7 +52,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .run strong{color:var(--gold);font-weight:400}
 /* supported platforms marquee */
 .platforms{margin-top:6px}
-.platforms .label{font-family:var(--dm);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);text-align:center;margin-bottom:18px}
+.platforms .label,.audience .label{font-family:var(--dm);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);text-align:center;margin-bottom:18px}
 .marquee{overflow:hidden;white-space:nowrap;position:relative;-webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
 .marquee-track{display:inline-block;white-space:nowrap;animation:scroll 26s linear infinite}
 .marquee-track span{font-family:var(--dm);font-size:13px;letter-spacing:.05em;color:var(--muted);border:1px solid var(--border);background:var(--surface);border-radius:10px;padding:12px 20px;margin:0 8px;display:inline-block}
@@ -74,10 +74,10 @@ button:disabled{opacity:.5;cursor:not-allowed}
     <a class="bloglink" href="https://godseye.digitalhustlerx.com/blog/what-is-an-ai-business-agent">Read the blog →</a>
   </div>
 
-  <div class="eyebrow">Early access · Founder pricing</div>
-  <div class="orchestrator">Orchestrator, <span class="gold">Godseye</span></div>
-  <div class="fleetline">a fleet of AI agents running <em>24/7</em> to manage your business</div>
-  <p class="sub">Godseye is an agentic system that orchestrates fleets of AI agents on demand — to build, manage, and run your entire business while you sleep. It manages your online presence, your store, your socials, your leads, your support. All of it.</p>
+  <div class="eyebrow">Beta release · Coming soon</div>
+  <div class="orchestrator"><span class="gold">Godseye</span></div>
+  <div class="fleetline">The fleet of AI agents that lives on Telegram and runs your business <em>24/7.</em></div>
+  <p class="sub">Godseye creates and coordinates the agents your business needs. They keep your content, customers, leads, social media, and daily work moving while you stay in control.</p>
 
   <div id="captureBox" class="capture">
     <div class="cb">Join the waitlist</div>
@@ -91,17 +91,20 @@ button:disabled{opacity:.5;cursor:not-allowed}
     <div id="errBox" class="err hidden"></div>
   </div>
 
-  <!-- Optimized bottom section: how the system benefits you -->
+  <!-- Short proof points: compact, human, and easy to scan -->
   <div class="values">
-    <div class="value"><div class="ic">🎯</div><div class="t">Looks for leads, constantly</div><div class="d">The fleet searches for prospects daily and reaches them for you — so you are always first to a new customer.</div></div>
-    <div class="value"><div class="ic">🗣️</div><div class="t">Answers your customers</div><div class="d">Support, bookings, follow-ups. It replies in your tone, in minutes, so you never lose a client to silence.</div></div>
-    <div class="value"><div class="ic">🌐</div><div class="t">Your whole online presence</div><div class="d">From your website to your store to your socials — one system manages it all and keeps everything consistent.</div></div>
-    <div class="value"><div class="ic">🌱</div><div class="t">Grows with your business</div><div class="d">Show it your process once. It never forgets. It learns how you work and only gets smoother from there.</div></div>
-    <div class="value"><div class="ic">🔭</div><div class="t">Always looking out for you</div><div class="d">Proactive and in the forefront — it spots problems and opportunities before they reach you.</div></div>
-    <div class="value"><div class="ic">🧠</div><div class="t">It thinks while you sleep</div><div class="d">Between sessions it reviews what happened and comes back with sharper suggestions.</div></div>
+    <div class="value"><div class="ic">⚙️</div><div class="t">Automates the repeat work</div><div class="d">Show it your process once. It remembers the pattern and keeps it moving.</div></div>
+    <div class="value"><div class="ic">🎯</div><div class="t">Keeps leads moving</div><div class="d">It can find prospects, organize outreach, and keep follow-ups from slipping.</div></div>
+    <div class="value"><div class="ic">🔔</div><div class="t">Nudges you forward</div><div class="d">Your goals, tasks, and next steps arrive in the Telegram chat you already use.</div></div>
+    <div class="value"><div class="ic">🔭</div><div class="t">Looks ahead</div><div class="d">It watches for problems and opportunities before they become urgent.</div></div>
   </div>
 
-  <p class="run"><strong>Runs 24/7.</strong> Unlike a human, it never gets tired, never has an off day, never clocks out. This is what entrepreneurs are using right now to stay ahead of their competition — reaching leads and closing deals while everyone else is still catching up.</p>
+  <p class="run"><strong>24/7, without the human limits.</strong> No tiredness. No clocking out. No forgotten follow-up. The fleet keeps working while you focus on the parts of business that need you.</p>
+
+  <section class="audience">
+    <div class="label">WHO IT IS FOR</div>
+    <p class="run">For solo founders, creators, service businesses, online stores, and small teams that want more work handled without adding another full-time role.</p>
+  </section>
 
   <div class="platforms">
     <div class="label">Supported platforms</div>
@@ -131,7 +134,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
     if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){errBox.textContent='Please enter a valid email.';errBox.classList.remove('hidden');return;}
     btn.disabled=true;btn.textContent='Joining…';
     try{
-      const r=await fetch('https://godseye.digitalhustlerx.com/api/waitlist',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email})});
+      const r=await fetch('/api/waitlist',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email})});
       const d=await r.json(); if(!r.ok) throw new Error(d.error||'Something went wrong');
       box.classList.add('hidden');
       const success=document.createElement('div');
