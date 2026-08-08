@@ -1,16 +1,17 @@
 # Godseye HQ — AGENTS.md
 
 > **For AI agents (OMP, Hermes, Claude Code, etc.) working on this project.**
-> Last Updated: 2026-07-21
+> Last Updated: 2026-08-08
 
 ---
 
 ## 🎯 Project Identity
 
 - **Brand:** GodsEye (styled GODSEYE or Godseye)
-- **What it is:** AI-powered WordPress management agent via Telegram
-- **Current Phase:** Pre-launch (waitlist gated, founder pricing active)
-- **Live URL:** https://godseye.digitalhustlerx.com
+- **What it is:** A living AI agent that runs your **business** from Telegram (clients, content, orders, reminders). NOT just WordPress — the whole-office framing.
+- **Current Phase:** Pre-launch (waitlist gated, founder pricing active, first 100 get founder rate)
+- **Live URL:** https://godseye.digitalhustlerx.com  ← **serves the dedicated WAITLIST landing page** (not the marketing SPA)
+- **Marketing SPA (full site):** reachable at `https://godseye.digitalhustlerx.com/app/` and `https://godseye.62.84.186.1.sslip.io/`
 - **Telegram Bot:** @GodseyeXbot
 - **License:** AGPL-3.0 + Commercial (dual license)
 
@@ -53,8 +54,14 @@ Everything else is legacy:
 ├── supabase-migration-godseyehq.sql ← DB schema migration
 ├── README.md                      ← GitHub-facing README (OMP already wrote this)
 ├── LICENSE                        ← AGPL-3.0
+├── seo-assets/waitlist.html        ← **DEDICATED WAITLIST LANDING PAGE** (served at main domain root). Source of truth; deploy.sh copies to dist/waitlist.html
+├── seo-assets/tracker.js           ← Self-hosted behavior tracker (posts to /api/track)
+├── drafts/                         ← Copy experiments + direction docs
+│   └── CONSOLIDATED-COPY-ANGLE.md  ← Consolidation agent output (best angle synthesis)
+├── marketing-fleet/                ← Accounts/channels/campaigns for social
 ├── dist/                          ← BUILT OUTPUT — nginx serves this
-│   ├── index.html
+│   ├── index.html                 (marketing SPA — /app)
+│   ├── waitlist.html              (WAITLIST page — main domain root, /)
 │   ├── assets/
 │   └── server.cjs
 ├── wp-plugin/                     ← God's Eye WordPress bridge plugin (PHP)
@@ -86,8 +93,8 @@ cd /root/godseye-repo && node dist/server.cjs
 # Nginx reload (after config changes)
 nginx -t && systemctl restart nginx
 
-# Push to GitHub (7 commits waiting)
-cd /root/godseye-repo && git push origin main
+# Push to GitHub (safe — checkpoint + push)
+cd /root/godseye-repo && git add -A && git commit -m "checkpoint: <desc>" && git push origin main
 ```
 
 ---
@@ -96,11 +103,12 @@ cd /root/godseye-repo && git push origin main
 
 | Priority | Task | Why |
 |----------|------|-----|
-| 🔴 **HIGH** | Push 7 commits to GitHub | Repo is 7 commits ahead, nothing on origin |
-| 🔴 **HIGH** | Rebuild (`npm run build`) | `dist/` may be stale after latest commit |
-| 🟡 MED | Wire Supabase credentials | WaitlistModal uses Supabase — currently unconnected |
-| 🟡 MED | Wire Polar.sh webhook | Payment checkout has placeholder, no real webhook |
-| 🟢 LOW | Replace godseye.shop | Old Next.js waitlist still active at godseye.shop |
+| 🔴 **HIGH** | Consolidate copy into ONE best angle (see `drafts/CONSOLIDATED-COPY-ANGLE.md`) | Founder consolidating months of copy; wants one all-around message for lead collection |
+| 🟡 MED | Set up Vercel/mirror fallback for the waitlist landing | Redundancy — "options so it never goes down" |
+| 🟡 MED | Purge old test emails from `waitlist` table if founder approves | Test rows inflate the honest adoption count |
+| 🟢 LOW | Wire Polar.sh webhook | Payment checkout has placeholder, no real webhook |
+
+> NOTE: Supabase is NOT used — waitlist + tracking are on local SQLite (`data/godseye.db`). Ignore any older "wire Supabase" notes.
 
 ---
 
@@ -157,11 +165,17 @@ radius: rounded-2xl (cards), rounded-full (buttons)
 
 ## 🌐 Domain & Nginx
 
-| URL | Config File | Root |
-|-----|-------------|------|
-| godseye.digitalhustlerx.com | `/etc/nginx/sites-available/godseye.digitalhustlerx.com` | `/root/godseye-repo/dist/` |
-| godseye.62.84.186.1.sslip.io | `/etc/nginx/sites-available/godseye.sslip` | `/root/godseye-repo/dist/` |
-| api.godseyes.digitalhustlerx.com | `/etc/nginx/sites-available/godseye-api` | Node API backend |
+| URL | Serves | Root |
+|-----|--------|------|
+| godseye.digitalhustlerx.com `/` | **WAITLIST landing page** (`waitlist.html`) | `/root/godseye-repo/dist/` |
+| godseye.digitalhustlerx.com `/app/` | Full marketing SPA | `/root/godseye-repo/dist/` (alias) |
+| godseye.62.84.186.1.sslip.io `/` | Full marketing SPA | `/root/godseye-repo/dist/` |
+| godseye-staging.62.84.186.1.sslip.io | Older staging build | `/root/godseye-staging/dist/` |
+| api.godseyes.digitalhustlerx.com | Node API backend | Node on :3000 |
+
+**IMPORTANT — main domain root = waitlist:** `location = /` and `location /` in `godseye.digitalhustlerx.com` serve `waitlist.html` (strict lead capture). The marketing SPA is at `/app/`. Do NOT point the main domain root back at `index.html` unless explicitly asked — the waitlist page is the public entry.
+
+**NGINX gotcha (KNOWN):** `sites-enabled/godseye.digitalhustlerx.com` is a **regular file COPY**, not a symlink. You must edit BOTH `sites-available/` and `sites-enabled/` (or copy one to the other) or the live server serves a stale config. `nginx -t` then `systemctl restart nginx`.
 
 ALL nginx configs bind to `62.84.186.1:443` and `[2a02:c207:2319:3150::1]:443` — NEVER use bare `listen 443;`.
 
@@ -172,13 +186,28 @@ After adding a new nginx server block, do a **full restart** (`systemctl restart
 ## 📊 Git State
 
 ```
-Remote: git@github.com:digitalhustlerx/GodseyeHQ.git
+Remote: git@github.com:digitalhustlerx/GodseyeHQ.git  (origin)
+        https://github.com/DigitalHustlerX-Labs/GodseyeHQ.git  (labs)
 Branch: main
-Status: 7 commits ahead of origin/main (NOT PUSHED)
 ```
 
-**Last commit (bb4fa40):** "Commercial launch: waitlist gating, founder pricing, self-host matrix, AGPL license"  
-— Added LICENSE files, WaitlistModal, founder pricing, referral system, Supabase migration, self-host matrix
+## ⚙️ WORKING PROTOCOL (version safety — READ THIS)
+
+**Consolidate, checkpoint, THEN push. No destructive/live pushes on a whim.**
+
+1. **Always create a checkpoint commit** before any batch of changes: `git add -A && git commit -m "checkpoint: <desc>"`.
+2. **Push the checkpoint to origin** so we can always revert to the last good state: `git push origin main`.
+3. **Never push straight to the live main page** without reviewing angles/options first when the founder asks to consolidate or choose direction. Analyze, present candidate angle(s), get signoff, THEN apply.
+4. **Never edit system files directly via patch/write_file** (nginix config, /etc/*) — those refuse and need terminal/sudo. See the NGINX gotcha above.
+5. **Local-first truth:** the waitlist lives in the self-hosted SQLite `data/godseye.db` (track_events for adoption metrics). No third-party analytics for core funnels.
+6. If a change is risky/broad, propose it before doing it. Small safe fixes can proceed.
+
+## 📊 LIVE ADOPTION METRICS (self-hosted, local)
+
+- Waitlist count + founder spots: `GET /api/waitlist/stats` → `{count, spotsTotal:100, spotsLeft, pct}`. Real number, never fake it.
+- Adoption funnel events: `popup_impression`, `popup_click` logged to `track_events` table in `data/godseye.db` (SQLite).
+- Query: `sqlite3 /root/godseye-repo/data/godseye.db "SELECT event,COUNT(*) FROM track_events WHERE event IN ('popup_impression','popup_click') GROUP BY event;"`
+- Signups: count in the `waitlist` table.
 
 ---
 
@@ -186,9 +215,12 @@ Status: 7 commits ahead of origin/main (NOT PUSHED)
 
 1. **Don't edit files outside `/root/godseye-repo/`** — old copies are scattered everywhere
 2. **Don't use `nginx -s reload`** for NEW server blocks — use `systemctl restart nginx`
-3. **Don't forget to rebuild** after editing `src/` — nginx serves `dist/` statically
-4. **Don't push without rebuilding first** — stale `dist/` breaks the live site
-5. **Don't change the remote** — it's `git@github.com:digitalhustlerx/GodseyeHQ.git`
+3. **Don't forget to rebuild** after editing `src/` or `seo-assets/waitlist.html` — nginx serves `dist/` statically; use `./scripts/deploy.sh` (it rebuilds + restores SEO assets + restarts backend)
+4. **Don't push without a checkpoint commit first** — always `git add -A && commit && push` so we can revert
+5. **Don't show a fake adoption/spots number** — always pull `count`/`spotsLeft` from `/api/waitlist/stats` (real DB)
+6. **Don't point the main domain root back to `index.html`** — main domain serves the waitlist page
+7. **Don't change the remote** — it's `git@github.com:digitalhustlerx/GodseyeHQ.git`
+8. **Don't use Space Grotesk for big headings** — Godseye big headings are **Georgia serif weight 300**; Space Grotesk is only for the wordmark/buttons
 
 ---
 
