@@ -93,6 +93,8 @@ function session(chatId) {
       // Referral tracking from /start deep-link (ref_CODE)
       referralCode: null,
       onboardingIntent: null,
+      hasWebsite: null,
+      websitePlatform: null,
     });
   }
   return sessions.get(key);
@@ -170,8 +172,16 @@ function formatSite(site) {
 
 const WELCOME_KYBD = inlineKeyboard([
   [{ text: "✨ Set up my business", callback_data: "ob:business_setup" }],
-  [{ text: "🧭 Help with my existing business", callback_data: "ob:business_help" }],
-  [{ text: "🔑 WordPress connection", callback_data: "ob:have_license" }],
+  [{ text: "🔑 I have a license", callback_data: "ob:have_license" }],
+]);
+const WEBSITE_KYBD = inlineKeyboard([
+  [{ text: "🌐 Yes, I have a website", callback_data: "ob:website_yes" }],
+  [{ text: "↩️ No website yet", callback_data: "ob:website_no" }],
+]);
+const PLATFORM_KYBD = inlineKeyboard([
+  [{ text: "🟦 WordPress", callback_data: "ob:wordpress" }],
+  [{ text: "🌐 Something else", callback_data: "ob:other_site" }],
+  [{ text: "↩️ Not sure yet", callback_data: "ob:platform_unknown" }],
 ]);
 const GROUP_KYBD = inlineKeyboard([
   [{ text: "👥 How to use a group chat", callback_data: "ob:group_help" }],
@@ -264,20 +274,43 @@ async function handleCallback(chatId, queryId, data) {
       "Tell me what you do and the first repeatable job you want off your plate.",
       "Example: `I run a salon and need help with bookings and client follow-up.`",
       "",
-      "After the preview, I'll show you how to bring your team into a dedicated group chat.",
+      "After the preview, I'll ask whether you have a website. You do not need a license just to start onboarding.",
+    ].join("\n"), WEBSITE_KYBD);
+  }
+
+  if (data === "ob:website_yes") {
+    state.hasWebsite = true;
+    return send(chatId, "What platform is your website using?", PLATFORM_KYBD);
+  }
+
+  if (data === "ob:website_no") {
+    state.hasWebsite = false;
+    state.onboardingStep = 10;
+    return send(chatId, [
+      "✅ No problem. We'll set up your business workflow first.",
+      "",
+      "Tell me what you do and the first repeatable job you want off your plate.",
+      "",
+      "A license is only needed later if you activate a paid plan for live integrations.",
     ].join("\n"));
   }
 
-  if (data === "ob:business_help") {
-    state.onboardingIntent = "business_help";
+  if (data === "ob:wordpress") {
+    state.websitePlatform = "wordpress";
     state.onboardingStep = 10;
     return send(chatId, [
-      "🧭 Tell me what is already running and what is currently stuck.",
+      "🟦 WordPress detected.",
       "",
-      "Include the business, tool, or workflow you want help with first. I'll keep the first plan focused and safe.",
+      "Continue telling me about your business first. After you choose a paid plan, your license will be issued and I'll give you the Godseye plugin connection steps.",
       "",
-      "When live access is needed, I'll ask for the relevant connection — never credentials in this chat.",
+      "No license is required just to preview onboarding, and never send WordPress credentials here.",
     ].join("\n"));
+  }
+
+  if (data === "ob:other_site" || data === "ob:platform_unknown") {
+    state.websitePlatform = data === "ob:other_site" ? "other" : "unknown";
+    state.onboardingStep = 10;
+    return send(chatId, "✅ Got it. We'll start with your business workflow and choose the right connection later. Tell me what you do and what is stuck first.");
   }
 
   if (data === "ob:group_help") {
