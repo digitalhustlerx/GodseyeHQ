@@ -330,7 +330,8 @@ async function handleCallback(chatId, queryId, data) {
   }
 
   if (data === "ob:action_plan") {
-    return send(chatId, "Here is your first action plan. Start with the thing that would remove the most stress this week.", ACTION_PLAN_KYBD);
+    const profile = state.previewProfile ? `\n\nWhat I heard: ${state.previewProfile}` : "";
+    return send(chatId, `Here is your first action plan. Start with the thing that would remove the most stress this week.${profile}\n\n1. Choose the task that matters most.\n2. Give me the details.\n3. I’ll prepare the next step and ask before sensitive actions.`, ACTION_PLAN_KYBD);
   }
 
   if (data === "ob:back_to_website") {
@@ -722,7 +723,8 @@ async function handleMessage(message) {
     }
 
     if (state.onboardingStep === 11 && state.previewProfile) {
-      return await send(chatId, "Choose an option below to continue your preview or connect a paid workspace.", PREVIEW_KYBD);
+      state.onboardingStep = 12;
+      return await send(chatId, "You are onboarded. Tell me what you want to do next, or use the buttons below.", ACTION_PLAN_KYBD);
     }
 
     // Niche template onboarding: after a template deep-link, a free-text reply
@@ -747,12 +749,13 @@ async function handleMessage(message) {
     }
 
     if (!state.siteId) {
-      // Offer preview demo as path forward
-      const demoKb = inlineKeyboard([
-        [{ text: "⚡ Try a free demo", callback_data: "ob:preview" }],
-        [{ text: "🔑 Connect license", callback_data: "ob:have_license" }],
+      const nextKb = inlineKeyboard([
+        [{ text: "🌐 Website / WordPress", callback_data: "ob:website_yes" }],
+        [{ text: "⚡ Show an example action plan", callback_data: "ob:action_plan" }],
+        [{ text: "👥 Set up my group chat", callback_data: "ob:group_help" }],
+        [{ text: "💳 See paid plans", callback_data: "preview:pricing" }],
       ]);
-      return await send(chatId, "Connect a site first, OR try a free demo to see how it works. Send `/connect <license_key>` or tap below.", demoKb);
+      return await send(chatId, "You are onboarded. I can help plan your next move now. A website connection is optional and only needed for live website work.", nextKb);
     }
 
     const planned = await planTelegramMessage({ siteId: state.siteId, conversationId: state.conversationId, text });
