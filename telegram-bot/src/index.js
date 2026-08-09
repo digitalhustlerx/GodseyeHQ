@@ -95,6 +95,8 @@ function session(chatId) {
       onboardingIntent: null,
       hasWebsite: null,
       websitePlatform: null,
+      onboardingQuestion: 0,
+      onboardingAnswers: [],
     });
   }
   return sessions.get(key);
@@ -268,14 +270,18 @@ async function handleCallback(chatId, queryId, data) {
   if (data === "ob:business_setup") {
     state.onboardingIntent = "business_setup";
     state.onboardingStep = 10;
+    state.onboardingQuestion = 0;
+    state.onboardingAnswers = [];
     return send(chatId, [
       "✨ Let's build your business space from the ground up.",
       "",
       "Tell me what you do and the first repeatable job you want off your plate.",
       "Example: `I run a salon and need help with bookings and client follow-up.`",
       "",
-      "After the preview, I'll ask whether you have a website. You do not need a license just to start onboarding.",
-    ].join("\n"), WEBSITE_KYBD);
+      "I’ll ask a few short questions so I can make this specific to you. You do not need a license just to start onboarding.",
+      "",
+      "First: what do you do, or what are you building?",
+    ].join("\n"));
   }
 
   if (data === "ob:website_yes") {
@@ -613,25 +619,40 @@ async function handleMessage(message) {
     }
 
     if (state.onboardingStep === 10) {
-      state.previewProfile = text.trim();
+      const answer = text.trim();
+      state.onboardingAnswers[state.onboardingQuestion] = answer;
+      const questions = [
+        "What do you do, or what are you building?",
+        "What is taking too much of your time right now?",
+        "What is stressing you most in the business?",
+        "What would you love to stop doing yourself?",
+        "What result would make this feel worthwhile this week?",
+      ];
+      state.onboardingQuestion += 1;
+      if (state.onboardingQuestion < questions.length) {
+        return await send(chatId, `Got it.\n\n${questions[state.onboardingQuestion]}`);
+      }
+      state.previewProfile = state.onboardingAnswers.join(" | ");
       state.onboardingStep = 11;
       return await send(
         chatId,
         [
-          "✅ Got it. Your preview workspace is ready.",
+          "✅ I have your starting picture.",
           "",
-          `Business profile: ${state.previewProfile}`,
+          "I can help first with:",
+          "• Planning and daily operations",
+          "• Customer replies and support",
+          "• Content, email, and follow-up",
+          "• Sales, leads, and admin",
+          "• Website, blog, and landing-page work when you need it",
           "",
-          "You can try one safe demo now. It will not connect to or change your real business.",
-          "When you want live work on your domain, store, email, or social accounts, choose a paid plan first.",
-          "",
-          "👥 Next: create a private group chat and add @GodseyeXbot so your team can follow the work together.",
+          "Next, I’ll ask about your website only if it is relevant. You can continue without one.",
         ].join("\n"),
         inlineKeyboard([
-          [{ text: "👥 Group chat setup", callback_data: "ob:group_help" }],
-          [{ text: "⚡ Try a safe demo", callback_data: "preview:demo" }],
-          [{ text: "💳 Keep my agent working", callback_data: "preview:pricing" }],
-          [{ text: "🔑 Connect my paid workspace", callback_data: "ob:have_license" }],
+          [{ text: "🌐 Tell me about my website", callback_data: "ob:website_yes" }],
+          [{ text: "↩️ Continue without a website", callback_data: "ob:website_no" }],
+          [{ text: "👥 Set up my group chat", callback_data: "ob:group_help" }],
+          [{ text: "⚡ Show my first action plan", callback_data: "preview:demo" }],
         ])
       );
     }
