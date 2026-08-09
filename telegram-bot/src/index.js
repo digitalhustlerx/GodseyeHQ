@@ -214,6 +214,21 @@ const PLATFORM_KYBD = inlineKeyboard([
   [{ text: "🟦 WordPress", callback_data: "ob:wordpress" }],
   [{ text: "🌐 Something else", callback_data: "ob:other_site" }],
   [{ text: "↩️ Not sure yet", callback_data: "ob:platform_unknown" }],
+  [{ text: "⬅️ Back", callback_data: "ob:back_to_website" }],
+]);
+const PRICING_KYBD = inlineKeyboard([
+  [{ text: "💳 Choose a paid plan", url: `${SIGNUP_URL}/app/` }],
+  [{ text: "⬅️ Back to my action plan", callback_data: "ob:action_plan" }],
+]);
+const ACTION_PLAN_KYBD = inlineKeyboard([
+  [{ text: "🌐 Tell me about my website", callback_data: "ob:website_yes" }],
+  [{ text: "↩️ Continue without a website", callback_data: "ob:website_no" }],
+  [{ text: "👥 Set up my group chat", callback_data: "ob:group_help" }],
+  [{ text: "💳 See paid plans", callback_data: "preview:pricing" }],
+]);
+const BACK_TO_PLAN_KYBD = inlineKeyboard([
+  [{ text: "⬅️ Back to my action plan", callback_data: "ob:action_plan" }],
+  [{ text: "👥 Set up my group chat", callback_data: "ob:group_help" }],
 ]);
 const GROUP_KYBD = inlineKeyboard([
   [{ text: "👥 How to use a group chat", callback_data: "ob:group_help" }],
@@ -314,6 +329,18 @@ async function handleCallback(chatId, queryId, data) {
     ].join("\n"));
   }
 
+  if (data === "ob:action_plan") {
+    return send(chatId, "Here is your first action plan. Start with the thing that would remove the most stress this week.", ACTION_PLAN_KYBD);
+  }
+
+  if (data === "ob:back_to_website") {
+    return send(chatId, "Do you have a website?", inlineKeyboard([
+      [{ text: "🌐 Yes, I have a website", callback_data: "ob:website_yes" }],
+      [{ text: "↩️ No website yet", callback_data: "ob:website_no" }],
+      [{ text: "⬅️ Back to my action plan", callback_data: "ob:action_plan" }],
+    ]));
+  }
+
   if (data === "ob:website_yes") {
     state.hasWebsite = true;
     return send(chatId, "What platform is your website using?", PLATFORM_KYBD);
@@ -340,7 +367,9 @@ async function handleCallback(chatId, queryId, data) {
       "Continue telling me about your business first. After you choose a paid plan, your license will be issued and I'll give you the Godseye plugin connection steps.",
       "",
       "No license is required just to preview onboarding, and never send WordPress credentials here.",
-    ].join("\n"));
+      "",
+      "When you are ready, choose a paid plan. Your license is issued after payment, then I will give you the plugin connection steps.",
+    ].join("\n"), PRICING_KYBD);
   }
 
   if (data === "ob:other_site" || data === "ob:platform_unknown") {
@@ -686,14 +715,9 @@ async function handleMessage(message) {
           "• Sales, leads, and admin",
           "• Website, blog, and landing-page work when you need it",
           "",
-          "Next, I’ll ask about your website only if it is relevant. You can continue without one.",
-        ].join("\n"),
-        inlineKeyboard([
-          [{ text: "🌐 Tell me about my website", callback_data: "ob:website_yes" }],
-          [{ text: "↩️ Continue without a website", callback_data: "ob:website_no" }],
-          [{ text: "👥 Set up my group chat", callback_data: "ob:group_help" }],
-          [{ text: "⚡ Show my first action plan", callback_data: "preview:demo" }],
-        ])
+          "You are onboarded. You can now talk to me normally. I’ll make suggestions as we work.",
+        ].join("\\n"),
+        ACTION_PLAN_KYBD
       );
     }
 
