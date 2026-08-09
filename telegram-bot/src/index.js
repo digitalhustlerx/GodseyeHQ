@@ -13,6 +13,17 @@ const LANDING_API_BASE_URL = (process.env.GODSEYE_LANDING_API_BASE_URL ?? "https
 
 // Per-chat session state.
 const sessions = new Map();
+const businessRooms = new Map();
+const ROOM_TOPICS = [
+  ["⚡ Tasks", "Work requests, plans, and approvals."],
+  ["🔔 Notifications", "Website, customer, and system alerts."],
+  ["🌐 Websites", "Sites, blogs, landing pages, and health."],
+  ["👥 Customers", "Customer messages and follow-up."],
+  ["✍️ Content", "Posts, email, campaigns, and drafts."],
+  ["📊 Reports", "Summaries, metrics, and completed work."],
+  ["🔌 Connections", "Connected tools and integrations."],
+  ["⚙️ Settings", "Workspace preferences and operating rules."],
+];
 
 // GOD-14 §C: one-shot activation emission per license key (activation is a first-
 // action event; don't re-fire on every /connect or every message).
@@ -113,6 +124,25 @@ async function send(chatId, text, replyMarkup) {
 
 async function answer(queryId, text) {
   return telegram("answerCallbackQuery", { callback_query_id: queryId, ...(text ? { text } : {}) });
+}
+
+async function setupBusinessRoom(chat) {
+  const chatId = String(chat.id);
+  if (businessRooms.has(chatId)) return businessRooms.get(chatId);
+  try {
+    const details = await telegram("getChat", { chat_id: chat.id });
+    if (!details?.is_forum) return { ok: false, error: "Turn on Topics in this private group, then send /setup again." };
+    const topics = {};
+    for (const [name, description] of ROOM_TOPICS) {
+      const topic = await telegram("createForumTopic", { chat_id: chat.id, name });
+      topics[name] = { messageThreadId: topic?.message_thread_id, description };
+    }
+    const room = { ok: true, chatId: chat.id, topics };
+    businessRooms.set(chatId, room);
+    return room;
+  } catch (error) {
+    return { ok: false, error: "I need to be an admin with topic-management permission. Add me as admin and try /setup again." };
+  }
 }
 
 async function findSitesForLicense(licenseKey) {
@@ -323,8 +353,8 @@ async function handleCallback(chatId, queryId, data) {
     return send(chatId, [
       "👥 Your group chat is the shared operating room.",
       "",
-      "Create a private Telegram group, add @GodseyeXbot, and make it admin only if you want the agent to manage topics. Keep sensitive credentials out of chat.",
-      "Use topics such as Tasks, Customers, Files, Analytics, and Settings. The agent reports there and keeps this private chat for setup and billing.",
+      "Create a private Telegram group for your business, turn on Topics, add @GodseyeXbot, and make me an admin so I can install the workspace topics.",
+      "Then send `/setup` inside that group. I’ll create Tasks, Notifications, Websites, Customers, Content, Reports, Connections, and Settings.",
       "",
       "I can't create or invite people into a group without Telegram's explicit group action, so you stay in control.",
     ].join("\n"), GROUP_KYBD);
@@ -510,6 +540,15 @@ async function handleCommand(chatId, text, fromCallback = true) {
     return send(chatId, welcomeText(state), WELCOME_KYBD);
   }
 
+  if (command === "/setup") {
+    if (!["group", "supergroup"].includes(String(state.chatType || ""))) {
+      return send(chatId, "Create a private business group, add me as admin, turn on Topics, then send /setup inside that group.");
+    }
+    const room = await setupBusinessRoom({ id: chatId });
+    if (!room.ok) return send(chatId, `Room setup not complete: ${room.error}`);
+    return send(chatId, "✅ Business room ready. Use ⚡ Tasks for work, 🔔 Notifications for alerts, 🌐 Websites for site work, and 🔌 Connections for integrations.");
+  }
+
   if (command === "/connect") {
     const licenseKey = rest[0];
     if (!licenseKey) {
@@ -605,6 +644,7 @@ async function handleMessage(message) {
   const chatId = message.chat.id;
   const text = message.text || "";
   const state = session(chatId);
+  state.chatType = message.chat.type;
 
   try {
     if (text.startsWith("/")) {
