@@ -14,9 +14,11 @@
 <body>
 <div class="wrap">
   <header class="top"><a class="logo" href="/">GODS<span>EYE</span></a>
-    <nav><a href="/">Home</a><a href="/pricing">Pricing</a><a href="/blog/">Blog</a></nav></header>
+    <button class="menu-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="site-menu"><span></span><span></span><span></span></button>
+    <nav id="site-menu"><a href="/">Home</a><a href="/pricing">Pricing</a><a href="/blog/">Blog</a><a href="https://t.me/GodseyeXbot">Telegram Bot</a></nav></header>
   <hr class="rule" />
 
+  <div class="eyebrow">GUIDE · 5 MIN READ</div>
   <h1>What is an AI business agent?</h1>
   <p class="meta">Field notes from the Godseye team · 5 min read <span class="pill">Guide</span></p>
 
@@ -52,4 +54,5 @@
   <footer class="foot"><span>© 2026 Godseye</span><span><a href="https://godseye.digitalhustlerx.com">godseye.digitalhustlerx.com</a></span></footer>
 </div>
 </body>
+<script>document.querySelectorAll('.menu-toggle').forEach(button=>button.addEventListener('click',()=>{const menu=document.getElementById(button.getAttribute('aria-controls'));const open=menu.classList.toggle('open');button.setAttribute('aria-expanded',open);button.setAttribute('aria-label',open?'Close menu':'Open menu')}));</script>
 </html>

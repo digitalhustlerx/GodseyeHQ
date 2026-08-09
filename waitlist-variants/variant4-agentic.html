@@ -31,7 +31,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .capture{background:linear-gradient(160deg, rgba(196,164,132,0.10), var(--surface) 55%);border:1px solid rgba(196,164,132,0.35);border-radius:22px;padding:34px;margin-bottom:40px}
 .capture .cb{font-family:var(--dm);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;text-align:center}
 .capture h2{font-family:var(--serif);font-weight:300;font-size:26px;margin-bottom:10px;text-align:center}
-.capture .note{color:var(--muted);font-weight:300;font-size:14px;line-height:1.7;margin-bottom:22px;text-align:center}
+.capture .note{color:var(--muted);font-weight:300;font-size:14px;line-height:1.7;margin-bottom:22px;text-align:center}.spots{font-family:var(--dm);font-size:11px;letter-spacing:.06em;text-align:center;color:var(--gold);margin:-6px 0 18px}.telegram-demo{display:flex;flex-direction:column;gap:10px;max-width:560px;margin:0 auto}.tg{font-size:13px;line-height:1.55}.tg.who{font-family:var(--dm);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-top:2px}.tg.bot{color:#a9c9b0}.tg.msg{background:#0d0d0d;border:1px solid var(--border);border-radius:14px;padding:12px 14px;color:var(--text)}.tg.botmsg{border-color:rgba(169,201,176,.3)}.tg.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:2px}.tg.actions span{font-family:var(--dm);font-size:10px;color:var(--gold);border:1px solid rgba(196,164,132,.35);border-radius:999px;padding:7px 10px}
 .form{display:flex;flex-direction:column;gap:12px;max-width:400px;margin:0 auto}
 .field input{width:100%;background:#0d0d0d;border:1px solid var(--border);border-radius:12px;padding:15px 16px;color:var(--text);font-family:var(--sans);font-size:15px;text-align:center}
 .field input:focus{outline:none;border-color:var(--gold)}
@@ -76,13 +76,19 @@ button:disabled{opacity:.5;cursor:not-allowed}
 
   <div class="eyebrow">Beta release · Coming soon</div>
   <div class="orchestrator"><span class="gold">Godseye</span></div>
-  <div class="fleetline">The fleet of AI agents that lives on Telegram and runs your business <em>24/7.</em></div>
-  <p class="sub">Godseye creates and coordinates the agents your business needs. They keep your content, customers, leads, social media, and daily work moving while you stay in control.</p>
+  <div class="fleetline">The fleet of AI agents that lives on Telegram and keeps your business moving <em>24/7.</em></div>
+  <p class="sub">Godseye coordinates the agents your business needs. They handle repeatable work across content, customers, leads, social media, and daily operations. It suggests, prepares, and waits for your approval before sensitive actions.</p>
+
+  <div class="capture" style="margin-bottom:18px">
+    <div class="cb">See the fleet at work</div>
+    <div class="telegram-demo"><div class="tg who">You</div><div class="tg msg">Prepare this week’s content, check my store, follow up with warm leads, and tell me what matters today.</div><div class="tg who bot">Godseye · Orchestrator</div><div class="tg msg botmsg">On it. I’m bringing in the Content, Store, and Follow-up agents. I’ll bring you drafts and recommendations first. Nothing sensitive goes out without your approval.</div><div class="tg actions"><span>Review drafts</span><span>Approve</span><span>Edit</span></div></div>
+  </div>
 
   <div id="captureBox" class="capture">
-    <div class="cb">Join the waitlist</div>
+    <div class="cb">Founder Pass · early access</div>
     <h2>Get in before the fleet fills.</h2>
-    <p class="note">The first 100 in lock the founder rate. Drop your email and we will ping you the moment you can bring it on board.</p>
+    <p class="note">Join the early-access list for your private founder code, beta access, and priority access to new agents, pre-built playbooks, automations, and workflows.</p>
+    <div class="spots" id="spotsLine">Checking the live founder list…</div>
     <div class="form">
       <div class="field"><input type="email" id="emailInput" placeholder="you@company.com" autocomplete="email"></div>
       <button id="submitBtn" type="button">Get on the list →</button>
@@ -128,7 +134,8 @@ button:disabled{opacity:.5;cursor:not-allowed}
 
 <script>
 (function(){
-  const box=document.getElementById('captureBox'),errBox=document.getElementById('errBox'),btn=document.getElementById('submitBtn'),emailIn=document.getElementById('emailInput');
+  const box=document.getElementById('captureBox'),errBox=document.getElementById('errBox'),btn=document.getElementById('submitBtn'),emailIn=document.getElementById('emailInput'),spotsLine=document.getElementById('spotsLine');
+  fetch('/api/waitlist').then(r=>r.json()).then(d=>{const left=Math.max(0,100-Number(d.count||0));spotsLine.textContent=left+' Founder Pass spots remaining · live count';}).catch(()=>{spotsLine.textContent='Founder Pass early access · live availability updates soon';});
   btn.addEventListener('click',async()=>{
     const email=emailIn.value.trim(); errBox.classList.add('hidden');
     if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){errBox.textContent='Please enter a valid email.';errBox.classList.remove('hidden');return;}
@@ -139,7 +146,10 @@ button:disabled{opacity:.5;cursor:not-allowed}
       box.classList.add('hidden');
       const success=document.createElement('div');
       success.className='capture'; success.style.textAlign='center';
-      success.innerHTML='<div class="cb">You are in 🎉</div><h2 style="text-align:center">Welcome to the fleet.</h2><p class="note">Your spot is locked. We will email you the moment GodsEye is ready, plus your founder bonus.</p><div class="secure">Founder code: <strong>'+(d.founderCode||d.founder_code||'locked at launch')+'</strong></div>';
+      const pos=await fetch('/api/waitlist').then(x=>x.json()).then(x=>x.count).catch(()=>null);
+      const share=d.referral_token?location.origin+'/?ref='+encodeURIComponent(d.referral_token):'';
+      success.innerHTML='<div class="cb">You are in 🎉</div><h2 style="text-align:center">Welcome to the fleet.</h2><p class="note">'+(pos?'You are #'+pos+' on the live list. ':'')+'Your founder code is ready. We will email you when beta access opens.</p><div class="secure">Founder code: <strong>'+(d.founderCode||d.founder_code||'emailed at launch')+'</strong></div>'+(share?'<div class="refbox"><strong>Bring someone building with you.</strong><br><span>Share your private invite link to help shape the first release.</span><button type="button" id="copyRef">Copy invite link</button></div>':'');
++      const copyRef=document.getElementById('copyRef'); if(copyRef) copyRef.onclick=async()=>{await navigator.clipboard.writeText(share);copyRef.textContent='Invite link copied';};
       box.parentNode.insertBefore(success,box.nextSibling);
     }catch(e){errBox.textContent=e.message;errBox.classList.remove('hidden');btn.disabled=false;btn.textContent='Get on the list →';}
   });

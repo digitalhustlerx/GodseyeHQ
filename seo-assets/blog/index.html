@@ -15,12 +15,14 @@
 <div class="wrap">
   <header class="top">
     <a class="logo" href="/">GODS<span>EYE</span></a>
-    <nav><a href="/">Home</a><a href="/pricing">Pricing</a><a href="/blog/">Blog</a><a href="https://t.me/GodseyeXbot">Telegram Bot</a></nav>
+    <button class="menu-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="site-menu"><span></span><span></span><span></span></button>
+    <nav id="site-menu"><a href="/">Home</a><a href="/pricing">Pricing</a><a href="/blog/">Blog</a><a href="https://t.me/GodseyeXbot">Telegram Bot</a></nav>
   </header>
   <hr class="rule" />
 
-  <h1>Run WordPress without logging into wp-admin</h1>
-  <p class="meta">Practical guides to managing your site from one Telegram chat.</p>
+  <div class="eyebrow">GODSEYE FIELD NOTES</div>
+  <h1>Practical guides for the business you’re building.</h1>
+  <p class="meta">AI agents, Telegram workflows, and running the work without another dashboard.</p>
 
   <div class="cardlist">
     <a class="article featured" href="/blog/save-tokens-with-fresh-agent-sessions/">
@@ -113,4 +115,5 @@
   </footer>
 </div>
 </body>
+<script>document.querySelectorAll('.menu-toggle').forEach(button=>button.addEventListener('click',()=>{const menu=document.getElementById(button.getAttribute('aria-controls'));const open=menu.classList.toggle('open');button.setAttribute('aria-expanded',open);button.setAttribute('aria-label',open?'Close menu':'Open menu')}));</script>
 </html>

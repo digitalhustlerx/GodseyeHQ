@@ -86,7 +86,7 @@ export default function TemplatesPage() {
           around your specific idea.
         </p>
         <button
-          onClick={() => window.open("https://t.me/GodseyeXbot?start=template", "_blank")}
+          onClick={() => window.open("https://t.me/GodseyeXbot", "_blank")}
           className="inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-[#F2F2F2] text-[10px] uppercase tracking-widest font-bold px-6 py-3 rounded-full transition-all cursor-pointer"
         >
           Request a custom profile <Send className="w-3.5 h-3.5" />

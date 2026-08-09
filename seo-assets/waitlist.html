@@ -50,6 +50,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .success .code{font-family:var(--dm);font-size:14px;color:var(--gold);background:rgba(196,164,132,.1);border:1px dashed rgba(196,164,132,.4);border-radius:10px;padding:12px;display:inline-block}
 .err{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.4);border-radius:14px;padding:14px;color:#fca5a5;font-size:13px;margin-top:12px}
 .foot{text-align:center;margin-top:40px}
+.brand{text-decoration:none;color:inherit}.site-menu-toggle{display:none;background:transparent;border:1px solid var(--border);border-radius:10px;padding:9px;width:42px;height:40px}.site-menu-toggle span{display:block;height:1px;background:var(--gold);margin:5px 0}.site-menu{display:flex;gap:20px;align-items:center}.site-menu a{color:var(--muted);text-decoration:none;font-family:var(--dm);font-size:11px;text-transform:uppercase;letter-spacing:.08em}.site-menu a:hover{color:var(--gold)}
 .foot a{color:var(--gold);text-decoration:none;font-family:var(--dm);font-size:12px}.foot a:hover{text-decoration:underline}
 
 /* Thank-you popup, fade in */
@@ -62,13 +63,13 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .popup-card p{color:var(--muted);font-weight:300;font-size:14px;line-height:1.7;margin-bottom:20px}
 .popup-card .code{font-family:var(--dm);font-size:14px;color:var(--gold);background:rgba(196,164,132,.1);border:1px dashed rgba(196,164,132,.4);border-radius:10px;padding:12px;display:inline-block;margin-bottom:20px}
 .popup-card .close{width:100%}
-@media(max-width:520px){h1{font-size:32px}.perks{grid-template-columns:1fr}.wrap{padding:48px 20px}}
+@media(max-width:520px){h1{font-size:32px}.perks{grid-template-columns:1fr}.wrap{padding:48px 20px}.site-menu-toggle{display:block;cursor:pointer}.bar{position:relative}.site-menu{display:none;position:absolute;right:0;top:50px;z-index:5;flex-direction:column;align-items:stretch;gap:0;min-width:180px;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:0 18px 40px #000}.site-menu.open{display:flex}.site-menu a{padding:12px 10px;border-bottom:1px solid var(--border)}.site-menu a:last-child{border-bottom:0}}
 </style>
 <script defer src="/tracker.js"></script>
 </head>
 <body>
 <div class="wrap">
-  <div class="bar"><div class="brand">GODS<span>EYE</span></div></div>
+  <div class="bar"><a class="brand" href="/">GODS<span>EYE</span></a><button class="site-menu-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="waitlist-menu"><span></span><span></span><span></span></button><nav id="waitlist-menu" class="site-menu"><a href="/blog/">Blog</a><a href="https://t.me/GodseyeXbot">Telegram Bot</a></nav></div>
 
   <div class="eyebrow">Early access · Founder pricing</div>
   <h1>Your <em>business</em>, run by an AI agent.</h1>
@@ -96,7 +97,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
   </div>
 
   <div class="foot">
-    <a href="https://t.me/GodseyeXbot">@GodseyeXbot</a> · <a href="https://godseye.digitalhustlerx.com/waitlist.html">godseye.digitalhustlerx.com</a>
+    <a href="/blog/">Read the Godseye field notes</a> · <a href="https://t.me/GodseyeXbot">@GodseyeXbot</a>
   </div>
 </div>
 
@@ -150,6 +151,7 @@ btn.addEventListener('click', async ()=>{
 emailIn.addEventListener('keydown',e=>{ if(e.key==='Enter') btn.click(); });
 popup.addEventListener('click',e=>{ if(e.target===popup) popup.classList.remove('show'); });
 document.getElementById('popupClose').addEventListener('click',()=>popup.classList.remove('show'));
+document.querySelectorAll('.site-menu-toggle').forEach(button=>button.addEventListener('click',()=>{const menu=document.getElementById(button.getAttribute('aria-controls'));const open=menu.classList.toggle('open');button.setAttribute('aria-expanded',open);button.setAttribute('aria-label',open?'Close menu':'Open menu')}));
 </script>
 </body>
 </html>

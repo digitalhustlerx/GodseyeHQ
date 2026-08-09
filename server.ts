@@ -1046,6 +1046,12 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
   // + start the subscription window (cold-start). Runs the SAME fulfillment body
   // as before; only the event parser changed from Flutterwave to Polar.
   app.post("/api/polar-webhook", (req, res) => {
+    const webhookSecret = process.env.POLAR_WEBHOOK_SECRET;
+    const suppliedSecret = String(req.headers["x-polar-webhook-secret"] || req.headers["webhook-secret"] || "");
+    const validWebhookSecret = Boolean(webhookSecret && suppliedSecret && suppliedSecret.length === webhookSecret.length && crypto.timingSafeEqual(Buffer.from(suppliedSecret), Buffer.from(webhookSecret)));
+    if (!validWebhookSecret) {
+      return res.status(401).json({ error: "Invalid webhook signature" });
+    }
     const event = req.body || {};
     const eventType = event.type || "";
     const data = event.data || {};
@@ -1140,15 +1146,15 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
             `Thanks for buying the GodsEye ${purchase.plan_name} plan. Your payment is confirmed.\n\n` +
             `Download your plugin here (the link works for 7 days):\n${downloadUrl}\n\n` +
             `How to install: in WordPress go to Plugins > Add New > Upload Plugin, pick the downloaded\n` +
-            `godseye-plugin.zip, then activate it. Next, message @GodseyeXBot and send /connect with your\n` +
-            `site URL, WordPress username, and an Application Password.\n\n` +
+            `godseye-plugin.zip, then activate it. Next, message @GodseyeXBot and send\n` +
+            `/connect YOUR_LICENSE_KEY. The plugin connects your site; never send WordPress credentials in Telegram.\n\n` +
             `— GodsEye`;
           const html =
             `<p>Hi,</p>` +
             `<p>Thanks for buying the GodsEye <strong>${purchase.plan_name}</strong> plan. Your payment is confirmed.</p>` +
             `<p><a style="background:#C4A484;color:#000;padding:12px 20px;border-radius:9999px;text-decoration:none;font-weight:bold" href="${downloadUrl}">Download plugin (.zip)</a></p>` +
             `<p style="font-size:12px;color:#777">Link expires in 7 days.</p>` +
-            `<p style="font-size:13px">Install: WordPress → Plugins → Add New → Upload Plugin → install & activate. Then message @GodseyeXBot and send <code>/connect</code> with your site URL, WordPress username, and an Application Password.</p>` +
+            `<p style="font-size:13px">Install: WordPress → Plugins → Add New → Upload Plugin → install & activate. Then message @GodseyeXBot and send <code>/connect YOUR_LICENSE_KEY</code>. The plugin connects your site. Never send WordPress credentials in Telegram.</p>` +
             `<p>— GodsEye</p>`;
           sendMail({
             to: showEmail,

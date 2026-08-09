@@ -7,7 +7,7 @@ export default function DocsPage() {
     { num: "02", title: "Activate", body: "Click Activate Plugin." },
     { num: "03", title: "Generate App Password", body: 'Users > Profile > Application Passwords > enter "GodsEye Agent" > Generate.' },
     { num: "04", title: "Open Telegram", body: "Search @GodseyeXbot, tap Start." },
-    { num: "05", title: "Connect", body: "Send /connect, paste your site URL, username, and Application Password." },
+    { num: "05", title: "Connect", body: "Message @GodseyeXbot and send /connect YOUR_LICENSE_KEY. Never send WordPress credentials in Telegram." },
     { num: "06", title: "Start Managing", body: 'Try "Check site health" or "Show latest orders".' },
   ];
 

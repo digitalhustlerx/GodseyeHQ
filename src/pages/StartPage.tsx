@@ -81,13 +81,11 @@ export default function StartPage() {
       body: (
         <>
           <p className="text-sm text-white/70 font-light leading-relaxed mb-5">
-            Send <code className="bg-white/5 px-1.5 py-0.5 rounded font-mono text-[11px] text-[#C4A484]">/connect</code> to{" "}
-            <code className="bg-white/5 px-1.5 py-0.5 rounded font-mono text-[11px] text-[#C4A484]">@GodseyeXbot</code>{" "}
-            in Telegram and follow the prompts. You will need your site URL,
-            WordPress username, and an Application Password.
+            Install and activate the plugin first. Then message <code className="bg-white/5 px-1.5 py-0.5 rounded font-mono text-[11px] text-[#C4A484]">@GodseyeXbot</code>{" "}
+            and send <code className="bg-white/5 px-1.5 py-0.5 rounded font-mono text-[11px] text-[#C4A484]">/connect YOUR_LICENSE_KEY</code>. Your site connects through the plugin; never send your WordPress password in Telegram.
           </p>
           <a
-            href="https://t.me/GodseyeXbot?start=connect"
+            href="https://t.me/GodseyeXbot"
             target="_blank"
             rel="noopener noreferrer"
             className="w-full sm:w-auto bg-white/5 hover:bg-white/10 border border-white/10 text-[#F2F2F2] text-[10px] uppercase tracking-widest font-bold px-8 py-3.5 rounded-full transition-all inline-block text-center"

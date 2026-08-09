@@ -38,6 +38,17 @@ async function api(path, options = {}) {
   return data;
 }
 
+// Fetch waitlist/founder stats for urgency messaging
+async function getWaitlistStats() {
+  try {
+    const data = await api("/api/waitlist/stats");
+    return data || { count: 0, spotsLeft: 100 };
+  } catch (err) {
+    console.error(`[stats] Failed to fetch waitlist stats: ${err.message}`);
+    return { count: 0, spotsLeft: 100 };
+  }
+}
+
 async function telegram(method, payload) {
   if (!TELEGRAM_BOT_TOKEN) throw new Error("TELEGRAM_BOT_TOKEN is required.");
   // getUpdates is a LONG-POLL — Telegram holds the connection open up to `timeout` seconds (30s).
@@ -79,6 +90,8 @@ function session(chatId) {
       // Niche profile template (from /templates deep-link) + onboarding position.
       templateId: null,
       templateOnboardStep: -1,
+      // Referral tracking from /start deep-link (ref_CODE)
+      referralCode: null,
     });
   }
   return sessions.get(key);
@@ -193,6 +206,14 @@ function welcomeText(state) {
   if (amConnected) {
     lines.push("", `You're ready to go. Connected site: \`${state.siteId || "see /sites"}\` — try a demo task.`);
   }
+  // Add founder spots urgency for non-connected users
+  if (!amConnected) {
+    lines.push("", "🔥 Founder Pass: Limited to 100 spots. Secure your spot at the special rate before the public launch.");
+  }
+  // Mention referral bonus if code exists
+  if (state.referralCode) {
+    lines.push("", `🎁 You have a referral bonus (${state.referralCode}) — extra credits when you activate.`);
+  }
   lines.push("", "Start by telling me what you do and what you want off your plate first.");
   return lines.join("\n");
 }
@@ -237,6 +258,7 @@ async function handleCallback(chatId, queryId, data) {
     if (!state.previewProfile) return send(chatId, previewWelcomeText());
     if (state.previewTaskUsed) return send(chatId, "Your free preview task is already complete. Choose a plan to keep your agent working.", PREVIEW_KYBD);
     state.previewTaskUsed = true;
+    const referralMsg = state.referralCode ? `🎁 Your referral gives you bonus credits when you activate.` : "";
     return send(
       chatId,
       [
@@ -247,14 +269,34 @@ async function handleCallback(chatId, queryId, data) {
         "Your agent would organize this into a simple work plan, then handle the first task and bring you the result here.",
         "",
         "This preview does not connect to or change your real website, store, email, or social accounts.",
-        "Choose a plan when you want Godseye to work on the real thing.",
-      ].join("\n"),
+        "",
+        "Ready to work on your real business? Choose a plan to activate your agent.",
+        "",
+        referralMsg,
+      ].filter(Boolean).join("\n"),
       PREVIEW_KYBD
     );
   }
 
   if (data === "preview:pricing") {
-    return send(chatId, `Keep your agent working from $9/month (about $0.30/day), or buy focused work when you need it.\n\n${SIGNUP_URL}/pricing`, PREVIEW_KYBD);
+    const referralMsg = state.referralCode ? `🎁 Your referral bonus (${state.referralCode}) gives you extra credits.` : "";
+    return send(
+      chatId,
+      [
+        "💳 Choose your plan at godseye.digitalhustlerx.com",
+        "",
+        "Founder Pass includes:",
+        "• 100 credits/month (expandable)",
+        "• Unlimited sites on one license",
+        "• Priority support + early feature access",
+        "• Discounted renewal rate",
+        "",
+        "🔥 Limited to 100 founder spots.",
+        "",
+        referralMsg,
+      ].filter(Boolean).join("\n"),
+      PREVIEW_KYBD
+    );
   }
 
   if (data === "ob:have_license") {
@@ -269,7 +311,7 @@ async function handleCallback(chatId, queryId, data) {
       [
         "🆕 Getting started is a 3-step setup:",
         "",
-        `1. Grab a license at ${SIGNUP_URL} (founder pricing live). You'll get a key like \`GS-1A2B-3C4D\`.`,
+        `1. Join early access at ${SIGNUP_URL}. We will send your verified license details when Founder Pass activation is ready.`,
         `2. Install the plugin on your WordPress site — download ${PLANT_PLUGIN_URL}, then Plugins → Upload → Activate. The plugin connects the site to your license automatically.`,
         "3. Come back here and/or connect: `/connect <license>`, then send a message to run your first task.",
         "",
@@ -337,7 +379,31 @@ async function handleCommand(chatId, text, fromCallback = true) {
 
   if (command === "/start" || command === "/help") {
     // Deep-link from the /templates gateway: t.me/GodseyeXbot?start=<template_id>
+    // Or referral deep-link: t.me/GodseyeXbot?start=ref_CODE
     const param = rest[0];
+
+    // Handle referral codes (ref_ prefix)
+    if (param && param.startsWith("ref_")) {
+      state.referralCode = param.replace("ref_", "");
+      state.onboardingStep = 0;
+      // Pull founder stats for urgency
+      const stats = await getWaitlistStats();
+      const urgencyMsg = stats.spotsLeft < 20 ? `🔥 Only ${stats.spotsLeft} founder spots left!` : `🔥 ${stats.spotsLeft} founder spots remaining.`;
+      return send(
+        chatId,
+        [
+          `🎁 You're invited by a founder!`,
+          "",
+          `Your referral code is saved: \`${state.referralCode}\``,
+          "",
+          urgencyMsg,
+          "",
+          `You get bonus credits when you activate. Let's get you set up.`,
+        ].join("\n"),
+        WELCOME_KYBD
+      );
+    }
+
     const tpl = param && param.startsWith("template_") ? botTemplate(param.replace("template_", "")) : botTemplate(param);
     if (tpl) {
       state.templateId = param;
@@ -509,7 +575,12 @@ async function handleMessage(message) {
     }
 
     if (!state.siteId) {
-      return await send(chatId, "Connect a site first. Send `/connect <license_key>` or tap below.", HAVE_LICENSE_KYBD);
+      // Offer preview demo as path forward
+      const demoKb = inlineKeyboard([
+        [{ text: "⚡ Try a free demo", callback_data: "ob:preview" }],
+        [{ text: "🔑 Connect license", callback_data: "ob:have_license" }],
+      ]);
+      return await send(chatId, "Connect a site first, OR try a free demo to see how it works. Send `/connect <license_key>` or tap below.", demoKb);
     }
 
     const planned = await planTelegramMessage({ siteId: state.siteId, conversationId: state.conversationId, text });
