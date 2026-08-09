@@ -333,6 +333,38 @@ CREATE TABLE IF NOT EXISTS sessions (
 );
 `);
 
+// Isolated per-user workspace metadata. Workspace paths are server-generated;
+// users never provide filesystem paths.
+db.exec(`
+CREATE TABLE IF NOT EXISTS user_workspaces (
+  user_id INTEGER PRIMARY KEY,
+  workspace_dir TEXT NOT NULL UNIQUE,
+  created_at TEXT DEFAULT (datetime('now')),
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);
+`);
+const USER_COLS = db.prepare("PRAGMA table_info(users)").all() as Array<{ name: string }>;
+if (!USER_COLS.some((c) => c.name === "founder_bonus_granted")) {
+  db.exec("ALTER TABLE users ADD COLUMN founder_bonus_granted INTEGER NOT NULL DEFAULT 0");
+}
+
+// Founder benefit: a one-time token grant, never a price reduction. It is
+// applied only after a verified payment webhook and guarded by this flag.
+const FOUNDER_BONUS_TOKENS = Math.max(0, Number(process.env.FOUNDER_BONUS_TOKENS || 500));
+
+function ensureUserWorkspace(userId: number): string {
+  const existing = db.prepare("SELECT workspace_dir FROM user_workspaces WHERE user_id = ?").get(userId) as { workspace_dir?: string } | undefined;
+  if (existing?.workspace_dir) return existing.workspace_dir;
+  const workspaceDir = path.join(DATA_DIR, "workspaces", `user-${userId}`);
+  fs.mkdirSync(workspaceDir, { recursive: true, mode: 0o700 });
+  const agentsPath = path.join(workspaceDir, "AGENTS.md");
+  if (!fs.existsSync(agentsPath)) {
+    fs.writeFileSync(agentsPath, `# User workspace rules\n\n- This workspace belongs only to user ${userId}.\n- Do not share files or secrets with other users.\n- Never place passwords, API keys, or WordPress credentials in files or chat.\n- Confirm before destructive external actions.\n`, { mode: 0o600 });
+  }
+  db.prepare("INSERT OR IGNORE INTO user_workspaces (user_id, workspace_dir) VALUES (?, ?)").run(userId, workspaceDir);
+  return workspaceDir;
+}
+
 // ===== Plugin purchases (pay-before-download) =====
 // One row per checkout intent. On a verified Polar webhook the row flips to
 // `paid` and a one-time `download_token` is issued so the customer can pull the
@@ -381,6 +413,7 @@ CREATE TABLE IF NOT EXISTS bridge_sites (
 );
 `);
 db.exec("CREATE INDEX IF NOT EXISTS bridge_sites_license_idx ON bridge_sites (license_key);");
+
 
 // Constant-time secret verify helper (avoids length-timing on the compare).
 function bridgeSecretMatches(storedHash: string, candidate: string): boolean {
@@ -456,6 +489,32 @@ function setSessionCookie(res: any, token: string) {
 async function startServer() {
   const app = express();
   app.use(express.json());
+
+  // Read-only license/site endpoints used by the Telegram WordPress onboarding.
+  // License keys are scoped to site lookups; WordPress credentials are never stored here.
+  app.get("/api/licenses/:licenseKey", (req, res) => {
+    const licenseKey = String(req.params.licenseKey || "").trim();
+    if (!licenseKey) return res.status(400).json({ error: "license key required" });
+    const sites = db.prepare("SELECT COUNT(*) AS count FROM bridge_sites WHERE license_key = ?").get(licenseKey) as any;
+    const owner = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(licenseKey) ? licenseKey.toLowerCase() : null;
+    const user = owner ? db.prepare("SELECT plan, plan_id, plan_expires_at FROM users WHERE email = ?").get(owner) as any : null;
+    if (!user && !sites?.count) return res.status(404).json({ error: "license not found" });
+    res.json({ license: { key: licenseKey, email: owner, plan: user?.plan || "active", status: "active", site_count: sites?.count || 0 } });
+  });
+
+  app.get("/api/sites", (req, res) => {
+    const licenseKey = String(req.query.licenseKey || "").trim();
+    if (!licenseKey) return res.status(400).json({ error: "licenseKey required" });
+    const sites = db.prepare("SELECT id, site_url AS url, site_name AS name, wp_version AS wpVersion, plugin_version AS pluginVersion, 'connected' AS connectionStatus FROM bridge_sites WHERE license_key = ?").all(licenseKey);
+    res.json({ sites });
+  });
+
+  app.get("/api/sites/:siteId", (req, res) => {
+    const site = db.prepare("SELECT id, site_url AS url, site_name AS name, wp_version AS wpVersion, plugin_version AS pluginVersion, 'connected' AS connectionStatus, updated_at AS lastBridgeCheckAt FROM bridge_sites WHERE id = ?").get(String(req.params.siteId));
+    if (!site) return res.status(404).json({ error: "site not found" });
+    res.json({ site });
+  });
+
   const PORT = Number(process.env.PORT) || 3000;
 
   // Live Playground API
@@ -844,7 +903,9 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
     const hash = hashPassword(password);
     const info = db.prepare("INSERT INTO users (email, password_hash, name) VALUES (?, ?, ?)")
       .run(emailLower, hash, (name || "").trim());
-    const token = createSession(Number(info.lastInsertRowid));
+    const newUserId = Number(info.lastInsertRowid);
+    ensureUserWorkspace(newUserId);
+    const token = createSession(newUserId);
     setSessionCookie(res, token);
     res.json({ user: { id: Number(info.lastInsertRowid), email: emailLower, name: (name || "").trim(), plan: "free", plan_id: "free", credits_remaining: 50 } });
   });
@@ -857,6 +918,7 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
     if (!row || !verifyPassword(password, row.password_hash)) {
       return res.status(401).json({ error: "Incorrect email or password" });
     }
+    ensureUserWorkspace(row.id);
     const token = createSession(row.id);
     setSessionCookie(res, token);
     res.json({ user: { id: row.id, email: row.email, name: row.name, plan: row.plan, plan_id: row.plan_id, credits_remaining: row.credits_remaining } });
@@ -1090,9 +1152,12 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
               // nudges re-subscription. Paid monthly plans get a 30-day window.
               const windowDays = planId === "taste" ? 7 : 30;
               const expires = new Date(Date.now() + windowDays * 24 * 60 * 60 * 1000).toISOString();
+              const userId = (user as any).id;
+              const bonus = db.prepare("SELECT founder_bonus_granted FROM users WHERE id=?").get(userId) as { founder_bonus_granted?: number } | undefined;
+              const bonusTokens = bonus?.founder_bonus_granted ? 0 : FOUNDER_BONUS_TOKENS;
               db.prepare(
-                "UPDATE users SET plan=?, plan_id=?, credits_remaining=COALESCE(?, credits_remaining), plan_expires_at=? WHERE id=?"
-              ).run(planId, planId, credits, expires, (user as any).id);
+                "UPDATE users SET plan=?, plan_id=?, credits_remaining=COALESCE(?, credits_remaining) + ?, plan_expires_at=?, founder_bonus_granted=CASE WHEN ? > 0 THEN 1 ELSE founder_bonus_granted END WHERE id=?"
+              ).run(planId, planId, credits, bonusTokens, expires, bonusTokens, userId);
             }
           }
 

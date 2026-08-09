@@ -92,6 +92,7 @@ function session(chatId) {
       templateOnboardStep: -1,
       // Referral tracking from /start deep-link (ref_CODE)
       referralCode: null,
+      onboardingIntent: null,
     });
   }
   return sessions.get(key);
@@ -168,8 +169,13 @@ function formatSite(site) {
 // ---------- Onboarding wizard ----------
 
 const WELCOME_KYBD = inlineKeyboard([
-  [{ text: "✨ Set up my business space", callback_data: "ob:preview" }],
-  [{ text: "🔑 I already have a license", callback_data: "ob:have_license" }],
+  [{ text: "✨ Set up my business", callback_data: "ob:business_setup" }],
+  [{ text: "🧭 Help with my existing business", callback_data: "ob:business_help" }],
+  [{ text: "🔑 WordPress connection", callback_data: "ob:have_license" }],
+]);
+const GROUP_KYBD = inlineKeyboard([
+  [{ text: "👥 How to use a group chat", callback_data: "ob:group_help" }],
+  [{ text: "↩️ Continue privately", callback_data: "ob:preview" }],
 ]);
 const PREVIEW_KYBD = inlineKeyboard([
   [{ text: "⚡ Try a safe demo", callback_data: "preview:demo" }],
@@ -249,6 +255,42 @@ async function handleCallback(chatId, queryId, data) {
   const state = session(chatId);
   await answer(queryId);
 
+  if (data === "ob:business_setup") {
+    state.onboardingIntent = "business_setup";
+    state.onboardingStep = 10;
+    return send(chatId, [
+      "✨ Let's build your business space from the ground up.",
+      "",
+      "Tell me what you do and the first repeatable job you want off your plate.",
+      "Example: `I run a salon and need help with bookings and client follow-up.`",
+      "",
+      "After the preview, I'll show you how to bring your team into a dedicated group chat.",
+    ].join("\n"));
+  }
+
+  if (data === "ob:business_help") {
+    state.onboardingIntent = "business_help";
+    state.onboardingStep = 10;
+    return send(chatId, [
+      "🧭 Tell me what is already running and what is currently stuck.",
+      "",
+      "Include the business, tool, or workflow you want help with first. I'll keep the first plan focused and safe.",
+      "",
+      "When live access is needed, I'll ask for the relevant connection — never credentials in this chat.",
+    ].join("\n"));
+  }
+
+  if (data === "ob:group_help") {
+    return send(chatId, [
+      "👥 Your group chat is the shared operating room.",
+      "",
+      "Create a private Telegram group, add @GodseyeXbot, and make it admin only if you want the agent to manage topics. Keep sensitive credentials out of chat.",
+      "Use topics such as Tasks, Customers, Files, Analytics, and Settings. The agent reports there and keeps this private chat for setup and billing.",
+      "",
+      "I can't create or invite people into a group without Telegram's explicit group action, so you stay in control.",
+    ].join("\n"), GROUP_KYBD);
+  }
+
   if (data === "ob:preview") {
     state.onboardingStep = 10;
     return send(chatId, previewWelcomeText());
@@ -286,7 +328,8 @@ async function handleCallback(chatId, queryId, data) {
         "💳 Choose your plan at godseye.digitalhustlerx.com",
         "",
         "Founder Pass includes:",
-        "• 100 credits/month (expandable)",
+        "• Full-price checkout + a one-time bonus token allocation on your first payment",
+        "• Future payments use the normal token allocation — no repeat first-payment bonus",
         "• Unlimited sites on one license",
         "• Priority support + early feature access",
         "• Discounted renewal rate",
@@ -389,6 +432,10 @@ async function handleCommand(chatId, text, fromCallback = true) {
       // Pull founder stats for urgency
       const stats = await getWaitlistStats();
       const urgencyMsg = stats.spotsLeft < 20 ? `🔥 Only ${stats.spotsLeft} founder spots left!` : `🔥 ${stats.spotsLeft} founder spots remaining.`;
+      // Referral users go straight to preview flow — no license button yet
+      const REFERRAL_WELCOME_KYBD = inlineKeyboard([
+        [{ text: "✨ Set up my business space", callback_data: "ob:preview" }],
+      ]);
       return send(
         chatId,
         [
@@ -400,7 +447,7 @@ async function handleCommand(chatId, text, fromCallback = true) {
           "",
           `You get bonus credits when you activate. Let's get you set up.`,
         ].join("\n"),
-        WELCOME_KYBD
+        REFERRAL_WELCOME_KYBD
       );
     }
 
@@ -544,8 +591,15 @@ async function handleMessage(message) {
           "",
           "You can try one safe demo now. It will not connect to or change your real business.",
           "When you want live work on your domain, store, email, or social accounts, choose a paid plan first.",
+          "",
+          "👥 Next: create a private group chat and add @GodseyeXbot so your team can follow the work together.",
         ].join("\n"),
-        PREVIEW_KYBD
+        inlineKeyboard([
+          [{ text: "👥 Group chat setup", callback_data: "ob:group_help" }],
+          [{ text: "⚡ Try a safe demo", callback_data: "preview:demo" }],
+          [{ text: "💳 Keep my agent working", callback_data: "preview:pricing" }],
+          [{ text: "🔑 Connect my paid workspace", callback_data: "ob:have_license" }],
+        ])
       );
     }
 
