@@ -140,15 +140,22 @@ async function hydrateSession(chatId) {
 
 async function persistSession(chatId) {
   if (!BOT_INTERNAL_KEY) return;
+  const payload = { state: persistableState(session(chatId)) };
   try {
     await api(`/api/telegram/profiles/${encodeURIComponent(chatId)}`, {
       method: "PUT",
       headers: { "x-godseye-bot-key": BOT_INTERNAL_KEY },
       // Pass the object through api(); it serializes the payload once and keeps
       // the profile endpoint's expected { state: {...} } shape intact.
-      body: { state: persistableState(session(chatId)) },
+      body: payload,
     });
-  } catch (error) { console.error(`[profile] save failed: ${error.message}`); }
+  } catch (error) {
+    // Diagnostic: capture the offending chatId + payload shape so the intermittent
+    // "telegramId and state object required" is reproducible. Surface payload size
+    // and state type, not sensitive values.
+    const s = payload.state;
+    console.error(`[profile] save failed: ${error.message} (chatId=${chatId} stateType=${s === null ? "null" : typeof s} keys=${s && typeof s === "object" ? Object.keys(s).length : 0} bodyLen=${JSON.stringify(payload).length})`);
+  }
 }
 
 function inlineKeyboard(rows) {
