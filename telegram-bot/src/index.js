@@ -346,11 +346,14 @@ function previewWelcomeText() {
   return [
     "✨ Let's set up your business space.",
     "",
-    "Reply in one line with:",
-    "1) what you do, and",
-    "2) the work you want help with first.",
+    "Answer 5 short questions, one at a time:",
+    "1) What do you do?",
+    "2) What takes too much time?",
+    "3) What stresses you most?",
+    "4) What would you stop doing yourself?",
+    "5) What result would matter this week?",
     "",
-    "Example: `I do hair and I need help replying to clients and posting on social.`",
+    "Start with your business or idea. Example: `I run a salon.`",
   ].join("\n");
 }
 
@@ -452,7 +455,10 @@ async function handleCallback(chatId, queryId, data) {
   }
 
   if (data === "ob:preview") {
+    state.onboardingIntent = "business_setup";
     state.onboardingStep = 10;
+    state.onboardingQuestion = 0;
+    state.onboardingAnswers = [];
     return send(chatId, previewWelcomeText());
   }
 
