@@ -144,7 +144,9 @@ async function persistSession(chatId) {
     await api(`/api/telegram/profiles/${encodeURIComponent(chatId)}`, {
       method: "PUT",
       headers: { "x-godseye-bot-key": BOT_INTERNAL_KEY },
-      body: JSON.stringify({ state: persistableState(session(chatId)) }),
+      // Pass the object through api(); it serializes the payload once and keeps
+      // the profile endpoint's expected { state: {...} } shape intact.
+      body: { state: persistableState(session(chatId)) },
     });
   } catch (error) { console.error(`[profile] save failed: ${error.message}`); }
 }
