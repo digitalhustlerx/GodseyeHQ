@@ -1,18 +1,19 @@
 # Godseye HQ — AGENTS.md
 
 > **For AI agents (OMP, Hermes, Claude Code, etc.) working on this project.**
-> Last Updated: 2026-08-08
+> Last Updated: 2026-08-10
 
 ---
 
 ## 🎯 Project Identity
 
 - **Brand:** GodsEye (styled GODSEYE or Godseye)
-- **What it is:** A living AI agent that runs your **business** from Telegram (clients, content, orders, reminders). NOT just WordPress — the whole-office framing.
-- **Current Phase:** Pre-launch (waitlist gated, founder pricing active, first 100 get founder rate)
-- **Live URL:** https://godseye.digitalhustlerx.com  ← **serves the dedicated WAITLIST landing page** (not the marketing SPA)
-- **Marketing SPA (full site):** reachable at `https://godseye.digitalhustlerx.com/app/` and `https://godseye.62.84.186.1.sslip.io/`
-- **Telegram Bot:** @GodseyeXbot
+- **What it is:** A Telegram-first AI business operator platform. Users onboard via Telegram bot, set up a business workspace, and get AI agents managing their content, customers, website, and admin.
+- **Current Phase:** LAUNCH-READY — all systems operational, payment flow verified, security hardened
+- **Live URL:** https://godseye.digitalhustlerx.com
+- **Marketing SPA:** https://godseye.digitalhustlerx.com/app/
+- **Telegram Bot:** @GodseyeXbot (conversational onboarding, group ownership, workspace binding)
+- **API Backend:** https://api.godseyes.digitalhustlerx.com (port 3000, localhost-only)
 - **License:** AGPL-3.0 + Commercial (dual license)
 
 ---
@@ -221,6 +222,70 @@ Branch: main
 6. **Don't point the main domain root back to `index.html`** — main domain serves the waitlist page
 7. **Don't change the remote** — it's `git@github.com:digitalhustlerx/GodseyeHQ.git`
 8. **Don't use Space Grotesk for big headings** — Godseye big headings are **Georgia serif weight 300**; Space Grotesk is only for the wordmark/buttons
+9. **Never bind API to 0.0.0.0** — always 127.0.0.1, nginx proxies external traffic
+10. **Never commit secrets** — .env files stay 600, POLAR_ACCESS_TOKEN in systemd unit
+
+---
+
+## 🔒 Security Status (2026-08-10)
+
+| Component | Status | Detail |
+|-----------|--------|--------|
+| SSH | ✅ Key-only | `PermitRootLogin prohibit-password` |
+| .env files | ✅ All 600 | 50+ files locked to root-only |
+| Godseye API | ✅ localhost | Bound to 127.0.0.1, nginx proxies |
+| Bot workspace routes | ✅ Gated | Returns 401 without `x-godseye-bot-key` |
+| drip/config | ✅ Gated | Returns 401 without admin key |
+| Polar webhook | ✅ HMAC verified | SHA256 signature + legacy fallback |
+| Non-standard ports | ✅ All blocked | iptables INPUT DROP on eth0 |
+| Paperclip | ✅ localhost | `--bind loopback` in config |
+| Docker ports | ✅ DOCKER-USER blocked | 54321, 54322, 17521, 17543, 8320 |
+
+---
+
+## 📊 Session Log (2026-08-10)
+
+### Bot Onboarding
+- Conversational `/start` — replaced "Set up my business" / "I have a license" with natural greeting
+- Welcome text: "Hey — Godseye here... how's your day going?"
+- `ob:convo_warm` handler added for conversational flow
+- Free starter allowance + first-100 founder bonus (extra tokens, not discount)
+
+### Payment Flow
+- `create-checkout` endpoint tested live — returns real Polar checkout URLs
+- Polar webhook HMAC-SHA256 verification implemented (was plain string comparison, failed)
+- `POLAR_WEBHOOK_SECRET` wired into systemd unit
+- `checkout.completed` + `order.created` events → license activation → credits added
+
+### Security Hardening
+- Godseye API bound to 127.0.0.1 (was 0.0.0.0, publicly exposed on :3000)
+- SSH root login changed to key-only
+- 50+ .env files tightened from 644 to 600
+- DRIP_ADMIN_KEY set (was defaulting to "change-me")
+- 12 non-standard ports blocked via iptables INPUT + DOCKER-USER chains
+- Paperclip bound to localhost (was lan)
+
+### Infrastructure
+- LastSaaS Resend key wired (was placeholder "STRIP") — email verification now works
+- Godseye-staging preserved in-place (divergent landing-page work, no remote)
+- Paperclip runtime data untracked (2538 files removed from git index)
+- Pandora-box branding pushed to digitalhustlerx/Pandora-Box
+- GetViralCity confirmed already tracked + pushed
+
+### Commits
+- `9233e47` — fix: conversational welcome screen, remove license-first onboarding
+- `697260f` — fix: conversational welcome screen, remove license-first onboarding
+- `4111739` + `50d6790` — feat: persist and verify Telegram room ownership
+- `aebfcfc` — feat: persist business profile with Telegram workspace
+- `968f81c` — security: bind godseye API to 127.0.0.1
+- `803ef10` — security: gate drip/config GET, root SSH key-only
+- `1b9dc02` — fix: Polar webhook HMAC-SHA256 signature verification
+
+### Known Remaining Items
+1. **Polar webhook events** — user needs to select `checkout.completed` + `order.created` in Polar dashboard
+2. **Disk at 91%** — dh-store-v2 (1.3G) + dhx-vault (645M) deletable if confirmed legacy
+3. **Fresh-user end-to-end test** — second account should run /start → group → checkout → license
+4. **Huntingbank Docker ports** — compose file needs localhost bind (iptables protects meanwhile)
 
 ---
 
