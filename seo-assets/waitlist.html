@@ -143,6 +143,12 @@ btn.addEventListener('click', async ()=>{
     popupCode.textContent=('Founder code: '+code);
     // Fade the thank-you popup in over the page
     popup.classList.add('show');
+    // Post-join: swap the capture card to a clean "you're in" state so closing the
+    // popup doesn't leave a stuck "Joining…" button / still-recruiting form.
+    box.innerHTML =
+      '<div class="cb">You&rsquo;re on the list</div>' +
+      '<h2>You&rsquo;re in. We&rsquo;ll handle the rest. →</h2>' +
+      '<p class="note" style="margin-bottom:0;color:var(--gold);font-weight:400;">Your founder spot is locked. Watch your inbox for the moment GodsEye is ready to meet your business.</p>';
   }catch(e){
     errBox.textContent=e.message; errBox.classList.remove('hidden');
     btn.disabled=false; btn.textContent='Join the waitlist →';
