@@ -192,11 +192,11 @@ button:disabled{opacity:.5;cursor:not-allowed}
   fetch('/api/waitlist').then(r=>r.json()).then(d=>{const left=Math.max(0,100-Number(d.count||0));spotsLine.textContent=left+' Founder Pass spots remaining · live count';}).catch(()=>{spotsLine.textContent='Founder Pass early access · live availability updates soon';});
   btn.addEventListener('click',async()=>{
     const email=emailIn.value.trim(); errBox.classList.add('hidden');
-    if(!email||!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)){errBox.textContent='Please enter a valid email.';errBox.classList.remove('hidden');return;}
+    if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){errBox.textContent='Please enter a valid email.';errBox.classList.remove('hidden');return;}
     btn.disabled=true;btn.textContent='Joining…';
     try{
       const r=await fetch('/api/waitlist',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})});
-      const d=await r.json(); if(!r.ok) throw new Error(d.error||'Something went wrong');
+      const d=await r.json(); if(!r.ok) throw new Error(d.error||d.message||'Something went wrong');
       box.classList.add('hidden');
       const success=document.createElement('div');
       success.className='capture'; success.style.textAlign='center';
