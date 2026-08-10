@@ -1550,7 +1550,7 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
     });
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
+  app.listen(PORT, "127.0.0.1", () => {
     console.log(`Server running on http://localhost:${PORT}`);
     // GOD-15: auto-start the drip worker on boot so due emails keep flushing
     // across restarts. Gated internally by drip.enabled (default OFF), so the
