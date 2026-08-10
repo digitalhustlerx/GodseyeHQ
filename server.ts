@@ -1485,6 +1485,7 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
   const adminOk = (req: any) => req.headers?.["x-drip-admin"] === DRIP_ADMIN;
 
   app.get("/api/drip/config", (req, res) => {
+    if (!adminOk(req)) return res.status(401).json({ error: "Unauthorized" });
     const cfg = getDripConfig();
     const pending = db.prepare("SELECT COUNT(*) as c FROM drip_jobs WHERE status='pending'").get() as { c: number };
     const sent = db.prepare("SELECT COUNT(*) as c FROM drip_jobs WHERE status='sent'").get() as { c: number };
