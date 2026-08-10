@@ -318,7 +318,7 @@ const COMMANDS_KYBD = inlineKeyboard([
 
 const DEMO_TASK_TEXT = "Create a draft post titled 'Hello Godseye' with the content block 'This post was created from Telegram.'";
 
-function welcomeText(state) {
+function welcomeText(state, stats = { spotsLeft: 100 }) {
   const amConnected = !!(state.siteId || state.licenseKey);
   const lines = [
     "👁️ Welcome to Godseye.",
@@ -330,9 +330,10 @@ function welcomeText(state) {
   if (amConnected) {
     lines.push("", `You're ready to go. Connected site: \`${state.siteId || "see /sites"}\` — try a demo task.`);
   }
-  // Add founder spots urgency for non-connected users
+  // Add live founder spots urgency for non-connected users.
   if (!amConnected) {
-    lines.push("", "🔥 Founder Pass: Limited to 100 spots. Secure your spot at the special rate before the public launch.");
+    const spotsLeft = Number.isFinite(Number(stats.spotsLeft)) ? Math.max(0, Number(stats.spotsLeft)) : 100;
+    lines.push("", `🔥 Founder Pass: ${spotsLeft} spots left. Secure the special rate before public launch.`);
   }
   // Mention referral bonus if code exists
   if (state.referralCode) {
@@ -642,7 +643,8 @@ async function handleCommand(chatId, text, fromCallback = true) {
     }
     // Plain /start — no template. Pre-seed the empty slot so /templates can attach later.
     if (!state.templateId) state.onboardingStep = 0;
-    return send(chatId, welcomeText(state), WELCOME_KYBD);
+    const stats = await getWaitlistStats();
+    return send(chatId, welcomeText(state, stats), WELCOME_KYBD);
   }
 
   if (command === "/setup") {
