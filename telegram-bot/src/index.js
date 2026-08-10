@@ -147,7 +147,7 @@ async function setupBusinessRoom(chat, ownerTelegramId) {
     }
     const details = await telegram("getChat", { chat_id: chat.id });
     const member = await telegram("getChatMember", { chat_id: chat.id, user_id: Number(ownerTelegramId) });
-    if (!['creator', 'administrator'].includes(member?.status)) return { ok: false, error: "Only the group owner or an admin can finish setup." };
+    if (member?.status !== "creator") return { ok: false, error: "The person who created the group must send /setup first. This permanently links the room to the right owner." };
     if (!details?.is_forum) return { ok: false, error: "Turn on Topics in this private group, then send /setup again." };
     const topics = {};
     for (const [name, description] of ROOM_TOPICS) {
