@@ -114,11 +114,44 @@ function session(chatId) {
   return sessions.get(key);
 }
 
+function persistableState(state) {
+  const copy = { ...state };
+  delete copy.chatType;
+  delete copy.ownerTelegramId;
+  delete copy._hydrated;
+  return copy;
+}
+
+async function hydrateSession(chatId) {
+  const state = session(chatId);
+  if (state._hydrated || !BOT_INTERNAL_KEY) return state;
+  state._hydrated = true;
+  try {
+    const data = await api(`/api/telegram/profiles/${encodeURIComponent(chatId)}`, { headers: { "x-godseye-bot-key": BOT_INTERNAL_KEY } });
+    if (data?.state && typeof data.state === "object") Object.assign(state, data.state);
+  } catch (error) {
+    if (!String(error.message || "").includes("profile not found")) console.error(`[profile] load failed: ${error.message}`);
+  }
+  return state;
+}
+
+async function persistSession(chatId) {
+  if (!BOT_INTERNAL_KEY) return;
+  try {
+    await api(`/api/telegram/profiles/${encodeURIComponent(chatId)}`, {
+      method: "PUT",
+      headers: { "x-godseye-bot-key": BOT_INTERNAL_KEY },
+      body: JSON.stringify({ state: persistableState(session(chatId)) }),
+    });
+  } catch (error) { console.error(`[profile] save failed: ${error.message}`); }
+}
+
 function inlineKeyboard(rows) {
   return { inline_keyboard: rows };
 }
 
 async function send(chatId, text, replyMarkup) {
+  await persistSession(chatId);
   const payload = { chat_id: chatId, text, ...(replyMarkup ? { reply_markup: replyMarkup } : {}) };
   return telegram("sendMessage", payload);
 }
@@ -338,7 +371,7 @@ function commandsText() {
 
 // Route a callback query from an inline button.
 async function handleCallback(chatId, queryId, data) {
-  const state = session(chatId);
+  const state = await hydrateSession(chatId);
   await answer(queryId);
 
   if (data === "ob:business_setup") {
@@ -542,7 +575,7 @@ async function handleCallback(chatId, queryId, data) {
 const COMMANDS_KYBD_FOR_START = COMMANDS_KYBD;
 
 async function handleCommand(chatId, text, fromCallback = true) {
-  const state = session(chatId);
+  const state = await hydrateSession(chatId);
   const [rawCommand, ...rest] = text.trim().split(/\s+/);
   // Telegram appends @BotUsername when a command is sent in a group.
   // Treat /start@GodseyeXbot exactly like /start so onboarding cannot be
@@ -703,7 +736,7 @@ export async function planTelegramMessage({ siteId, conversationId, text }) {
 async function handleMessage(message) {
   const chatId = message.chat.id;
   const text = message.text || "";
-  const state = session(chatId);
+  const state = await hydrateSession(chatId);
   state.chatType = message.chat.type;
   if (message.from?.id) state.ownerTelegramId = String(message.from.id);
 

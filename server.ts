@@ -331,6 +331,11 @@ CREATE TABLE IF NOT EXISTS sessions (
   expires_at TEXT NOT NULL,
   FOREIGN KEY (user_id) REFERENCES users(id)
 );
+CREATE TABLE IF NOT EXISTS telegram_profiles (
+  telegram_id TEXT PRIMARY KEY,
+  state_json TEXT NOT NULL DEFAULT '{}',
+  updated_at TEXT DEFAULT (datetime('now'))
+);
 `);
 
 // Isolated per-user workspace metadata. Workspace paths are server-generated;
@@ -537,6 +542,25 @@ async function startServer() {
     const supplied = String(req.headers["x-godseye-bot-key"] || "");
     return Boolean(configured && supplied && configured.length === supplied.length && crypto.timingSafeEqual(Buffer.from(configured), Buffer.from(supplied)));
   };
+  app.get("/api/telegram/profiles/:telegramId", (req, res) => {
+    if (!telegramBotKeyValid(req)) return res.status(401).json({ error: "unauthorized" });
+    const telegramId = String(req.params.telegramId || "").trim();
+    const row = db.prepare("SELECT state_json AS stateJson FROM telegram_profiles WHERE telegram_id=?").get(telegramId) as { stateJson?: string } | undefined;
+    if (!row) return res.status(404).json({ error: "telegram profile not found" });
+    try { return res.json({ state: JSON.parse(row.stateJson || "{}") }); }
+    catch { return res.status(500).json({ error: "invalid telegram profile" }); }
+  });
+  app.put("/api/telegram/profiles/:telegramId", (req, res) => {
+    if (!telegramBotKeyValid(req)) return res.status(401).json({ error: "unauthorized" });
+    const telegramId = String(req.params.telegramId || "").trim();
+    const state = req.body?.state;
+    if (!telegramId || !state || typeof state !== "object" || Array.isArray(state)) return res.status(400).json({ error: "telegramId and state object required" });
+    const stateJson = JSON.stringify(state);
+    if (stateJson.length > 100_000) return res.status(413).json({ error: "telegram profile too large" });
+    db.prepare("INSERT INTO telegram_profiles (telegram_id, state_json, updated_at) VALUES (?, ?, datetime('now')) ON CONFLICT(telegram_id) DO UPDATE SET state_json=excluded.state_json, updated_at=datetime('now')").run(telegramId, stateJson);
+    res.json({ ok: true });
+  });
+
   app.post("/api/telegram/workspaces/bind", (req, res) => {
     if (!telegramBotKeyValid(req)) return res.status(401).json({ error: "unauthorized" });
     const groupChatId = String(req.body?.groupChatId || "").trim();
@@ -1324,6 +1348,99 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
     const row = db.prepare("SELECT backend_secret_hash FROM bridge_sites WHERE id = ?").get(siteId) as any;
     const ok = !!row && bridgeSecretMatches(row.backend_secret_hash, String(backendSecret));
     res.json({ site: { connectionStatus: ok ? "connected" : "failed" } });
+  });
+
+  // ===== GitHub Contributions widget =====
+  // Data-driven widget that renders the account's REAL GitHub contribution
+  // history/grid (see `GitHubContributions.tsx` in the marketing SPA). Proxies
+  // the GitHub GraphQL API server-side so the fine-grained token never leaks to
+  // the browser. Token is read from env GITHUB_TOKEN, falling back to
+  // ~/.github-token (used by this dev box) so it works locally out of the box.
+  const GH_USERNAME = process.env.GITHUB_USERNAME || "digitalhustlerx";
+  const ghToken = (() => {
+    if (process.env.GITHUB_TOKEN) return process.env.GITHUB_TOKEN;
+    try {
+      const p = path.join(process.env.HOME || "/root", ".github-token");
+      const raw = fs.readFileSync(p, "utf8").trim();
+      return raw || "";
+    } catch {
+      return "";
+    }
+  })();
+
+  app.get("/api/github/contributions", async (req, res) => {
+    const username = (req.query.username as string) || GH_USERNAME;
+    if (!/^[a-zA-Z0-9-]+$/.test(username)) {
+      return res.status(400).json({ error: "Invalid GitHub username" });
+    }
+    if (!ghToken) {
+      return res
+        .status(503)
+        .json({ error: "GitHub token not configured (set GITHUB_TOKEN)" });
+    }
+    try {
+      const query = `query($login: String!) {
+        user(login: $login) {
+          login
+          name
+          avatarUrl
+          url
+          contributionsCollection {
+            contributionCalendar {
+              totalContributions
+              weeks {
+                contributionDays {
+                  date
+                  contributionCount
+                  level
+                }
+              }
+            }
+          }
+        }
+      }`;
+      const gh = await fetch("https://api.github.com/graphql", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${ghToken}`,
+          "Content-Type": "application/json",
+          "User-Agent": "GodseyeHQ",
+        },
+        body: JSON.stringify({ query, variables: { login: username } }),
+      });
+
+      const body: any = await gh.json();
+      if (!gh.ok || body.errors) {
+        console.error("GitHub GraphQL error:", body.errors || body.message);
+        return res.status(502).json({
+          error: body.errors?.[0]?.message || body.message || "GitHub API error",
+        });
+      }
+
+      const user = body.data?.user;
+      if (!user) {
+        return res.status(404).json({ error: `GitHub user "${username}" not found` });
+      }
+      const calendar = user.contributionsCollection.contributionCalendar;
+      const weeks = (calendar.weeks || []).map((w: any) =>
+        (w.contributionDays || []).map((d: any) => ({
+          date: d.date,
+          count: d.contributionCount,
+          level: typeof d.level === "number" ? d.level : 0,
+        }))
+      );
+      res.json({
+        username: user.login,
+        name: user.name,
+        avatarUrl: user.avatarUrl,
+        profileUrl: user.url,
+        totalContributions: calendar.totalContributions,
+        weeks,
+      });
+    } catch (error: any) {
+      console.error("GitHub contributions proxy error:", error);
+      res.status(500).json({ error: error.message || "Failed to fetch GitHub contributions" });
+    }
   });
 
   // Tokenized download — serves the plugin zip for a paid purchase.
