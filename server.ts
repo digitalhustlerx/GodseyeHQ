@@ -1172,15 +1172,33 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
   // token, email the download link, and (for logged-in users) activate the plan
   // + start the subscription window (cold-start). Runs the SAME fulfillment body
   // as before; only the event parser changed from Flutterwave to Polar.
-  app.post("/api/polar-webhook", (req, res) => {
+  // Polar webhook verification: supports both HMAC-SHA256 signature (current Polar)
+  // and plain secret header (legacy). Body must be captured as raw bytes for HMAC.
+  app.post("/api/polar-webhook", express.raw({ type: "application/json" }), (req, res) => {
     const webhookSecret = process.env.POLAR_WEBHOOK_SECRET;
-    const suppliedSecret = String(req.headers["x-polar-webhook-secret"] || req.headers["webhook-secret"] || "");
-    const validWebhookSecret = Boolean(webhookSecret && suppliedSecret && suppliedSecret.length === webhookSecret.length && crypto.timingSafeEqual(Buffer.from(suppliedSecret), Buffer.from(webhookSecret)));
-    if (!validWebhookSecret) {
+    const rawBody = Buffer.isBuffer(req.body) ? req.body : Buffer.from(JSON.stringify(req.body || {}));
+    const eventType = req.body?.type || "";
+
+    // Verify HMAC-SHA256 signature (Polar's current format)
+    const polarSignature = String(req.headers["polar-signature"] || "");
+    let valid = false;
+
+    if (webhookSecret && polarSignature) {
+      const expectedSig = crypto.createHmac("sha256", webhookSecret).update(rawBody).digest("hex");
+      valid = crypto.timingSafeEqual(Buffer.from(polarSignature), Buffer.from(expectedSig));
+    }
+
+    // Fallback: plain secret header (legacy)
+    if (!valid) {
+      const suppliedSecret = String(req.headers["x-polar-webhook-secret"] || req.headers["webhook-secret"] || "");
+      valid = Boolean(webhookSecret && suppliedSecret && suppliedSecret.length === webhookSecret.length && crypto.timingSafeEqual(Buffer.from(suppliedSecret), Buffer.from(webhookSecret)));
+    }
+
+    if (!valid) {
       return res.status(401).json({ error: "Invalid webhook signature" });
     }
+
     const event = req.body || {};
-    const eventType = event.type || "";
     const data = event.data || {};
 
     // We only act on confirmed, successful checkouts / orders.
