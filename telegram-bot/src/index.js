@@ -273,6 +273,11 @@ const CONNECT_SITE_KYBD = inlineKeyboard([
   [{ text: "🖥 /sites", callback_data: "cmd:sites" }],
   [{ text: "❓ Help", callback_data: "ob:commands" }],
 ]);
+const DEMO_FALLBACK_KYBD = inlineKeyboard([
+  [{ text: "✨ Start a safe free preview", callback_data: "ob:preview" }],
+  [{ text: "💳 See paid plans", callback_data: "preview:pricing" }],
+  [{ text: "🌐 Connect a website later", callback_data: "ob:website_yes" }],
+]);
 const COMMANDS_KYBD = inlineKeyboard([
   [{ text: "⚡ Try a demo task", callback_data: "task:demo" }],
   [{ text: "🖥 List my sites", callback_data: "cmd:sites" }],
@@ -512,7 +517,8 @@ async function handleCallback(chatId, queryId, data) {
 
   if (data === "task:demo") {
     if (!state.siteId) {
-      return send(chatId, "Connect a site first. Tap below to connect.", HAVE_LICENSE_KYBD);
+      state.onboardingStep = 10;
+      return send(chatId, "A live demo needs a connected website. You can still try Godseye safely without one — start the free preview below.", DEMO_FALLBACK_KYBD);
     }
     try {
       const { conversationId, task, needsApproval } = await startTask(state.siteId, state.conversationId, DEMO_TASK_TEXT);
