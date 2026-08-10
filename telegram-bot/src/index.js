@@ -785,6 +785,22 @@ async function handleMessage(message) {
       return await handleCommand(chatId, `/connect ${text.trim()}`);
     }
 
+    if (state.onboardingStep === 10 && state.onboardingIntent === "convo_warm") {
+      const answer = text.trim();
+      state.onboardingAnswers = [answer];
+      state.previewProfile = answer;
+      state.onboardingStep = 11;
+      return await send(
+        chatId,
+        [
+          "✅ Got it — I have the starting picture.",
+          "",
+          "I can help turn that into a practical next move. Pick the area that would remove the most stress first, or tell me in your own words.",
+        ].join("\\n"),
+        ACTION_PLAN_KYBD
+      );
+    }
+
     if (state.onboardingStep === 10) {
       const answer = text.trim();
       state.onboardingAnswers[state.onboardingQuestion] = answer;
