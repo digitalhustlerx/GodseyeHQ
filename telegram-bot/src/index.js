@@ -140,21 +140,46 @@ async function hydrateSession(chatId) {
 
 async function persistSession(chatId) {
   if (!BOT_INTERNAL_KEY) return;
-  const payload = { state: persistableState(session(chatId)) };
+  const chatIdStr = String(chatId).trim();
+  // Guard: never send a malformed PUT. If the state cannot be serialized to a
+  // non-empty object, log the shape and abort — a `null`/`undefined` state would
+  // otherwise produce the server's `400 telegramId and state object required`
+  // and silently drop the onboarding save.
+  let payload;
   try {
-    await api(`/api/telegram/profiles/${encodeURIComponent(chatId)}`, {
-      method: "PUT",
-      headers: { "x-godseye-bot-key": BOT_INTERNAL_KEY },
-      // Pass the object through api(); it serializes the payload once and keeps
-      // the profile endpoint's expected { state: {...} } shape intact.
-      body: payload,
-    });
+    const state = persistableState(session(chatIdStr));
+    if (state === null || typeof state !== "object" || Array.isArray(state)) throw new Error("state is not a plain object");
+    const body = JSON.stringify({ state });
+    if (!body || body === "{}" || !Object.keys(state).length) throw new Error("state is empty");
+    payload = { state };
   } catch (error) {
-    // Diagnostic: capture the offending chatId + payload shape so the intermittent
-    // "telegramId and state object required" is reproducible. Surface payload size
-    // and state type, not sensitive values.
-    const s = payload.state;
-    console.error(`[profile] save failed: ${error.message} (chatId=${chatId} stateType=${s === null ? "null" : typeof s} keys=${s && typeof s === "object" ? Object.keys(s).length : 0} bodyLen=${JSON.stringify(payload).length})`);
+    console.error(`[profile] save blocked: ${error.message} (chatId=${chatIdStr}) — session state not persistable`);
+    return;
+  }
+  // Retry transient failures (a dropped PUT silently loses the session). The
+  // intermittent "telegramId and state object required" is a server-side body
+  // parse race under load; two short retries let the same caller self-heal.
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      await api(`/api/telegram/profiles/${encodeURIComponent(chatIdStr)}`, {
+        method: "PUT",
+        headers: { "x-godseye-bot-key": BOT_INTERNAL_KEY },
+        // Pass the object through api(); it serializes the payload once and keeps
+        // the profile endpoint's expected { state: {...} } shape intact.
+        body: payload,
+      });
+      return; // success
+    } catch (error) {
+      const isTransient = attempt < 2 && /(HTTP 4(0[0-9]|9)|socket hang up|ECONNRESET|ETIMEDOUT|fetch failed|ENOTFOUND|temporarily|timeout|body)/i.test(String(error.message || "")) && !/unauthorized|not found/i.test(String(error.message || ""));
+      if (isTransient) {
+        await new Promise((r) => setTimeout(r, 300 * (attempt + 1)));
+        continue;
+      }
+      // Non-transient (or final attempt) — surface the diagnostic shape once.
+      const s = payload.state;
+      console.error(`[profile] save failed: ${error.message} (chatId=${chatIdStr} attempt=${attempt + 1} stateType=${s === null ? "null" : typeof s} keys=${s && typeof s === "object" ? Object.keys(s).length : 0} bodyLen=${JSON.stringify(payload).length})`);
+      break;
+    }
   }
 }
 
