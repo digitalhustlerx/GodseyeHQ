@@ -40,9 +40,13 @@ setDefaultResultOrder("ipv4first");
 import { botTemplate } from "./templates.js";
 
 async function api(path, options = {}) {
+  const request = { ...options };
+  if (request.body && typeof request.body !== "string" && !(request.body instanceof Uint8Array)) {
+    request.body = JSON.stringify(request.body);
+  }
   const response = await fetch(`${API_BASE_URL}${path}`, {
-    headers: { "content-type": "application/json", ...(options.headers || {}) },
-    ...options,
+    headers: { "content-type": "application/json", ...(request.headers || {}) },
+    ...request,
   });
   const text = await response.text();
   const data = text ? JSON.parse(text) : null;
