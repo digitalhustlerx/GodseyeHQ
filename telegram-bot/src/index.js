@@ -159,7 +159,7 @@ async function setupBusinessRoom(chat, ownerTelegramId) {
       await api("/api/telegram/workspaces/bind", {
         method: "POST",
         headers: { "x-godseye-bot-key": BOT_INTERNAL_KEY },
-        body: JSON.stringify({ groupChatId: chat.id, ownerTelegramId: String(ownerTelegramId || ""), groupTitle: details.title || "" }),
+        body: JSON.stringify({ groupChatId: chat.id, ownerTelegramId: String(ownerTelegramId || ""), groupTitle: details.title || "", profile: session(ownerTelegramId || chat.id).onboardingAnswers || [] }),
       });
     }
     businessRooms.set(chatId, room);

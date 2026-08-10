@@ -525,10 +525,13 @@ async function startServer() {
       owner_telegram_id TEXT NOT NULL,
       workspace_key TEXT NOT NULL UNIQUE,
       group_title TEXT DEFAULT '',
+      profile_json TEXT DEFAULT '{}',
       created_at TEXT DEFAULT (datetime('now')),
       updated_at TEXT DEFAULT (datetime('now'))
     );
   `);
+  const TW_COLS = db.prepare("PRAGMA table_info(telegram_workspaces)").all() as Array<{ name: string }>;
+  if (!TW_COLS.some((c) => c.name === "profile_json")) db.exec("ALTER TABLE telegram_workspaces ADD COLUMN profile_json TEXT DEFAULT '{}'");
   const telegramBotKeyValid = (req: any) => {
     const configured = process.env.GODSEYE_BOT_INTERNAL_KEY || "";
     const supplied = String(req.headers["x-godseye-bot-key"] || "");
@@ -539,11 +542,12 @@ async function startServer() {
     const groupChatId = String(req.body?.groupChatId || "").trim();
     const ownerTelegramId = String(req.body?.ownerTelegramId || "").trim();
     const groupTitle = String(req.body?.groupTitle || "").slice(0, 255);
+    const profileJson = JSON.stringify(req.body?.profile && typeof req.body.profile === "object" ? req.body.profile : {});
     if (!groupChatId || !ownerTelegramId) return res.status(400).json({ error: "groupChatId and ownerTelegramId required" });
     const existing = db.prepare("SELECT * FROM telegram_workspaces WHERE group_chat_id=?").get(groupChatId) as any;
     if (existing && existing.owner_telegram_id !== ownerTelegramId) return res.status(409).json({ error: "group already belongs to another owner" });
     const workspaceKey = existing?.workspace_key || `tg-${crypto.createHash("sha256").update(`${ownerTelegramId}:${groupChatId}`).digest("hex").slice(0, 32)}`;
-    db.prepare(`INSERT INTO telegram_workspaces (group_chat_id, owner_telegram_id, workspace_key, group_title, updated_at) VALUES (?, ?, ?, ?, datetime('now')) ON CONFLICT(group_chat_id) DO UPDATE SET group_title=excluded.group_title, updated_at=datetime('now')`).run(groupChatId, ownerTelegramId, workspaceKey, groupTitle);
+    db.prepare(`INSERT INTO telegram_workspaces (group_chat_id, owner_telegram_id, workspace_key, group_title, profile_json, updated_at) VALUES (?, ?, ?, ?, ?, datetime('now')) ON CONFLICT(group_chat_id) DO UPDATE SET group_title=excluded.group_title, profile_json=excluded.profile_json, updated_at=datetime('now')`).run(groupChatId, ownerTelegramId, workspaceKey, groupTitle, profileJson);
     db.prepare("UPDATE users SET telegram_id=? WHERE id=(SELECT id FROM users WHERE telegram_id=? LIMIT 1)").run(ownerTelegramId, ownerTelegramId);
     res.json({ workspace: { groupChatId, ownerTelegramId, workspaceKey, groupTitle } });
   });
