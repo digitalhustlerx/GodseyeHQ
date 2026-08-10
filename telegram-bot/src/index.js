@@ -587,6 +587,13 @@ async function handleCommand(chatId, text, fromCallback = true) {
     // Or referral deep-link: t.me/GodseyeXbot?start=ref_CODE
     const param = rest[0];
 
+    // The paid setup page deep-links here after checkout. Jump directly to
+    // the license wizard instead of showing the generic welcome screen.
+    if (param === "connect") {
+      state.onboardingStep = 2;
+      return send(chatId, "🔑 Welcome back. Send your license key in the format `GS-XXXX-XXXX`.\n\nExample: `/connect GS-1A2B-3C4D`", HAVE_LICENSE_KYBD);
+    }
+
     // Handle referral codes (ref_ prefix)
     if (param && param.startsWith("ref_")) {
       state.referralCode = param.replace("ref_", "");
