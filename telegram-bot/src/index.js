@@ -259,8 +259,9 @@ function formatSite(site) {
 // ---------- Onboarding wizard ----------
 
 const WELCOME_KYBD = inlineKeyboard([
-  [{ text: "✨ Set up my business", callback_data: "ob:business_setup" }],
-  [{ text: "🔑 I have a license", callback_data: "ob:have_license" }],
+  [{ text: "👋 Tell me how it's going", callback_data: "ob:convo_warm" }],
+  [{ text: "💬 What can Godseye help with?", callback_data: "ob:action_plan" }],
+  [{ text: "🔑 I'm already a customer", callback_data: "ob:have_license" }],
 ]);
 const WEBSITE_KYBD = inlineKeyboard([
   [{ text: "🌐 Yes, I have a website", callback_data: "ob:website_yes" }],
@@ -321,25 +322,22 @@ const DEMO_TASK_TEXT = "Create a draft post titled 'Hello Godseye' with the cont
 function welcomeText(state, stats = { spotsLeft: 100 }) {
   const amConnected = !!(state.siteId || state.licenseKey);
   const lines = [
-    "👁️ Welcome to Godseye.",
+    "👁️ Hey — Godseye here.",
     "",
-    "I'm your business agent. You can talk to me right here on Telegram.",
+    "I'm your business agent on Telegram. Right now I'm just checking in: how's your day going? What's on your plate today?",
     "",
-    "I can help with your customers, content, store, website, numbers, and admin — then bring in more specialist agents when the work grows.",
+    "You can talk to me like you'd talk to a partner. No forms, no setup needed to start.",
   ];
   if (amConnected) {
     lines.push("", `You're ready to go. Connected site: \`${state.siteId || "see /sites"}\` — try a demo task.`);
-  }
-  // Add live founder spots urgency for non-connected users.
-  if (!amConnected) {
+  } else {
     const spotsLeft = Number.isFinite(Number(stats.spotsLeft)) ? Math.max(0, Number(stats.spotsLeft)) : 100;
-    lines.push("", `🔥 Founder Pass: ${spotsLeft} spots left. Secure the special rate before public launch.`);
+    lines.push("", `🔥 Founder Pass: ${spotsLeft} spots left. You get a free starter allowance to try it; first 100 founders keep the special rate.`);
   }
-  // Mention referral bonus if code exists
   if (state.referralCode) {
     lines.push("", `🎁 You have a referral bonus (${state.referralCode}) — extra credits when you activate.`);
   }
-  lines.push("", "Start by telling me what you do and what you want off your plate first.");
+  lines.push("", "So — what are we doing today?");
   return lines.join("\n");
 }
 
@@ -376,6 +374,21 @@ function commandsText() {
 async function handleCallback(chatId, queryId, data) {
   const state = await hydrateSession(chatId);
   await answer(queryId);
+
+  if (data === "ob:convo_warm") {
+    state.onboardingStep = 10;
+    state.onboardingIntent = "convo_warm";
+    return send(chatId, [
+      "👋 Awesome — a real person.",
+      "",
+      "Give me the honest version of today. Like:",
+      "• \"I'm juggling orders and I keep missing follow-ups.\"",
+      "• \"I wrote 3 posts this week and it ate my whole day.\"",
+      "• \"Honestly not sure where to start, my business is a lot.\"",
+      "",
+      "No wrong answer. I'll work with whatever you say.",
+    ].join("\n"));
+  }
 
   if (data === "ob:business_setup") {
     state.onboardingIntent = "business_setup";
