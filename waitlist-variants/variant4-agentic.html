@@ -62,7 +62,29 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .socials{display:flex;justify-content:center;gap:18px;margin-top:22px}
 .socials a{font-family:var(--dm);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);text-decoration:none}
 .socials a:hover{color:var(--gold)}
-@media(max-width:600px){.orchestrator{font-size:32px}.fleetline{font-size:24px}.values{grid-template-columns:1fr}.wrap{padding:44px 20px 32px}}
+/* ---------- Bottom sections: the fleet, the setup, the add-ons ---------- */
+.section{margin:56px 0 0}
+.section .lab{font-family:var(--dm);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:16px;text-align:center}
+.section h3{font-family:var(--serif);font-weight:300;font-size:28px;line-height:1.15;text-align:center;margin-bottom:28px}
+/* named-agent catalog */
+.agents{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.agent{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px}
+.agent .ic{font-size:22px;margin-bottom:12px}
+.agent .n{font-family:var(--serif);font-weight:300;font-size:18px;margin-bottom:8px;color:var(--text)}
+.agent .d{color:var(--muted);font-weight:300;font-size:13.5px;line-height:1.65}
+/* hardware / setup configurator feel */
+.setup{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.setup .opt{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px}
+.setup .opt .ic{font-size:22px;margin-bottom:12px}
+.setup .opt .n{font-family:var(--serif);font-weight:300;font-size:18px;margin-bottom:8px}
+.setup .opt .d{color:var(--muted);font-weight:300;font-size:13.5px;line-height:1.65}
+/* cron / add-ons */
+.addons{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.addon{background:var(--surface);border:1px solid rgba(196,164,132,.3);border-radius:16px;padding:22px}
+.addon .ic{font-size:22px;margin-bottom:12px}
+.addon .n{font-family:var(--serif);font-weight:300;font-size:18px;margin-bottom:8px;color:var(--gold)}
+.addon .d{color:var(--muted);font-weight:300;font-size:13.5px;line-height:1.65}
+@media(max-width:600px){.orchestrator{font-size:32px}.fleetline{font-size:24px}.values{grid-template-columns:1fr}.agents,.setup,.addons{grid-template-columns:1fr}.wrap{padding:44px 20px 32px}}
 </style>
 <script defer src="https://godseye.digitalhustlerx.com/tracker.js"></script>
 </head>
@@ -76,7 +98,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
 
   <div class="eyebrow">Beta release · Coming soon</div>
   <div class="orchestrator"><span class="gold">Godseye</span></div>
-  <div class="fleetline">The fleet of AI agents that lives on Telegram and keeps your business on Telegram and manages your business 24/7.</div>
+  <div class="fleetline">A fleet of AI agents that lives on Telegram and keeps your business on Telegram and manages your business 24/7.</div>
   <p class="sub">Godseye coordinates the agents your business needs. They handle repeatable work across content, customers, leads, social media, and daily operations. It suggests, prepares, and waits for your approval before sensitive actions.</p>
 
   <div class="capture" style="margin-bottom:18px">
@@ -121,6 +143,38 @@ button:disabled{opacity:.5;cursor:not-allowed}
       </div>
     </div>
   </div>
+
+  <!-- The fleet: named agents people can picture -->
+  <section class="section">
+    <div class="lab">The fleet</div>
+    <h3>One hire. Every role it takes to run a business.</h3>
+    <div class="agents">
+      <div class="agent"><div class="ic">🎬</div><div class="n">Content & Reels Agent</div><div class="d">Drafts your posts, scripts your TikTok & Reels, pulls the trending audio, and reminds you what to publish today.</div></div>
+      <div class="agent"><div class="ic">💬</div><div class="n">Receptionist Agent</div><div class="d">Replies to clients, books appointments, and follows up so warm leads never go cold.</div></div>
+      <div class="agent"><div class="ic">📦</div><div class="n">Store & Inventory Agent</div><div class="d">Tracks orders, updates products, and keeps your stock and prices straight across your store.</div></div>
+      <div class="agent"><div class="ic">🛡️</div><div class="n">24/7 Site-Health Agent</div><div class="d">Watches your site around the clock and brings you the fix before you even notice it broke.</div></div>
+    </div>
+  </section>
+
+  <!-- Setup / configuration = perceived value -->
+  <section class="section">
+    <div class="lab">Built for the way you run things</div>
+    <h3>Set your own stage. It grows with you.</h3>
+    <div class="setup">
+      <div class="opt"><div class="ic">🧠</div><div class="n">Shared or your own brain</div><div class="d">Start on our infrastructure or bring your own server and keys. It works the same — your business, your data, your control.</div></div>
+      <div class="opt"><div class="ic">⚡</div><div class="n">Runs harder as you grow</div><div class="d">One task at a time at first. As your business grows, the fleet handles more at once — exactly like upgrading to more powerful hardware.</div></div>
+    </div>
+  </section>
+
+  <!-- Add-ons: cron + extras = recurring value -->
+  <section class="section">
+    <div class="lab">Add-ons</div>
+    <h3>Automations that run while you sleep.</h3>
+    <div class="addons">
+      <div class="addon"><div class="ic">⏰</div><div class="n">Custom Cron Jobs</div><div class="d">Schedule it once — daily leads reports, weekly content, monthly follow-ups. Set the clock and it does the work.</div></div>
+      <div class="addon"><div class="ic">⚙️</div><div class="n">Extra Agent Slots</div><div class="d">Spawn a specialist when the work grows past one agent — on-demand, and retired when you don't need it.</div></div>
+    </div>
+  </section>
 
   <div class="foot">
     <a href="https://t.me/GodseyeXbot">@GodseyeXbot</a> · <a href="https://godseye.digitalhustlerx.com">godseye.digitalhustlerx.com</a>
