@@ -10,6 +10,7 @@ const SIGNUP_URL = process.env.GODSEYE_SIGNUP_URL ?? "https://godseye.digitalhus
 // action (successful /connect with a license + site) so Growth sees the
 // signup -> activated -> paid funnel. Overridable for local testing.
 const LANDING_API_BASE_URL = (process.env.GODSEYE_LANDING_API_BASE_URL ?? "https://godseye.digitalhustlerx.com").replace(/\/+$/, "");
+const BOT_INTERNAL_KEY = process.env.GODSEYE_BOT_INTERNAL_KEY ?? "";
 
 // Per-chat session state.
 const sessions = new Map();
@@ -126,11 +127,27 @@ async function answer(queryId, text) {
   return telegram("answerCallbackQuery", { callback_query_id: queryId, ...(text ? { text } : {}) });
 }
 
-async function setupBusinessRoom(chat) {
+async function setupBusinessRoom(chat, ownerTelegramId) {
   const chatId = String(chat.id);
   if (businessRooms.has(chatId)) return businessRooms.get(chatId);
   try {
+    if (BOT_INTERNAL_KEY) {
+      try {
+        const existing = await api(`/api/telegram/workspaces/${encodeURIComponent(chat.id)}`, { headers: { "x-godseye-bot-key": BOT_INTERNAL_KEY } });
+        if (existing?.workspace) {
+          if (String(existing.workspace.ownerTelegramId) !== String(ownerTelegramId)) {
+            return { ok: false, error: "This business room is already linked to another owner." };
+          }
+          businessRooms.set(chatId, existing.workspace);
+          return { ok: true, ...existing.workspace };
+        }
+      } catch (error) {
+        if (!String(error.message || "").includes("workspace not found")) throw error;
+      }
+    }
     const details = await telegram("getChat", { chat_id: chat.id });
+    const member = await telegram("getChatMember", { chat_id: chat.id, user_id: Number(ownerTelegramId) });
+    if (!['creator', 'administrator'].includes(member?.status)) return { ok: false, error: "Only the group owner or an admin can finish setup." };
     if (!details?.is_forum) return { ok: false, error: "Turn on Topics in this private group, then send /setup again." };
     const topics = {};
     for (const [name, description] of ROOM_TOPICS) {
@@ -138,6 +155,13 @@ async function setupBusinessRoom(chat) {
       topics[name] = { messageThreadId: topic?.message_thread_id, description };
     }
     const room = { ok: true, chatId: chat.id, topics };
+    if (BOT_INTERNAL_KEY) {
+      await api("/api/telegram/workspaces/bind", {
+        method: "POST",
+        headers: { "x-godseye-bot-key": BOT_INTERNAL_KEY },
+        body: JSON.stringify({ groupChatId: chat.id, ownerTelegramId: String(ownerTelegramId || ""), groupTitle: details.title || "" }),
+      });
+    }
     businessRooms.set(chatId, room);
     return room;
   } catch (error) {
@@ -574,7 +598,7 @@ async function handleCommand(chatId, text, fromCallback = true) {
     if (!["group", "supergroup"].includes(String(state.chatType || ""))) {
       return send(chatId, "Create a private business group, add me as admin, turn on Topics, then send /setup inside that group.");
     }
-    const room = await setupBusinessRoom({ id: chatId });
+    const room = await setupBusinessRoom({ id: chatId }, state.ownerTelegramId || chatId);
     if (!room.ok) return send(chatId, `Room setup not complete: ${room.error}`);
     return send(chatId, "✅ Business room ready. Use ⚡ Tasks for work, 🔔 Notifications for alerts, 🌐 Websites for site work, and 🔌 Connections for integrations.");
   }
@@ -675,6 +699,7 @@ async function handleMessage(message) {
   const text = message.text || "";
   const state = session(chatId);
   state.chatType = message.chat.type;
+  if (message.from?.id) state.ownerTelegramId = String(message.from.id);
 
   try {
     if (text.startsWith("/")) {

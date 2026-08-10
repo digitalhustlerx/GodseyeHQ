@@ -517,6 +517,43 @@ async function startServer() {
 
   const PORT = Number(process.env.PORT) || 3000;
 
+  // Telegram business-room ownership. The bot key keeps these internal routes
+  // private; a group can never be claimed by an arbitrary public request.
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS telegram_workspaces (
+      group_chat_id TEXT PRIMARY KEY,
+      owner_telegram_id TEXT NOT NULL,
+      workspace_key TEXT NOT NULL UNIQUE,
+      group_title TEXT DEFAULT '',
+      created_at TEXT DEFAULT (datetime('now')),
+      updated_at TEXT DEFAULT (datetime('now'))
+    );
+  `);
+  const telegramBotKeyValid = (req: any) => {
+    const configured = process.env.GODSEYE_BOT_INTERNAL_KEY || "";
+    const supplied = String(req.headers["x-godseye-bot-key"] || "");
+    return Boolean(configured && supplied && configured.length === supplied.length && crypto.timingSafeEqual(Buffer.from(configured), Buffer.from(supplied)));
+  };
+  app.post("/api/telegram/workspaces/bind", (req, res) => {
+    if (!telegramBotKeyValid(req)) return res.status(401).json({ error: "unauthorized" });
+    const groupChatId = String(req.body?.groupChatId || "").trim();
+    const ownerTelegramId = String(req.body?.ownerTelegramId || "").trim();
+    const groupTitle = String(req.body?.groupTitle || "").slice(0, 255);
+    if (!groupChatId || !ownerTelegramId) return res.status(400).json({ error: "groupChatId and ownerTelegramId required" });
+    const existing = db.prepare("SELECT * FROM telegram_workspaces WHERE group_chat_id=?").get(groupChatId) as any;
+    if (existing && existing.owner_telegram_id !== ownerTelegramId) return res.status(409).json({ error: "group already belongs to another owner" });
+    const workspaceKey = existing?.workspace_key || `tg-${crypto.createHash("sha256").update(`${ownerTelegramId}:${groupChatId}`).digest("hex").slice(0, 32)}`;
+    db.prepare(`INSERT INTO telegram_workspaces (group_chat_id, owner_telegram_id, workspace_key, group_title, updated_at) VALUES (?, ?, ?, ?, datetime('now')) ON CONFLICT(group_chat_id) DO UPDATE SET group_title=excluded.group_title, updated_at=datetime('now')`).run(groupChatId, ownerTelegramId, workspaceKey, groupTitle);
+    db.prepare("UPDATE users SET telegram_id=? WHERE id=(SELECT id FROM users WHERE telegram_id=? LIMIT 1)").run(ownerTelegramId, ownerTelegramId);
+    res.json({ workspace: { groupChatId, ownerTelegramId, workspaceKey, groupTitle } });
+  });
+  app.get("/api/telegram/workspaces/:groupChatId", (req, res) => {
+    if (!telegramBotKeyValid(req)) return res.status(401).json({ error: "unauthorized" });
+    const workspace = db.prepare("SELECT group_chat_id AS groupChatId, owner_telegram_id AS ownerTelegramId, workspace_key AS workspaceKey, group_title AS groupTitle FROM telegram_workspaces WHERE group_chat_id=?").get(String(req.params.groupChatId));
+    if (!workspace) return res.status(404).json({ error: "workspace not found" });
+    res.json({ workspace });
+  });
+
   // Live Playground API
   app.post("/api/playground/generate", async (req, res) => {
     try {
