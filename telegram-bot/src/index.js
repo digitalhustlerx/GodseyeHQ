@@ -657,7 +657,10 @@ async function handleCommand(chatId, text, fromCallback = true) {
         `${tpl.icon} Deep-link confirmed: **${tpl.title}** profile loaded.\n\n` +
           `I'm your agent, and I already know this world — your tools, your workflow, your corners. Before I start, one quick question to go specific:\n\n` +
           `_${q1}_`,
-        HAVE_LICENSE_KYBD
+        inlineKeyboard([
+          [{ text: "💬 Tell me about my situation", callback_data: "ob:convo_warm" }],
+          [{ text: "⚡ Show me an example action plan", callback_data: "ob:action_plan" }],
+        ])
       );
     }
     // Plain /start — no template. Pre-seed the empty slot so /templates can attach later.
