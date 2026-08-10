@@ -796,7 +796,7 @@ async function handleMessage(message) {
           "✅ Got it — I have the starting picture.",
           "",
           "I can help turn that into a practical next move. Pick the area that would remove the most stress first, or tell me in your own words.",
-        ].join("\\n"),
+        ].join("\n"),
         ACTION_PLAN_KYBD
       );
     }
