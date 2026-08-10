@@ -1,6 +1,7 @@
 import { Link, useSearchParams } from "react-router-dom";
 import { Download, CheckCircle2, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
+import GitHubContributions from "../components/GitHubContributions";
 
 type PurchaseStatus = {
   tx_ref: string;

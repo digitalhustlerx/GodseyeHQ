@@ -117,7 +117,6 @@ function session(chatId) {
 function persistableState(state) {
   const copy = { ...state };
   delete copy.chatType;
-  delete copy.ownerTelegramId;
   delete copy._hydrated;
   return copy;
 }
@@ -788,7 +787,7 @@ async function handleMessage(message) {
           "• Website, blog, and landing-page work when you need it",
           "",
           "You are onboarded. You can now talk to me normally. I’ll make suggestions as we work.",
-        ].join("\\n"),
+        ].join("\n"),
         ACTION_PLAN_KYBD
       );
     }
