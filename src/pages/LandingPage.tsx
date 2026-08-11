@@ -2,7 +2,6 @@ import { Link, useSearchParams } from "react-router-dom";
 import { Check, ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState, useEffect, useCallback, useRef, type TouchEvent } from "react";
 import { PRICING_PLANS } from "../mockData";
-import WaitlistModal from "../components/WaitlistModal";
 
 // ─── HERO SLIDES (Vicky version — plain, human, non-technical) ─────────────
 const HERO_SLIDES = [
@@ -198,9 +197,7 @@ export default function LandingPage() {
   const touchStartY = useRef<number | null>(null);
   const [searchParams] = useSearchParams();
   const refParam = searchParams.get("ref") || undefined;
-  const [showWaitlist, setShowWaitlist] = useState(
-    () => typeof window !== "undefined" && !!refParam
-  );
+  const [showWaitlist, setShowWaitlist] = useState(false); // kept for ref compat — no modal rendered
 
   // GODSEYE-POPUP: floating animated waitlist trigger. Appears after a short
   // delay so it doesn't cover the hero on first paint; hides once the modal opens.
@@ -704,32 +701,26 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ═══ FLOATING WAITLIST POPUP ═══
+      {/* ═══ FLOATING SIGNUP CTA ═══
           Animated gold trigger, bottom-right. Entrances after 6s, gently bobs,
-          pulses a gold glow, and opens the waitlist modal on click. Hides itself
-          once the modal is up so it never overlaps the real form. */}
-      {showPopup && !showWaitlist && (
-        <button
+          pulses a gold glow, and sends user to /signup on click. */}
+      {showPopup && (
+        <a
+          href="/signup"
           onClick={() => {
             setShowPopup(false);
-            // GODSEYE-ADOPTION: log the click to the local tracker (real funnel data).
             try {
               fetch("/api/track", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ event: "popup_click", selector: "waitlist-popup", page: "/" }),
+                body: JSON.stringify({ event: "popup_click", selector: "signup-cta", page: "/" }),
               });
             } catch {}
-            try {
-              const u = (window as any).umami;
-              if (u?.track) u.track("waitlist_popup_click");
-            } catch {}
-            setShowWaitlist(true);
           }}
-          aria-label="Join the early-adopter waitlist"
+          aria-label="Get started"
           className="popup-shine animate-popupEntrance fixed bottom-5 right-5 z-40 w-[264px] rounded-2xl border border-[#C4A484]/40 bg-[#0A0A0A]/95 p-3 text-left shadow-2xl backdrop-blur-md hover:border-[#C4A484] transition-colors cursor-pointer"
         >
-          {/* Top row: eye icon + live spots badge */}
+          {/* Top row: eye icon + live CTA */}
           <div className="flex items-center gap-3">
             <span className="animate-popupFloat flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#C4A484] text-black">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -739,39 +730,18 @@ export default function LandingPage() {
             </span>
             <span className="text-left">
               <span className="block text-xs font-bold text-[#C4A484] uppercase tracking-widest font-mono">
-                {stats && stats.spotsLeft > 0
-                  ? <>🔸 {stats.spotsLeft} early-adopter {stats.spotsLeft === 1 ? "spot" : "spots"} left</>
-                  : <>🚀 Waitlist open</>}
+                🚀 Godseye is live
               </span>
               <span className="block text-[13px] text-white/90 font-light leading-tight" style={{ fontFamily: "'Georgia', serif" }}>
-                {stats && stats.spotsLeft > 0
-                  ? <>First <span className="text-[#C4A484]">{stats.spotsTotal}</span> lock in the founder rate.</>
-                  : <>Join the list for launch-day priority access.</>}
+                Start your first agent today.
               </span>
             </span>
           </div>
 
-          {/* Real adoption progress bar — only meaningful while spots remain */}
-          {stats && stats.spotsLeft > 0 && (
-            <div className="mt-3">
-              <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10">
-                <div
-                  className="h-full rounded-full bg-[#C4A484] transition-all duration-700"
-                  style={{ width: `${stats.pct}%` }}
-                />
-              </div>
-              <p className="mt-1.5 text-[10px] uppercase tracking-widest text-white/40 font-mono">
-                {stats.count} joined · {stats.pct}% of 100
-              </p>
-            </div>
-          )}
-
           {/* Pulsing gold attention dot */}
           <span className="animate-popupPulse absolute -top-1 -right-1 h-3.5 w-3.5 rounded-full border-2 border-[#0A0A0A] bg-[#C4A484]" />
-        </button>
+        </a>
       )}
-
-      <WaitlistModal open={showWaitlist} onClose={() => setShowWaitlist(false)} onSuccess={() => setShowWaitlist(false)} referralParam={refParam} />
 
     </div>
   );
