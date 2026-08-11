@@ -565,7 +565,7 @@ export default function LandingPage() {
           ))}
           <div className="flex items-center justify-between px-6 py-5 bg-[#C4A484]/5 border-t border-[#C4A484]/20">
             <span className="text-sm font-bold text-white">Total with Godseye</span>
-            <span className="text-lg font-black text-[#C4A484]">$9-29/mo</span>
+            <span className="text-lg font-black text-[#C4A484]">$9-99/mo</span>
           </div>
         </div>
 
@@ -622,12 +622,15 @@ export default function LandingPage() {
           ))}
         </div>
 
-        <div className="text-center">
-          <p className="text-[10px] uppercase tracking-wider text-white/40 font-mono mb-2">Need more credits?</p>
+        <div className="text-center space-y-4">
+          <p className="text-[10px] uppercase tracking-wider text-[#C4A484] font-mono">Add-Ons</p>
+          <p className="text-xs text-white/60 font-light">Need more? Top up your credits anytime.</p>
           <div className="flex flex-wrap items-center justify-center gap-3">
-            <span className="px-4 py-2 bg-white/5 border border-white/10 rounded-full text-xs text-white/70">Wallet Top-Up — $10</span>
+            <span className="px-4 py-2 bg-white/5 border border-white/10 rounded-full text-xs text-white/70">Wallet Top-Up — $10 (100 credits)</span>
+            <span className="px-4 py-2 bg-white/5 border border-white/10 rounded-full text-xs text-white/70">Starter Pack — $9 (500 credits)</span>
+            <span className="px-4 py-2 bg-white/5 border border-white/10 rounded-full text-xs text-white/70">Pro Pack — $29 (2,000 credits)</span>
           </div>
-          <Link to="/pricing" className="inline-block mt-4 text-xs text-[#C4A484] hover:text-[#b59574] font-semibold uppercase tracking-wider">See full pricing →</Link>
+          <Link to="/pricing" className="inline-block mt-2 text-xs text-[#C4A484] hover:text-[#b59574] font-semibold uppercase tracking-wider">See full pricing →</Link>
         </div>
       </section>
 
