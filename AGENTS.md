@@ -58,14 +58,14 @@ Everything else is legacy:
 ├── supabase-migration-godseyehq.sql ← DB schema migration
 ├── README.md                      ← GitHub-facing README (OMP already wrote this)
 ├── LICENSE                        ← AGPL-3.0
-├── seo-assets/waitlist.html        ← **DEDICATED WAITLIST LANDING PAGE** (served at main domain root). Source of truth; deploy.sh copies to dist/waitlist.html
+├── seo-assets/waitlist.html        ← Legacy waitlist capture (served only at /waitlist.html; source of truth for that route). deploy.sh copies to dist/waitlist.html
 ├── seo-assets/tracker.js           ← Self-hosted behavior tracker (posts to /api/track)
 ├── drafts/                         ← Copy experiments + direction docs
 │   └── CONSOLIDATED-COPY-ANGLE.md  ← Consolidation agent output (best angle synthesis)
 ├── marketing-fleet/                ← Accounts/channels/campaigns for social
 ├── dist/                          ← BUILT OUTPUT — nginx serves this
 │   ├── index.html                 (marketing SPA — /app)
-│   ├── waitlist.html              (WAITLIST page — main domain root, /)
+│   ├── waitlist.html              (Legacy waitlist capture — served at /waitlist.html only)
 │   ├── assets/
 │   └── server.cjs
 ├── wp-plugin/                     ← God's Eye WordPress bridge plugin (PHP)
@@ -224,7 +224,7 @@ Branch: main
 3. **Don't forget to rebuild** after editing `src/` or `seo-assets/waitlist.html` — nginx serves `dist/` statically; use `./scripts/deploy.sh` (it rebuilds + restores SEO assets + restarts backend)
 4. **Don't push without a checkpoint commit first** — always `git add -A && commit && push` so we can revert
 5. **Don't show a fake adoption/spots number** — always pull `count`/`spotsLeft` from `/api/waitlist/stats` (real DB)
-6. **Don't point the main domain root back to `index.html`** — main domain serves the waitlist page
+6. **Root serves the multi-hero landing (`dist/index.html`).** Do NOT repoint `/` to waitlist.html/G4/`/app/` without explicit approval (canonical lock, see domain table + PRD #7).
 7. **Don't change the remote** — it's `git@github.com:digitalhustlerx/GodseyeHQ.git`
 8. **Don't use Space Grotesk for big headings** — Godseye big headings are **Georgia serif weight 300**; Space Grotesk is only for the wordmark/buttons
 9. **Never bind API to 0.0.0.0** — always 127.0.0.1, nginx proxies external traffic
