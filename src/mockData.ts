@@ -20,7 +20,7 @@ export const PRICING_PLANS: PricingPlan[] = [
   {
     id: "starter",
     name: "Starter",
-    price: "$9",
+    price: "$15",
     credits: "500",
     sites: "1 running agent + 1 connection",
     features: [
