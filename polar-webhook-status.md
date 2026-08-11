@@ -66,3 +66,31 @@ keeping it, fix its Polar secret/HMAC so it stops 400ing and dedupe the two endp
 This is the **second time** this exact endpoint has been disabled after being verified-enabled.
 Owner should audit who/what toggles Polar webhook endpoints (dashboard users, dev agents, config
 sync jobs). A guard (e.g. daily cron that re-lists and re-enables `639653fe…`) is recommended.
+
+---
+
+## ⚠️ THIRD RECURRENCE FOUND & FIXED (2026-08-11 ~20:58 WAT/cron)
+
+The Godseye primary Polar webhook (`639653fe…`) was **re-disabled a third time**
+(`enabled:false`), silently breaking the revenue-critical activation path again.
+The 6-hourly guard had run at 20:23 and reported `OK: enabled` — the endpoint flipped
+OFF some time after that and was still broken at 20:58 (guard's next scheduled slot had
+not yet fired). Live Polar API listing at 20:58 confirmed `639653fe enabled=False`,
+while the two non-Godseye-primary endpoints remained enabled.
+
+### Fix applied
+- `PATCH /api/v1/webhooks/endpoints/639653fe…` → `{"enabled": true}` → HTTP 200, `enabled:True`.
+- Re-verified via re-listing: `639653fe enabled=True`.
+- Backend `POST /api/polar-webhook` on :3000 → 401 on unsigned (route live, correct HMAC rejection).
+- **Guard interval tightened from `0 */6 * * *` to `0 * * * *` (hourly)** so the 
+  up-to-6h silent-payment-breakage window (which allowed this 3rd recurrence) is closed
+  to ≤1h.
+- Guard re-run manually → `OK: enabled` (validates guard reads current live state correctly).
+
+### Root-cause still open (owner)
+Three independent re-disablings of the SAME endpoint in one day, always after a guard/verify
+pass, strongly implies an automated process (dev agent, config-sync job, or Polar dashboard
+script) toggling it OFF on a schedule. The hourly guard now contains it, but the owner should
+**identify and stop whatever disables `639653fe`** — otherwise this is a continuing fight
+against an unknown actor. Candidate leads: agents acting on stale `enabled:false` snapshots,
+a sync job that overwrites endpoint config, or a Polar dashboard toggle.
