@@ -9,7 +9,7 @@
 
 ## Milestone baseline — canonical pre-launch landing
 
-The original GodsEye application page is the canonical public pre-launch landing page at `https://godseye.digitalhustlerx.com`. It is not the waitlist/capture variant.
+The canonical multi-hero GodsEye application page is the public pre-launch landing page at `https://godseye.digitalhustlerx.com`. It contains the hero slider and full marketing sections. It is not the single-hero alternate page or waitlist/capture variant.
 
 All primary account CTAs must go directly to the branded OpenSaaS application:
 
@@ -17,7 +17,7 @@ All primary account CTAs must go directly to the branded OpenSaaS application:
 - Login: `https://app.digitalhustlerx.com/login`
 - Authenticated dashboard, account, and pricing host: `https://app.digitalhustlerx.com`
 
-The temporary `opensaas.62.84.186.1.sslip.io` hostname is not customer-facing. `godseye.shop` is a legacy alias redirecting to the canonical landing; `buy.godseye.shop` redirects to app pricing. See `docs/PRE-LAUNCH-LANDING-MILESTONE-PRD.md` for complete acceptance criteria and remaining field-tweaking work.
+The temporary `opensaas.62.84.186.1.sslip.io` hostname is not customer-facing. `godseye.shop` is a legacy alias redirecting to the canonical landing; `buy.godseye.shop` redirects to app pricing. `/app/` is an alternate/legacy route, not the primary public entry. See `docs/PRE-LAUNCH-LANDING-MILESTONE-PRD.md` for complete acceptance criteria and remaining field-tweaking work.
 
 ---
 

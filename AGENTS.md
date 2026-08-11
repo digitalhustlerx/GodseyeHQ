@@ -11,7 +11,8 @@
 - **What it is:** A Telegram-first AI business operator platform. Users onboard via Telegram bot, set up a business workspace, and get AI agents managing their content, customers, website, and admin.
 - **Current Phase:** PRE-LAUNCH LANDING MILESTONE — canonical public page approved; field tweaking remains
 - **Live URL:** https://godseye.digitalhustlerx.com
-- **Marketing SPA:** https://godseye.digitalhustlerx.com/app/
+- **Canonical multi-hero landing:** https://godseye.digitalhustlerx.com/
+- **Legacy/alternate SPA route:** https://godseye.digitalhustlerx.com/app/
 - **Canonical Auth/App:** https://app.digitalhustlerx.com
 - **Milestone PRD:** `docs/PRE-LAUNCH-LANDING-MILESTONE-PRD.md`
 - **Telegram Bot:** @GodseyeXbot (conversational onboarding, group ownership, workspace binding)
@@ -170,15 +171,15 @@ radius: rounded-2xl (cards), rounded-full (buttons)
 
 | URL | Serves | Root |
 |-----|--------|------|
-| `godseye.digitalhustlerx.com` `/` | **Original GodsEye pre-launch landing/application page** (`index.html`) | `/root/godseye-repo/dist/` |
-| `godseye.digitalhustlerx.com` `/app/` | Full marketing SPA | `/root/godseye-repo/dist/` (alias) |
+| `godseye.digitalhustlerx.com` `/` | **Canonical multi-hero GodsEye landing/application page** | `/root/godseye-repo/dist/index.html` |
+| `godseye.digitalhustlerx.com` `/app/` | Alternate/legacy SPA route; not the primary public entry | `/root/godseye-repo/dist/` (alias) |
 | `app.digitalhustlerx.com/signup` | OpenSaaS branded signup | Wasp static client + API on :3101 |
 | `app.digitalhustlerx.com/login` | OpenSaaS branded login | Wasp static client + API on :3101 |
 | godseye.62.84.186.1.sslip.io `/` | Full marketing SPA | `/root/godseye-repo/dist/` |
 | godseye-staging.62.84.186.1.sslip.io | Older staging build | `/root/godseye-staging/dist/` |
 | api.godseyes.digitalhustlerx.com | Node API backend | Node on :3000 |
 
-**IMPORTANT — main domain root = canonical pre-launch landing:** nginx serves `/index.html` from `dist/`. Do not repoint it to the G4 waitlist/capture variant without explicit approval. Get Started and Log In must go directly to `app.digitalhustlerx.com/signup` and `/login`. The temporary `opensaas.*.sslip.io` URL is not customer-facing. `godseye.shop` redirects to the canonical landing and `buy.godseye.shop` redirects to app pricing.
+**IMPORTANT — main domain root = canonical multi-hero landing:** nginx must serve the multi-hero `dist/index.html` at `/`. Do not repoint `/` to `waitlist.html`, the G4 capture variant, or the alternate `/app/` route without explicit approval. Verify the live title and hero markers after every deployment. Get Started and Log In must go directly to `app.digitalhustlerx.com/signup` and `/login`. The temporary `opensaas.*.sslip.io` URL is not customer-facing. `godseye.shop` redirects to the canonical landing and `buy.godseye.shop` redirects to app pricing.
 
 **NGINX gotcha (KNOWN):** `sites-enabled/godseye.digitalhustlerx.com` is a **regular file COPY**, not a symlink. You must edit BOTH `sites-available/` and `sites-enabled/` (or copy one to the other) or the live server serves a stale config. `nginx -t` then `systemctl restart nginx`.
 

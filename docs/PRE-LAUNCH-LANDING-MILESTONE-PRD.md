@@ -1,6 +1,6 @@
 # GodsEye Pre-Launch Landing Milestone PRD
 
-**Status:** Approved milestone baseline  
+**Status:** Approved milestone baseline — canonical multi-hero root  
 **Phase:** Pre-launch / field-tweaking  
 **Product:** GodsEye  
 **Repository:** https://github.com/digitalhustlerx/GodseyeHQ  
@@ -8,7 +8,7 @@
 
 ## 1. Milestone decision
 
-The original GodsEye application page is the canonical public pre-launch page for the product. It is served at:
+The multi-hero GodsEye application page is the canonical public pre-launch page for the product. It is served at:
 
 - `https://godseye.digitalhustlerx.com`
 
@@ -36,7 +36,7 @@ The OpenSaaS public marketing landing page must not appear between the GodsEye l
 
 ## 3. What is in this baseline
 
-The public pre-launch page contains the original GodsEye product presentation:
+The public pre-launch page contains the canonical multi-hero GodsEye product presentation:
 
 - Telegram-first AI business operator positioning
 - Agent fleet and automation messaging
@@ -44,6 +44,8 @@ The public pre-launch page contains the original GodsEye product presentation:
 - Starter, Pro, Elite, and Burst pricing language where applicable
 - Direct account creation and login calls to action
 - GodsEye dark/gold visual identity
+
+The root must visibly include the hero slider/multiple hero sections. The alternate `/app/` route is not the primary public entry and must not replace `/`.
 
 The authenticated OpenSaaS application supplies:
 
@@ -80,7 +82,8 @@ Both the public page and the authenticated application should converge on the Go
 ## 6. Acceptance criteria for this milestone
 
 - [x] Canonical public page returns HTTP 200.
-- [x] Canonical public page shows the original GodsEye application page.
+- [x] Canonical public page shows the multi-hero GodsEye application page.
+- [x] Root includes multiple hero slides and the full marketing sections.
 - [x] Get Started goes directly to `app.digitalhustlerx.com/signup`.
 - [x] Log In goes directly to `app.digitalhustlerx.com/login`.
 - [x] OpenSaaS marketing landing page is not shown during the auth transition.
@@ -90,11 +93,11 @@ Both the public page and the authenticated application should converge on the Go
 - [x] Legacy domains redirect to the canonical destinations.
 - [ ] Complete a production email-delivery test with real SMTP.
 - [ ] Complete a full authenticated dashboard and logout dogfood pass.
-- [ ] Perform the next field-tweaking pass against this baseline.
+- [ ] Perform the next field-tweaking pass against the multi-hero baseline.
 
 ## 7. Explicit non-goals for this milestone
 
-- Do not replace the public page with the G4 waitlist/capture variant.
+- Do not replace the public page with the G4 waitlist/capture variant or the single-hero alternate page.
 - Do not expose the temporary sslip.io hostname in CTAs.
 - Do not merge the OpenSaaS public marketing page into the public GodsEye landing page.
 - Do not redesign the dashboard before the baseline is reviewed and field tweaks are agreed.

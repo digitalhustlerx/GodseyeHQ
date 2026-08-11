@@ -1,6 +1,6 @@
 # Godseye HQ — Agent Handoff
 
-> Current milestone: **Pre-launch landing baseline approved**
+> Current milestone: **Canonical multi-hero pre-launch landing approved**
 > Last Updated: 2026-08-11
 
 ## Quick Start
@@ -19,7 +19,7 @@
 
 | Surface | URL | Role |
 |---|---|---|
-| Public pre-launch landing/application | https://godseye.digitalhustlerx.com | Original GodsEye page; canonical public front door |
+| Public pre-launch landing/application | https://godseye.digitalhustlerx.com | Canonical multi-hero GodsEye page; public front door |
 | Signup | https://app.digitalhustlerx.com/signup | OpenSaaS branded auth |
 | Login | https://app.digitalhustlerx.com/login | OpenSaaS branded auth |
 | Authenticated app | https://app.digitalhustlerx.com | Dashboard, account, pricing, subscriptions |
@@ -30,13 +30,13 @@ The OpenSaaS marketing landing page must not flash between the public GodsEye pa
 
 ## Current milestone
 
-The original Godseye application page has been restored to `godseye.digitalhustlerx.com`. It is the approved pre-launch landing baseline for field tweaking. Its Get Started and Log In CTAs point directly to the canonical OpenSaaS auth URLs.
+The multi-hero GodsEye application page is the canonical root at `godseye.digitalhustlerx.com`. It is the approved pre-launch landing baseline for field tweaking. It contains the hero slider, feature sections, agent fleet, integrations, pricing, FAQ, and footer navigation. Its Get Started and Log In CTAs point directly to the canonical OpenSaaS auth URLs.
 
 See `docs/PRE-LAUNCH-LANDING-MILESTONE-PRD.md` for acceptance criteria and remaining work.
 
 ## Remaining work
 
-1. Field-tweak the canonical public page copy, spacing, and CTA placement.
+1. Field-tweak the canonical multi-hero page copy, spacing, hero timing, and CTA placement.
 2. Configure production SMTP and verify confirmation email delivery.
 3. Complete authenticated signup → login → dashboard → logout dogfood testing.
 4. Audit all public links and outcomes.
@@ -70,10 +70,11 @@ The previous handoff described the old waitlist-gated phase and is superseded by
 
 ## Verification
 
-Always verify the actual live title and CTA targets, not only HTTP status:
+Always verify the actual live title, hero markers, and CTA targets, not only HTTP status:
 
 ```bash
 curl -sk https://godseye.digitalhustlerx.com/ | grep -o '<title>[^<]*'
+curl -sk https://godseye.digitalhustlerx.com/ | grep -Eo 'Previous slide|Next slide|Slide [1-5]' | sort -u
 curl -sk https://godseye.digitalhustlerx.com/ | grep -o 'https://app.digitalhustlerx.com/[^" ]*'
 curl -sk -o /dev/null -w '%{http_code}\n' https://app.digitalhustlerx.com/signup
 curl -sk -o /dev/null -w '%{http_code}\n' https://app.digitalhustlerx.com/login
