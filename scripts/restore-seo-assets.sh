@@ -25,6 +25,7 @@ echo "[restore-seo] Rebuilding plugin zip into dist/ (pay-before-download payloa
 echo "[restore-seo] Restoring static SEO + organic asset tree into dist/..."
 # token visualisation
 cp /root/godseye-repo/seo-assets/token-wrapped.png        dist/token-wrapped.png
+cp /root/godseye-repo/seo-assets/og-image.png            dist/og-image.png
 cp /root/godseye-repo/seo-assets/token-visualization.html dist/token-visualization.html
 cp /root/godseye-repo/seo-assets/token-wrapped.html       dist/token-wrapped.html
 # brand/launch HTML pages (human-readable; .md legacy is redirect-only)
