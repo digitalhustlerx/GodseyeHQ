@@ -172,7 +172,7 @@ async function persistSession(chatId) {
       });
       return; // success
     } catch (error) {
-      const isTransient = attempt < 2 && /(HTTP 4(0[0-9]|9)|socket hang up|ECONNRESET|ETIMEDOUT|fetch failed|ENOTFOUND|temporarily|timeout|body)/i.test(String(error.message || "")) && !/unauthorized|not found/i.test(String(error.message || ""));
+      const isTransient = attempt < 2 && /(HTTP 4(0[0-9]|9)|socket hang up|ECONNRESET|ETIMEDOUT|fetch failed|ENOTFOUND|temporarily|timeout|body|telegramId and state object required)/i.test(String(error.message || "")) && !/unauthorized|not found/i.test(String(error.message || ""));
       if (isTransient) {
         await new Promise((r) => setTimeout(r, 300 * (attempt + 1)));
         continue;
