@@ -90,6 +90,14 @@ export default function AccountPage() {
   const isFree = user.plan === "free";
   const paidPlans = PRICING_PLANS.filter((p) => p.id !== "free");
 
+  // Usage-allocation math (renders real backend credits_remaining vs plan allowance)
+  const creditPlan = PRICING_PLANS.find((p) => p.id === planId);
+  const planCreditsRaw = creditPlan?.credits ?? "";
+  const planCreditsInt = parseInt(String(planCreditsRaw).replace(/[^0-9]/g, ""), 10) || 0;
+  const planCreditsLabel = planCreditsInt > 0 ? planCreditsRaw : "unmetered";
+  const usedCredits = Math.max(0, planCreditsInt - user.credits_remaining);
+  const usedPct = planCreditsInt > 0 ? (usedCredits / planCreditsInt) * 100 : 0;
+
   return (
     <div className="min-h-screen bg-[#0A0A0A] text-[#F2F2F2] px-4 py-14">
       <div className="max-w-5xl mx-auto space-y-10">
@@ -135,6 +143,26 @@ export default function AccountPage() {
             <div className="shrink-0 text-right">
               <p className="text-[10px] text-white/40 font-mono uppercase tracking-widest">Credits remaining</p>
               <p className="text-3xl font-black text-[#C4A484]">{Math.round(user.credits_remaining)}</p>
+            </div>
+          </div>
+
+          {/* Usage allocation bar — visual fill that empties as credits are used */}
+          <div className="mt-6 border-t border-white/10 pt-5">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-[10px] text-[#C4A484] font-mono uppercase tracking-widest font-bold">Credit allocation</p>
+              <p className="text-[10px] font-mono tracking-wider text-white/50">
+                {Math.round(usedCredits)} / {planCreditsLabel} used
+              </p>
+            </div>
+            <div className="h-2.5 w-full rounded-full bg-white/10 overflow-hidden">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-[#8a6f50] to-[#C4A484] transition-all duration-500"
+                style={{ width: `${Math.min(100, Math.max(0, usedPct))}%` }}
+              />
+            </div>
+            <div className="mt-2 flex items-center justify-between text-[10px] font-mono uppercase tracking-widest text-white/30">
+              <span>{planCreditsInt > 0 ? `${Math.round(user.credits_remaining)} left` : "No cap — pay as you go"}</span>
+              <span>{usedPct >= 100 ? "Out of allocation" : `${Math.round(usedPct)}% used`}</span>
             </div>
           </div>
         </div>
