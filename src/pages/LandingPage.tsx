@@ -342,7 +342,7 @@ export default function LandingPage() {
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
               <a
-                href="/signup"
+                href="https://opensaas.62.84.186.1.sslip.io/signup"
                 className="btn-shine w-full sm:w-auto bg-[#C4A484] hover:bg-[#b59574] text-black px-10 py-4 rounded-full font-bold text-xs uppercase tracking-widest transition-all shadow-md text-center cursor-pointer"
               >
                 Get Started →
@@ -380,7 +380,7 @@ export default function LandingPage() {
           </h2>
           <div>
             <a
-              href="/signup"
+              href="https://opensaas.62.84.186.1.sslip.io/signup"
               className="inline-block bg-[#C4A484] text-black px-8 py-3 rounded-full font-bold text-xs uppercase tracking-widest hover:bg-[#b59574] transition-all cursor-pointer"
             >
               Get Started →
@@ -648,7 +648,7 @@ export default function LandingPage() {
           </div>
 
           <div className="space-y-3 max-w-md mx-auto">
-            <a href="/signup" className="block w-full bg-[#C4A484] hover:bg-[#b59574] text-black px-8 py-4 rounded-full font-bold text-xs uppercase tracking-widest transition-all shadow-md cursor-pointer text-center">
+            <a href="https://opensaas.62.84.186.1.sslip.io/signup" className="block w-full bg-[#C4A484] hover:bg-[#b59574] text-black px-8 py-4 rounded-full font-bold text-xs uppercase tracking-widest transition-all shadow-md cursor-pointer text-center">
               Get Started →
             </a>
             <p className="text-[10px] uppercase tracking-wider text-white/40 font-mono">
@@ -706,7 +706,7 @@ export default function LandingPage() {
           pulses a gold glow, and sends user to /signup on click. */}
       {showPopup && (
         <a
-          href="/signup"
+          href="https://opensaas.62.84.186.1.sslip.io/signup"
           onClick={() => {
             setShowPopup(false);
             try {
