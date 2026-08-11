@@ -286,7 +286,7 @@ export default function Layout({ children }: { children: ReactNode }) {
                 </svg>
               </a>
               <a
-                href="https://github.com/digitalhustlerx/GodseyeHQ"
+                href="https://godseye.digitalhustlerx.com"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="GodsEye on GitHub"
