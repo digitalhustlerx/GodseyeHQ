@@ -64,10 +64,10 @@ export async function login(email: string, password: string): Promise<User> {
   return data.user;
 }
 
-export async function register(email: string, password: string, name: string): Promise<User> {
+export async function register(email: string, password: string, name: string, referralCode?: string, bonusChoice?: "memory" | "context"): Promise<User> {
   const data = await jsonFetch("/api/auth/register", {
     method: "POST",
-    body: JSON.stringify({ email, password, name }),
+    body: JSON.stringify({ email, password, name, referralCode, bonusChoice }),
   });
   return data.user;
 }

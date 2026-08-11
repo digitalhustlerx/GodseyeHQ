@@ -15,6 +15,9 @@ export default function AuthPage({
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [referralCode, setReferralCode] = useState(params.get("ref") || "");
+  const [bonusChoice, setBonusChoice] = useState<"context" | "memory">("context");
+  const [bonusApplied, setBonusApplied] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const redirect = params.get("next") || "/account";
@@ -22,6 +25,7 @@ export default function AuthPage({
   const switchMode = (m: "login" | "signup") => {
     setMode(m);
     setError("");
+    setBonusApplied("");
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -31,7 +35,10 @@ export default function AuthPage({
     try {
       let user: User;
       if (mode === "signup") {
-        user = await register(email, password, name);
+        user = await register(email, password, name, referralCode || undefined, bonusChoice);
+        if (referralCode && referralCode.trim()) {
+          setBonusApplied(bonusChoice === "memory" ? "You got the extra memory bonus. Your agent's vault is bigger, plus your standard credits." : "You got the extra context bonus. More free tokens to start, plus your standard credits.");
+        }
       } else {
         user = await login(email, password);
       }
@@ -111,6 +118,49 @@ export default function AuthPage({
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#C4A484]/50 transition-all"
               />
             </div>
+
+            {mode === "signup" && (
+              <div className="space-y-2 pt-1">
+                <label className="block text-[10px] text-[#C4A484] font-mono uppercase font-bold">Referral bonus (optional)</label>
+                <input
+                  type="text"
+                  value={referralCode}
+                  onChange={(e) => setReferralCode(e.target.value)}
+                  placeholder="Enter a referral code"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#C4A484]/50 transition-all"
+                />
+                {referralCode && referralCode.trim() !== "" && (
+                  <div className="flex flex-col gap-1.5 mt-2">
+                    <div className="text-[10px] text-white/50 font-light">When you sign up with a referral, choose your bonus:</div>
+                    {(["context", "memory"] as const).map((b) => (
+                      <label
+                        key={b}
+                        className={`flex items-center gap-2 rounded-lg border px-3 py-2.5 cursor-pointer transition-all ${
+                          bonusChoice === b ? "border-[#C4A484]/60 bg-[#C4A484]/10" : "border-white/10 bg-white/5"
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="bonus"
+                          checked={bonusChoice === b}
+                          onChange={() => setBonusChoice(b)}
+                          className="accent-[#C4A484]"
+                        />
+                        <span className="text-xs text-white/80 font-normal">
+                          {b === "context" ? "Extra free context (+20k tokens)" : "Extra memory (+250MB vault)"}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {bonusApplied && (
+              <div className="rounded-lg border border-[#C4A484]/30 bg-[#C4A484]/10 px-3 py-2.5 text-xs text-[#e8d1b6]">
+                {bonusApplied}
+              </div>
+            )}
 
             {error && (
               <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2.5 text-xs text-red-300">

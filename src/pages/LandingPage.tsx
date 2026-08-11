@@ -187,7 +187,8 @@ const FAQS = [
 // ═══════════════════════════════════════════════════════════════════════════
 // GODSEYE-WAITLIST: target launch date for the countdown. Change this one value
 // (ISO string) to move the countdown. When null, the countdown section hides.
-const LAUNCH_AT = "2026-09-07T00:00:00Z"; // ~30 days out — update as launch firms up
+// LAUNCH IS LIVE — no countdown. Direct sign-up.
+const LAUNCH_AT = null; // null = no countdown (launch is live)
 
 export default function LandingPage() {
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
@@ -247,32 +248,9 @@ export default function LandingPage() {
     return () => clearTimeout(t);
   }, [impressionLogged]);
 
-  // GODSEYE-WAITLIST: live countdown to launch. Updates every second.
-  const [countdown, setCountdown] = useState(() => {
-    const target = new Date(LAUNCH_AT).getTime();
-    const now = Date.now();
-    const diff = Math.max(0, target - now);
-    const d = Math.floor(diff / 86400000);
-    const h = Math.floor((diff % 86400000) / 3600000);
-    const m = Math.floor((diff % 3600000) / 60000);
-    const s = Math.floor((diff % 60000) / 1000);
-    return { d, h, m, s, done: diff <= 0 };
-  });
+  // Launch is live — no countdown needed.
 
-  useEffect(() => {
-    const t = setInterval(() => {
-      const target = new Date(LAUNCH_AT).getTime();
-      const diff = Math.max(0, target - Date.now());
-      setCountdown({
-        d: Math.floor(diff / 86400000),
-        h: Math.floor((diff % 86400000) / 3600000),
-        m: Math.floor((diff % 3600000) / 60000),
-        s: Math.floor((diff % 60000) / 1000),
-        done: diff <= 0,
-      });
-    }, 1000);
-    return () => clearInterval(t);
-  }, []);
+  // Launch is live — no countdown interval needed.
 
   const goToSlide = useCallback((idx: number, dir: "next" | "prev") => {
     setSlideDir(dir);
@@ -394,44 +372,25 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ═══ 1.5 COUNTDOWN TO LAUNCH ═══ */}
+      {/* ═══ 1.5 LAUNCH IS LIVE — DIRECT CTA ═══ */}
       <section className="px-4 max-w-3xl mx-auto">
         <div className="rounded-3xl border border-[#C4A484]/25 bg-[#121212] px-6 py-10 text-center space-y-5">
           <span className="text-[10px] uppercase tracking-widest text-[#C4A484] font-semibold font-mono">
-            ⏳ Godseye goes live in
+            🚀 Godseye is live
           </span>
-          <div className="grid grid-cols-4 gap-3 max-w-md mx-auto">
-            {[
-              { v: countdown.d, label: "Days" },
-              { v: countdown.h, label: "Hours" },
-              { v: countdown.m, label: "Minutes" },
-              { v: countdown.s, label: "Seconds" },
-            ].map((b) => (
-              <div key={b.label} className="bg-black/40 rounded-2xl border border-white/10 py-4">
-                <div className="text-3xl md:text-4xl font-light text-[#F2F2F2] tabular-nums" style={{ fontFamily: "'Georgia', serif" }}>
-                  {String(b.v).padStart(2, "0")}
-                </div>
-                <div className="text-[9px] uppercase tracking-widest text-white/40 font-mono mt-1">{b.label}</div>
-              </div>
-            ))}
+          <h2 className="text-2xl md:text-3xl font-light text-[#F2F2F2]" style={{ fontFamily: "'Georgia', serif" }}>
+            Start your first agent today.
+          </h2>
+          <div>
+            <a
+              href="/signup"
+              className="inline-block bg-[#C4A484] text-black px-8 py-3 rounded-full font-bold text-xs uppercase tracking-widest hover:bg-[#b59574] transition-all cursor-pointer"
+            >
+              Get Started →
+            </a>
           </div>
-          {countdown.done ? (
-            <button
-              onClick={() => setShowWaitlist(true)}
-              className="bg-[#C4A484] text-black px-8 py-3 rounded-full font-bold text-xs uppercase tracking-widest hover:bg-[#b59574] transition-all cursor-pointer"
-            >
-              We're Live — Get Started →
-            </button>
-          ) : (
-            <button
-              onClick={() => setShowWaitlist(true)}
-              className="bg-[#C4A484] text-black px-8 py-3 rounded-full font-bold text-xs uppercase tracking-widest hover:bg-[#b59574] transition-all cursor-pointer"
-            >
-              Join the Founders List →
-            </button>
-          )}
           <p className="text-[11px] text-white/40 font-light">
-            First <strong className="text-[#C4A484]">100</strong> to join lock in <strong className="text-[#C4A484]">50% off</strong> for their first year.
+            First <strong className="text-[#C4A484]">100</strong> founders lock in a <strong className="text-[#C4A484]">bonus credit pack</strong>.
           </p>
         </div>
       </section>

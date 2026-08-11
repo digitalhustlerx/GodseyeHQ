@@ -131,7 +131,7 @@ btn.addEventListener('click', async ()=>{
   if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
     errBox.textContent='Please enter a valid email.'; errBox.classList.remove('hidden'); return;
   }
-  btn.disabled=true; btn.textContent='Joining…';
+  btn.disabled=true; btn.textContent='Starting…';
   try{
     const r=await fetch('/api/waitlist',{
       method:'POST',
@@ -148,12 +148,12 @@ btn.addEventListener('click', async ()=>{
     // Post-join: swap the capture card to a clean "you're in" state so closing the
     // popup doesn't leave a stuck "Joining…" button / still-recruiting form.
     box.innerHTML =
-      '<div class="cb">You&rsquo;re on the list</div>' +
-      '<h2>You&rsquo;re in. We&rsquo;ll handle the rest. →</h2>' +
-      '<p class="note" style="margin-bottom:0;color:var(--gold);font-weight:400;">Your founder spot is locked. Watch your inbox for the moment GodsEye is ready to meet your business.</p>';
+      '<div class="cb">Founder spot locked</div>' +
+      '<h2>You&rsquo;re in. Your agent is ready. →</h2>' +
+      '<p class="note" style="margin-bottom:0;color:var(--gold);font-weight:400;">Check your inbox — your agent is ready to meet you on Telegram.</p>';
   }catch(e){
     errBox.textContent=e.message; errBox.classList.remove('hidden');
-    btn.disabled=false; btn.textContent='Join the waitlist →';
+    btn.disabled=false; btn.textContent='Get Started →';
   }
 });
 // Enter key submits

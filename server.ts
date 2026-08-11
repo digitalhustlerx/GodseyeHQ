@@ -1147,7 +1147,7 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
 
   // ===== Auth =====
   app.post("/api/auth/register", (req, res) => {
-    const { email, password, name } = req.body || {};
+    const { email, password, name, referralCode, bonusChoice } = req.body || {};
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return res.status(400).json({ error: "Valid email required" });
     }
@@ -1164,9 +1164,41 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
       .run(emailLower, hash, (name || "").trim());
     const newUserId = Number(info.lastInsertRowid);
     ensureUserWorkspace(newUserId);
+
+    // GODSEYE REFERRAL BONUS — when a user signs up with a valid referral code,
+    // they choose an extra bonus: MORE MEMORY or MORE FREE CONTEXT (tokens),
+    // on top of the baseline 50 credits. The referrer also gets credit.
+    let referralBonus = { kind: bonusChoice === "memory" ? "memory" : "context", applied: false, detail: "" };
+    if (referralCode && typeof referralCode === "string" && referralCode.trim()) {
+      const code = referralCode.trim().toLowerCase();
+      // Referral tokens live in the referrers table (email <-> opaque token).
+      const referrer = db.prepare("SELECT id, email FROM referrers WHERE lower(token) = ? OR email = ?")
+        .get(code, code) as any;
+      if (referrer && referrer.email !== emailLower) {
+        const bonus = bonusChoice === "memory" ? "memory" : "context";
+        // Tag the new user with their chosen bonus + referrer attribution.
+        try { db.prepare("ALTER TABLE users ADD COLUMN referred_bonus TEXT DEFAULT ''").run(); } catch (_) { /* already exists */ }
+        try { db.prepare("ALTER TABLE users ADD COLUMN referred_by TEXT DEFAULT ''").run(); } catch (_) { /* already exists */ }
+        db.prepare("UPDATE users SET referred_bonus = ?, referred_by = ? WHERE id = ?")
+          .run(bonus, referrer.email, newUserId);
+        // Record the 'signup' attribution stage for the referrer's ladder.
+        try {
+          db.prepare(`INSERT OR IGNORE INTO referral_events (inviter_id, inviter_email, invitee_email, stage, credited_at, status, source)
+            VALUES (?, ?, ?, 'signup', datetime('now'), 'credited', 'referral-code-bonus')`)
+            .run(referrer.id, referrer.email, emailLower);
+        } catch (_) { /* attribution already recorded */ }
+        referralBonus = { kind: bonus, applied: true, detail: bonusChoice === "memory" ? "Extra memory (+250MB vault)" : "Extra free context (+20k tokens)" };
+      } else {
+        referralBonus = { kind: bonusChoice === "memory" ? "memory" : "context", applied: false, detail: "Referral not found" };
+      }
+    }
+
     const token = createSession(newUserId);
     setSessionCookie(res, token);
-    res.json({ user: { id: Number(info.lastInsertRowid), email: emailLower, name: (name || "").trim(), plan: "free", plan_id: "free", credits_remaining: 50 } });
+    res.json({
+      user: { id: Number(info.lastInsertRowid), email: emailLower, name: (name || "").trim(), plan: "free", plan_id: "free", credits_remaining: 50 },
+      referralBonus,
+    });
   });
 
   app.post("/api/auth/login", (req, res) => {
