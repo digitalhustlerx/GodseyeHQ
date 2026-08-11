@@ -4,38 +4,15 @@
 set -e
 cd /root/godseye-repo
 
-echo "[1/5] Building SPA (dist recreated)..."
+echo "[1/3] Building SPA (dist recreated, SEO tree auto-restored)..."
 npm run build 2>&1 | tail -8
+# NOTE: `npm run build` ends with scripts/restore-seo-assets.sh, which rebuilds
+# the plugin zip AND restores the full waitlist/blog/SEO tree + normalizes perms
+# (no wipe hazard). The call below is explicit + idempotent for safety/visibility.
+echo "[2/3] Restoring SEO + organic asset tree (idempotent)..."
+bash ./scripts/restore-seo-assets.sh
 
-echo "[2/5] Rebuilding plugin zip into dist/ (pay-before-download payload)..."
-(cd wp-plugin && rm -f /root/godseye-repo/dist/godseye-plugin.zip \
-  && zip -r -q /root/godseye-repo/dist/godseye-plugin.zip godseye-bridge/ -x '*.git*')
-
-echo "[3/5] Restoring static SEO + organic asset tree into dist/..."
-# token visualisation
-cp /root/godseye-repo/seo-assets/token-wrapped.png        dist/token-wrapped.png
-cp /root/godseye-repo/seo-assets/token-visualization.html dist/token-visualization.html
-cp /root/godseye-repo/seo-assets/token-wrapped.html       dist/token-wrapped.html
-# brand/launch HTML pages (human-readable; .md legacy is redirect-only)
-cp /root/godseye-repo/seo-assets/godseye-tiers.html          dist/godseye-tiers.html
-cp /root/godseye-repo/seo-assets/godseye-insight-report.html dist/godseye-insight-report.html
-cp /root/godseye-repo/seo-assets/godseye-launch-posts.html   dist/godseye-launch-posts.html
-cp /root/godseye-repo/seo-assets/waitlist.html               dist/waitlist.html
-cp /root/godseye-repo/seo-assets/tracker.js                  dist/tracker.js
-# NOTE: .md source docs are NOT copied to dist. Legacy .md URLs 301-redirect
-# in nginx to the .html pages above (see godseye.digitalhustlerx.com config).
-# SEO fundamentals
-cp /root/godseye-repo/seo-assets/robots.txt   dist/robots.txt
-cp /root/godseye-repo/seo-assets/sitemap.xml  dist/sitemap.xml
-# blog tree
-mkdir -p dist/blog
-cp -r /root/godseye-repo/seo-assets/blog/*    dist/blog/
-
-echo "[4/5] Normalizing permissions (644 files / 755 dirs)..."
-find dist -type f -exec chmod 644 {} \;
-find dist -type d -exec chmod 755 {} \;
-
-echo "[5/5] Restarting backend service (godseye-landing-api)..."
+echo "[3/3] Restarting backend service (godseye-landing-api)..."
 systemctl restart godseye-landing-api
 sleep 2
 systemctl is-active godseye-landing-api || { echo "backend restart FAILED"; exit 1; }
