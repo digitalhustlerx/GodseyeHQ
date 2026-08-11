@@ -17,12 +17,16 @@ const FAQ = [
     a: 'Yes, from your account dashboard. Remaining credits stay in your wallet.',
   },
   {
-    q: 'How is this different from hiring a developer?',
-    a: 'A developer charges $50-150/hr. GodsEye handles the same tasks instantly, 24/7, for a fraction of the cost.',
+    q: 'Do I need technical skills or a website?',
+    a: 'No. You get a running agent the moment you sign up. Bring your own LLM keys or use our cheap OpenCode + GLM keys. Connect your own Telegram bot and start. No website, no dashboard to babysit.',
   },
   {
-    q: 'What is God Mode?',
-    a: 'Everything unlimited plus a dedicated VPS, your own API keys, and full server architecture control. Perfect for agencies and power users.',
+    q: 'What is the base agent?',
+    a: 'A vanilla, recursive agent kit — it improves as you use it. From there you customise it, or install plugins from the marketplace when it opens. You are the hardware company for your own agents.',
+  },
+  {
+    q: 'Can I connect my own Telegram bot and LLM?',
+    a: 'Yes. On every plan you can bring your own Telegram bot and your own LLM API keys, or use the keys we include cheap.',
   },
 ];
 
@@ -37,19 +41,20 @@ type Cell = { type: 'check' } | { type: 'dash' } | { type: 'text'; value: string
 
 const COMPARISON_ROWS: { feature: string; free: Cell; starter: Cell; pro: Cell; godmode: Cell }[] = [
   { feature: 'Monthly Credits', free: { type: 'text', value: '50' }, starter: { type: 'text', value: '500' }, pro: { type: 'text', value: '2,000' }, godmode: { type: 'text', value: '10,000' } },
-  { feature: 'WordPress Sites', free: { type: 'text', value: '1' }, starter: { type: 'text', value: '1' }, pro: { type: 'text', value: '3' }, godmode: { type: 'text', value: '10' } },
-  { feature: 'Post & Page Management', free: { type: 'check' }, starter: { type: 'check' }, pro: { type: 'check' }, godmode: { type: 'check' } },
-  { feature: 'Store Overview', free: { type: 'text', value: '✓ (read-only)' }, starter: { type: 'text', value: '✓ (full)' }, pro: { type: 'text', value: '✓ (full)' }, godmode: { type: 'text', value: '✓ (full)' } },
-  { feature: 'Visual Editor (Elementor)', free: { type: 'dash' }, starter: { type: 'check' }, pro: { type: 'check' }, godmode: { type: 'check' } },
-  { feature: 'Content Creation', free: { type: 'dash' }, starter: { type: 'check' }, pro: { type: 'check' }, godmode: { type: 'check' } },
-  { feature: 'Proactive Security Monitoring', free: { type: 'dash' }, starter: { type: 'dash' }, pro: { type: 'check' }, godmode: { type: 'check' } },
-  { feature: 'Automations & Recurring Tasks', free: { type: 'dash' }, starter: { type: 'dash' }, pro: { type: 'check' }, godmode: { type: 'check' } },
-  { feature: 'Business Analytics', free: { type: 'dash' }, starter: { type: 'dash' }, pro: { type: 'check' }, godmode: { type: 'check' } },
-  { feature: 'Social Media Analytics', free: { type: 'dash' }, starter: { type: 'dash' }, pro: { type: 'check' }, godmode: { type: 'check' } },
-  { feature: 'Dedicated VPS', free: { type: 'dash' }, starter: { type: 'dash' }, pro: { type: 'dash' }, godmode: { type: 'check' } },
-  { feature: 'Bring Your Own API Keys', free: { type: 'dash' }, starter: { type: 'dash' }, pro: { type: 'dash' }, godmode: { type: 'check' } },
+  { feature: 'Agents You Can Run', free: { type: 'text', value: '1' }, starter: { type: 'text', value: '1' }, pro: { type: 'text', value: '2' }, godmode: { type: 'text', value: 'Unlimited' } },
+  { feature: 'Concurrent Tasks', free: { type: 'text', value: '1' }, starter: { type: 'text', value: '2' }, pro: { type: 'text', value: '4' }, godmode: { type: 'text', value: 'Unlimited' } },
+  { feature: 'Run an Agent Day One', free: { type: 'check' }, starter: { type: 'check' }, pro: { type: 'check' }, godmode: { type: 'check' } },
+  { feature: 'Bring Your Own API Keys', free: { type: 'check' }, starter: { type: 'check' }, pro: { type: 'check' }, godmode: { type: 'check' } },
+  { feature: 'Connect Your Own Telegram Bot', free: { type: 'check' }, starter: { type: 'check' }, pro: { type: 'check' }, godmode: { type: 'check' } },
+  { feature: 'Vanilla Recursive Agent Kit', free: { type: 'check' }, starter: { type: 'check' }, pro: { type: 'check' }, godmode: { type: 'check' } },
+  { feature: 'Storage-backed File System', free: { type: 'check' }, starter: { type: 'check' }, pro: { type: 'check' }, godmode: { type: 'check' } },
+  { feature: 'Automations & Recurring Tasks', free: { type: 'dash' }, starter: { type: 'check' }, pro: { type: 'check' }, godmode: { type: 'check' } },
+  { feature: 'Cheap OpenCode + GLM Keys Included', free: { type: 'dash' }, starter: { type: 'check' }, pro: { type: 'check' }, godmode: { type: 'check' } },
+  { feature: 'Community (Living with Agents)', free: { type: 'dash' }, starter: { type: 'check' }, pro: { type: 'check' }, godmode: { type: 'check' } },
+  { feature: 'Recommended Plugin Marketplace', free: { type: 'dash' }, starter: { type: 'dash' }, pro: { type: 'check' }, godmode: { type: 'check' } },
+  { feature: 'Custom Cron Jobs / Extra Agent Slots', free: { type: 'dash' }, starter: { type: 'dash' }, pro: { type: 'check' }, godmode: { type: 'check' } },
+  { feature: 'Dedicated / BYO VPS', free: { type: 'dash' }, starter: { type: 'dash' }, pro: { type: 'dash' }, godmode: { type: 'check' } },
   { feature: 'Full Server Control', free: { type: 'dash' }, starter: { type: 'dash' }, pro: { type: 'dash' }, godmode: { type: 'check' } },
-  { feature: 'Rate Priority', free: { type: 'text', value: 'Standard' }, starter: { type: 'text', value: 'Standard' }, pro: { type: 'text', value: 'Priority' }, godmode: { type: 'text', value: 'Unlimited' } },
 ];
 
 function renderCell(cell: Cell) {

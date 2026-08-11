@@ -3,34 +3,34 @@ import { PricingPlan, MockWPState, SelfHostPlan } from "./types";
 export const PRICING_PLANS: PricingPlan[] = [
   {
     id: "free",
-    name: "Free",
+    name: "Vanilla Base",
     price: "$0",
-    credits: "50",
-    sites: "1 WordPress Site",
+    credits: "Running",
+    sites: "1 running agent",
     features: [
-      "50 Credits / Month",
-      "1 WordPress Site",
-      "Post & Page Management",
-      "Store Overview (read-only)",
-      "Telegram Bot Access",
-      "Standard Response Rate"
+      "A running agent you can talk to immediately on Telegram",
+      "Bring your own LLM API keys, or use our shared keys at cost",
+      "Your own plugin (agent directive) included",
+      "Community support via Living with Agents",
+      "Curated plugin feed (view-only)",
+      "Agents file + primary store (storage-based)"
     ],
     polarProductId: "free"
   },
   {
     id: "starter",
-    name: "Starter",
+    name: "Base",
     price: "$9",
     credits: "500",
-    sites: "1 WordPress Site",
+    sites: "1 running agent + 1 connection",
     features: [
-      "Everything in Free, plus:",
-      "Full WooCommerce Management",
-      "Visual Editor (Elementor edits)",
-      "Content Creation & Drafting",
-      "Media Upload & Management",
-      "Email Support (24h)",
-      "Unused Credits Roll Over"
+      "Everything in Vanilla Base, plus:",
+      "Plugin marketplace access (Recommended plugins)",
+      "Connect your own Telegram bot to your agent",
+      "Live connectors (store, site, content)",
+      "LLM keys at cost + our referral links",
+      "Extra stores for your agents file",
+      "Email Support (24h)"
     ],
     polarProductId: "bc746111-be41-4f7e-8e75-ed3d7eb1e7e3",
     isPopular: true
@@ -40,16 +40,15 @@ export const PRICING_PLANS: PricingPlan[] = [
     name: "Pro",
     price: "$29",
     credits: "2,000",
-    sites: "3 WordPress Sites",
+    sites: "3 running agents + connectors",
     features: [
-      "Everything in Starter, plus:",
-      "Proactive Security Monitoring",
-      "Automations & Recurring Tasks",
-      "Business Analytics & Insights",
-      "Social Media Analytics",
-      "Multi-Site Management (3 Sites)",
-      "Priority Support (4h)",
-      "Unused Credits Roll Over"
+      "Everything in Base, plus:",
+      "Recommended plugins unlocked & installable",
+      "Multi-agent (3 agents) & multi-store",
+      "Recurring tasks & automations",
+      "Priority plugin library access",
+      "Business analytics & insights",
+      "Priority Support (4h)"
     ],
     polarProductId: "a31bba8d-5ef6-4033-93c4-24acdb46a30f"
   },
@@ -58,16 +57,15 @@ export const PRICING_PLANS: PricingPlan[] = [
     name: "God Mode",
     price: "$99",
     credits: "10,000",
-    sites: "10 WordPress Sites",
+    sites: "Unlimited agents & connectors",
     features: [
       "Everything in Pro",
-      "Unlimited Everything — No Rate Limits",
-      "Dedicated VPS Included",
-      "Bring Your Own API Keys",
-      "Full Server Architecture Control",
-      "Multi-Site Management (10 Sites)",
-      "Dedicated Support Channel",
-      "Unused Credits Roll Over"
+      "Unlimited everything — no rate limits",
+      "Dedicated VPS included",
+      "Bring your own API keys at full control",
+      "Full server architecture control",
+      "Earliest access to new store drops",
+      "Dedicated support channel"
     ],
     polarProductId: "b13480b8-f4ae-4051-aa1c-36ac31303ce7"
   }

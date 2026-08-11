@@ -74,6 +74,7 @@ export default function Layout({ children }: { children: ReactNode }) {
     { to: "/templates", label: "Templates" },
     { to: "/pricing", label: "Pricing" },
     { to: "/docs", label: "Docs" },
+    { to: "/community/", label: "Community" },
     { to: "/blog", label: "Blog" },
   ];
 
@@ -311,6 +312,7 @@ export default function Layout({ children }: { children: ReactNode }) {
               <li><Link to="/agents/lead-gen" className="hover:text-[#C4A484] transition-colors">Hire an Agent</Link></li>
               <li><Link to="/pricing" className="hover:text-[#C4A484] transition-colors">Pricing</Link></li>
               <li><Link to="/start" className="hover:text-[#C4A484] transition-colors">Get Started</Link></li>
+              <li><Link to="/community/" className="hover:text-[#C4A484] transition-colors">Living with Agents</Link></li>
               <li><Link to="/docs" className="hover:text-[#C4A484] transition-colors">Docs</Link></li>
             </ul>
           </div>
