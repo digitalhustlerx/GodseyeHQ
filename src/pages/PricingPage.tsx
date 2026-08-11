@@ -179,7 +179,7 @@ export default function PricingPage() {
                   <th className="font-mono text-[10px] uppercase tracking-widest px-4 py-4 text-center font-semibold text-white/70">Free</th>
                   <th className="font-mono text-[10px] uppercase tracking-widest px-4 py-4 text-center font-semibold text-white/70">Starter</th>
                   <th className="font-mono text-[10px] uppercase tracking-widest px-4 py-4 text-center font-semibold text-white/70">Pro</th>
-                  <th className="font-mono text-[10px] uppercase tracking-widest px-4 py-4 text-center font-semibold text-[#C4A484]">God Mode</th>
+                  <th className="font-mono text-[10px] uppercase tracking-widest px-4 py-4 text-center font-semibold text-[#C4A484]">Elite</th>
                 </tr>
               </thead>
               <tbody>

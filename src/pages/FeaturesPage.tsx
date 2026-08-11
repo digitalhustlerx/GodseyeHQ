@@ -134,7 +134,7 @@ export default function FeaturesPage() {
             <span className="bg-[#C4A484]/20 text-[#C4A484] text-[9px] font-mono font-bold px-2 py-0.5 rounded-full border border-[#C4A484]/30 uppercase tracking-wider">Pro</span>
           </div>
           <p className="text-xs text-white/60 font-light leading-relaxed max-w-3xl">
-            Connect your social accounts through our managed integrations. Get cross-platform analytics, content performance insights, and trending topics for your niche — all through conversation. No developer keys needed. Available on Pro and God Mode plans.
+            Connect your social accounts through our managed integrations. Get cross-platform analytics, content performance insights, and trending topics for your niche — all through conversation. No developer keys needed. Available on Pro and Elite plans.
           </p>
         </div>
       </section>

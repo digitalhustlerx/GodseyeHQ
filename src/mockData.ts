@@ -19,7 +19,7 @@ export const PRICING_PLANS: PricingPlan[] = [
   },
   {
     id: "starter",
-    name: "Base",
+    name: "Starter",
     price: "$9",
     credits: "500",
     sites: "1 running agent + 1 connection",
@@ -32,8 +32,7 @@ export const PRICING_PLANS: PricingPlan[] = [
       "Extra stores for your agents file",
       "Email Support (24h)"
     ],
-    polarProductId: "bc746111-be41-4f7e-8e75-ed3d7eb1e7e3",
-    isPopular: true
+    polarProductId: "bc746111-be41-4f7e-8e75-ed3d7eb1e7e3"
   },
   {
     id: "pro",
@@ -42,7 +41,7 @@ export const PRICING_PLANS: PricingPlan[] = [
     credits: "2,000",
     sites: "3 running agents + connectors",
     features: [
-      "Everything in Base, plus:",
+      "Everything in Starter, plus:",
       "Recommended plugins unlocked & installable",
       "Multi-agent (3 agents) & multi-store",
       "Recurring tasks & automations",
@@ -50,11 +49,12 @@ export const PRICING_PLANS: PricingPlan[] = [
       "Business analytics & insights",
       "Priority Support (4h)"
     ],
-    polarProductId: "a31bba8d-5ef6-4033-93c4-24acdb46a30f"
+    polarProductId: "a31bba8d-5ef6-4033-93c4-24acdb46a30f",
+    isPopular: true
   },
   {
     id: "godmode",
-    name: "God Mode",
+    name: "Elite",
     price: "$99",
     credits: "10,000",
     sites: "Unlimited agents & connectors",

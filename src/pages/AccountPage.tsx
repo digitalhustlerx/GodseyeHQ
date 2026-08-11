@@ -10,7 +10,7 @@ const PLAN_LABEL: Record<string, string> = {
   free: "Free",
   starter: "Starter",
   pro: "Pro",
-  godmode: "God Mode",
+  godmode: "Elite",
   agency: "Agency",
 };
 
@@ -289,7 +289,7 @@ export default function AccountPage() {
                 {[
                   { label: "Waitlist priority +1 per invitee", on: true },
                   { label: "1 paid invite → 1 month of your plan free (caps Pro)", on: (refStats?.rewards?.paid_count ?? 0) >= 1 },
-                  { label: "3 paid invites → 14-day God Mode trial", on: (refStats?.rewards?.paid_count ?? 0) >= 3 },
+                  { label: "3 paid invites → 14-day Elite trial", on: (refStats?.rewards?.paid_count ?? 0) >= 3 },
                   { label: "5 paid invites → Lifetime -20% on your plan", on: (refStats?.rewards?.paid_count ?? 0) >= 5 },
                 ].map((r) => (
                   <li key={r.label} className="flex items-start gap-2">
