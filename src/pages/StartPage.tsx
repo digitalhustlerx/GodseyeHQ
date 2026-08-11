@@ -7,7 +7,7 @@ const ONBOARDING_STEPS = [
     title: "Create your account",
     body: "Sign up with your email. You get 50 free credits to try Godseye immediately — no card required.",
     cta: "Sign up free",
-    href: "https://opensaas.62.84.186.1.sslip.io/signup",
+    href: "https://app.digitalhustlerx.com/signup",
   },
   {
     icon: MessageCircle,
@@ -75,14 +75,14 @@ export default function StartPage() {
         {/* CTA */}
         <div className="mt-16 text-center border-t border-white/10 pt-12">
           <Link
-            to="https://opensaas.62.84.186.1.sslip.io/signup"
+            to="https://app.digitalhustlerx.com/signup"
             className="inline-block bg-[#C4A484] hover:bg-[#b59574] text-black px-8 py-3.5 rounded-full font-bold text-xs uppercase tracking-widest transition-all cursor-pointer"
           >
             Create your free account →
           </Link>
           <p className="mt-4 text-xs text-white/40 font-light">
             Already have an account?{" "}
-            <Link to="https://opensaas.62.84.186.1.sslip.io/login" className="text-[#C4A484] hover:text-[#b59574] font-semibold">
+            <Link to="https://app.digitalhustlerx.com/login" className="text-[#C4A484] hover:text-[#b59574] font-semibold">
               Log in
             </Link>
           </p>
