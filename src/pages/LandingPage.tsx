@@ -285,7 +285,7 @@ export default function LandingPage() {
   }, [nextSlide, prevSlide]);
 
   useEffect(() => {
-    const timer = setInterval(nextSlide, 5000);
+    const timer = setInterval(nextSlide, 8000);
     return () => clearInterval(timer);
   }, [nextSlide]);
 
@@ -648,9 +648,9 @@ export default function LandingPage() {
           </div>
 
           <div className="space-y-3 max-w-md mx-auto">
-            <button onClick={() => setShowWaitlist(true)} className="block w-full bg-[#C4A484] hover:bg-[#b59574] text-black px-8 py-4 rounded-full font-bold text-xs uppercase tracking-widest transition-all shadow-md cursor-pointer">
-              Get My AI Agent →
-            </button>
+            <a href="/signup" className="block w-full bg-[#C4A484] hover:bg-[#b59574] text-black px-8 py-4 rounded-full font-bold text-xs uppercase tracking-widest transition-all shadow-md cursor-pointer text-center">
+              Get Started →
+            </a>
             <p className="text-[10px] uppercase tracking-wider text-white/40 font-mono">
               No credit card required · Cancel anytime · Your data stays yours
             </p>
