@@ -144,9 +144,26 @@ async function hydrateSession(chatId) {
   return state;
 }
 
+// Per-chat persist queue. A single onboarding turn can fire several rapid
+// `persistSession` (send/stream) calls; each would otherwise stringify the live,
+// mutating session object concurrently — the source of the intermittent
+// `400 telegramId and state object required` when two saves serialize the same
+// shared object mid-mutation and one lands as a malformed/empty body. Chaining
+// per chat guarantees each save snapshots state when its turn starts and runs to
+// completion before the next, so no competing write can wedge a valid payload.
+const persistQueues = new Map(); // chatId -> Promise tail
+
 async function persistSession(chatId) {
   if (!BOT_INTERNAL_KEY) return;
   const chatIdStr = String(chatId).trim();
+  const prev = persistQueues.get(chatIdStr) || Promise.resolve();
+  const run = prev.then(() => doPersistSession(chatIdStr));
+  // Keep the tail as `run` even if it rejects so the chain never hard-poison.
+  persistQueues.set(chatIdStr, run.catch(() => {}));
+  return run;
+}
+
+async function doPersistSession(chatIdStr) {
   // Guard: never send a malformed PUT. If the state cannot be serialized to a
   // non-empty object, log the shape and abort — a `null`/`undefined` state would
   // otherwise produce the server's `400 telegramId and state object required`

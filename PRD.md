@@ -1,9 +1,23 @@
 # Godseye HQ — Product Requirements Document (PRD)
 
-> **Version:** 2.0.0  
-> **Status:** 🟢 Live (Pre-launch / Waitlist Gated)  
-> **Last Updated:** 2026-07-21  
+> **Version:** 3.0.0  
+> **Status:** 🟢 Pre-launch landing baseline approved  
+> **Last Updated:** 2026-08-11  
 > **Author:** Digital Viking / Digital Hustlers  
+
+---
+
+## Milestone baseline — canonical pre-launch landing
+
+The original GodsEye application page is the canonical public pre-launch landing page at `https://godseye.digitalhustlerx.com`. It is not the waitlist/capture variant.
+
+All primary account CTAs must go directly to the branded OpenSaaS application:
+
+- Signup: `https://app.digitalhustlerx.com/signup`
+- Login: `https://app.digitalhustlerx.com/login`
+- Authenticated dashboard, account, and pricing host: `https://app.digitalhustlerx.com`
+
+The temporary `opensaas.62.84.186.1.sslip.io` hostname is not customer-facing. `godseye.shop` is a legacy alias redirecting to the canonical landing; `buy.godseye.shop` redirects to app pricing. See `docs/PRE-LAUNCH-LANDING-MILESTONE-PRD.md` for complete acceptance criteria and remaining field-tweaking work.
 
 ---
 

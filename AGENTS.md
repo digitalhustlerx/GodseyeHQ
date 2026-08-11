@@ -1,7 +1,7 @@
 # Godseye HQ — AGENTS.md
 
 > **For AI agents (OMP, Hermes, Claude Code, etc.) working on this project.**
-> Last Updated: 2026-08-10
+> Last Updated: 2026-08-11
 
 ---
 
@@ -9,9 +9,11 @@
 
 - **Brand:** GodsEye (styled GODSEYE or Godseye)
 - **What it is:** A Telegram-first AI business operator platform. Users onboard via Telegram bot, set up a business workspace, and get AI agents managing their content, customers, website, and admin.
-- **Current Phase:** LAUNCH-READY — all systems operational, payment flow verified, security hardened
+- **Current Phase:** PRE-LAUNCH LANDING MILESTONE — canonical public page approved; field tweaking remains
 - **Live URL:** https://godseye.digitalhustlerx.com
 - **Marketing SPA:** https://godseye.digitalhustlerx.com/app/
+- **Canonical Auth/App:** https://app.digitalhustlerx.com
+- **Milestone PRD:** `docs/PRE-LAUNCH-LANDING-MILESTONE-PRD.md`
 - **Telegram Bot:** @GodseyeXbot (conversational onboarding, group ownership, workspace binding)
 - **API Backend:** https://api.godseyes.digitalhustlerx.com (port 3000, localhost-only)
 - **License:** AGPL-3.0 + Commercial (dual license)
@@ -168,13 +170,15 @@ radius: rounded-2xl (cards), rounded-full (buttons)
 
 | URL | Serves | Root |
 |-----|--------|------|
-| godseye.digitalhustlerx.com `/` | **WAITLIST landing page** (`waitlist.html`) | `/root/godseye-repo/dist/` |
-| godseye.digitalhustlerx.com `/app/` | Full marketing SPA | `/root/godseye-repo/dist/` (alias) |
+| `godseye.digitalhustlerx.com` `/` | **Original GodsEye pre-launch landing/application page** (`index.html`) | `/root/godseye-repo/dist/` |
+| `godseye.digitalhustlerx.com` `/app/` | Full marketing SPA | `/root/godseye-repo/dist/` (alias) |
+| `app.digitalhustlerx.com/signup` | OpenSaaS branded signup | Wasp static client + API on :3101 |
+| `app.digitalhustlerx.com/login` | OpenSaaS branded login | Wasp static client + API on :3101 |
 | godseye.62.84.186.1.sslip.io `/` | Full marketing SPA | `/root/godseye-repo/dist/` |
 | godseye-staging.62.84.186.1.sslip.io | Older staging build | `/root/godseye-staging/dist/` |
 | api.godseyes.digitalhustlerx.com | Node API backend | Node on :3000 |
 
-**IMPORTANT — main domain root = waitlist:** `location = /` and `location /` in `godseye.digitalhustlerx.com` serve `waitlist.html` (strict lead capture). The marketing SPA is at `/app/`. Do NOT point the main domain root back at `index.html` unless explicitly asked — the waitlist page is the public entry.
+**IMPORTANT — main domain root = canonical pre-launch landing:** nginx serves `/index.html` from `dist/`. Do not repoint it to the G4 waitlist/capture variant without explicit approval. Get Started and Log In must go directly to `app.digitalhustlerx.com/signup` and `/login`. The temporary `opensaas.*.sslip.io` URL is not customer-facing. `godseye.shop` redirects to the canonical landing and `buy.godseye.shop` redirects to app pricing.
 
 **NGINX gotcha (KNOWN):** `sites-enabled/godseye.digitalhustlerx.com` is a **regular file COPY**, not a symlink. You must edit BOTH `sites-available/` and `sites-enabled/` (or copy one to the other) or the live server serves a stale config. `nginx -t` then `systemctl restart nginx`.
 
