@@ -45,8 +45,12 @@ async function api(path, options = {}) {
     request.body = JSON.stringify(request.body);
   }
   const response = await fetch(`${API_BASE_URL}${path}`, {
-    headers: { "content-type": "application/json", ...(request.headers || {}) },
     ...request,
+    // content-type must come AFTER ...request so the object spread cannot
+    // clobber it — callers pass only auth headers in options.headers, and
+    // without application/json the server's express.json() skips body parsing
+    // (req.body stays undefined -> 400 "telegramId and state object required").
+    headers: { "content-type": "application/json", ...(request.headers || {}) },
   });
   const text = await response.text();
   const data = text ? JSON.parse(text) : null;
