@@ -4,7 +4,7 @@
 const API_BASE_URL = (process.env.GODSEYE_API_BASE_URL ?? "https://api.godseyes.digitalhustlerx.com").replace(/\/+$/, "");
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN ?? "";
 const PLANT_PLUGIN_URL = process.env.GODSEYE_PLUGIN_URL ?? "https://api.godseyes.digitalhustlerx.com/dist/godseye-bridge.zip";
-const SIGNUP_URL = process.env.GODSEYE_SIGNUP_URL ?? "https://godseye.digitalhustlerx.com";
+const SIGNUP_URL = process.env.GODSEYE_SIGNUP_URL ?? "https://app.digitalhustlerx.com";
 // GOD-14 §C: the landing/referral API that owns the referral ledger. The bot
 // fires the 'activated' stage event here once a user completes their first real
 // action (successful /connect with a license + site) so Growth sees the
