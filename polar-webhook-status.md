@@ -114,3 +114,35 @@ and no such logic exists in the repo (git clean). Repo is not the actor. Prime s
 an external parallel agent cluster (OMP orchestration running on this box) acting on a
 stale/misread endpoint snapshot. Guard remains a stopgap — still need to identify + stop
 that actor. Revert anytime: `crontab /root/.crontab.bak-polar-guard-20260811`.
+
+---
+
+## ⚠️ SIXTH RECURRENCE FOUND & FIXED (2026-08-12 ~00:19 CEST / ~01:19 WAT — completion agent)
+
+The Godseye primary Polar webhook (`639653fe…`) was **re-disabled a sixth time**
+(`enabled:false`), silently breaking the revenue-critical license/credit activation
+path again.
+
+### Evidence captured pre-fix
+- Guard log showed `OK: enabled` at 00:00:02 and 00:10:02 and 00:12:40 (healthy ticks).
+- Live Polar API listing at 00:19 showed `639653fe enabled=False` — it flipped OFF some
+  time after the 00:12:40 tick and before my check at 00:19 (a ~7min window).
+- The other two endpoints (`54171c6b…`, `2b33d0cc…`) remained `enabled=True` — only the
+  Godseye-primary activation endpoint was toggled off, as in every prior recurrence.
+
+### Fix applied
+- `PATCH /api/v1/webhooks/endpoints/639653fe…` → `{"enabled": true}` → HTTP 200.
+- Re-verified via re-listing: `enabled: True` confirmed at 00:19:12.
+- Appended `MANUAL-RE-ENABLE` line to `logs/polar-webhook-guard.log`.
+- Backend :3000 live (site/API 200), `POST /api/polar-webhook` route present (HMAC path,
+  secret confirmed real, len 49).
+- The `*/10` guard would have caught this at 00:20; my manual sweep was ~1 min ahead of it.
+
+### Assessment
+Disable cadence keeps accelerating (22:17 → 22:41 → ~00:14). The `*/10` guard heals every
+instance within ≤10 min, but EACH disable still opens an up-to-10min window where a paid
+checkout won't activate. **Root cause remains uncontained and is now confirmed external**
+(7h uptime, git clean, no local disabler in box crontab). Owner action required: identify
+and stop the parallel agent/OMP process toggling `639653fe` off — the guard is a stopgap,
+not a fix. Verify after every new disable that a manual `PATCH enabled:true` restores it.
+
