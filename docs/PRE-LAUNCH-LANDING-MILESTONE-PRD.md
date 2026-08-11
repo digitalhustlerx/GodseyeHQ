@@ -3,7 +3,8 @@
 **Status:** Approved milestone baseline  
 **Phase:** Pre-launch / field-tweaking  
 **Product:** GodsEye  
-**Repository:** https://github.com/digitalhustlerx/GodseyeHQ
+**Repository:** https://github.com/digitalhustlerx/GodseyeHQ  
+**Milestone checkpoint:** `pre-launch landing baseline`
 
 ## 1. Milestone decision
 
