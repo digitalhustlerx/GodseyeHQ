@@ -958,7 +958,14 @@ async function handleMessage(message) {
               } catch {
                 continue;
               }
-              if (json.done || json.error) return;
+              // Surface a stream-level error as the user-facing reply so a
+              // failed LLM turn shows a friendly line (e.g. "warming up — try
+              // again") instead of silently ending with an empty message.
+              if (json.error) {
+                yield json.error;
+                return;
+              }
+              if (json.done) return;
               if (json.delta) yield json.delta;
             }
           }

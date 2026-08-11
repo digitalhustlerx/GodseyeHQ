@@ -728,9 +728,13 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
 
       if (!hasGemini) {
         // ---- Local Ollama streaming (no API key required) ----
+        // Fail fast (20s) when Ollama is down/slow so the bot doesn't hang the
+        // whole turn. A 500-class error below is caught and sent as a clean SSE
+        // error the bot can surface as a friendly "try again later" message.
         const chatRes = await fetch(`${OLLAMA_URL}/api/chat`, {
           method: "POST",
           headers: { "content-type": "application/json" },
+          signal: AbortSignal.timeout(20000),
           body: JSON.stringify({
             model: OLLAMA_MODEL,
             stream: true,
@@ -741,7 +745,12 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
             options: { temperature: 0.7 },
           }),
         });
-        if (!chatRes.ok || !chatRes.body) throw new Error(`Ollama chat failed with HTTP ${chatRes.status}`);
+        if (!chatRes.ok || !chatRes.body) {
+          // Ollama live but the model failed/inference timed out on its side.
+          // Match the bot's friendly message so users see a clean nudge.
+          sendError("Godseye's chat engine is warming up — try again in a minute.");
+          return res.end();
+        }
 
         const reader = chatRes.body.getReader();
         const decoder = new TextDecoder();
@@ -809,7 +818,15 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
       res.end();
     } catch (error: any) {
       console.error("Gemini chat stream error:", error?.message || error);
-      if (!res.writableEnded) sendError(error?.message || "Streaming failed");
+      if (!res.writableEnded) {
+        // Friendly line for timeouts/aborts so a slow/unavailable LLM backend
+        // doesn't leak a raw Node error message to the user.
+        const isTimeout = /abort|timeout|timed ?out|ETIMEDOUT|fetch failed/i.test(String(error?.message || ""));
+        const msg = isTimeout
+          ? "Godseye's chat engine is warming up — try again in a minute."
+          : (error?.message || "Streaming failed");
+        sendError(msg);
+      }
     }
   });
 
