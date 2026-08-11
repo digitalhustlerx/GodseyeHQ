@@ -17,6 +17,15 @@ systemctl restart godseye-landing-api
 sleep 2
 systemctl is-active godseye-landing-api || { echo "backend restart FAILED"; exit 1; }
 
+# The root domain is the canonical public site. Fail closed if the deployed
+# root is not the source-of-truth waitlist page.
+live_hash=$(curl -fsSL https://godseye.digitalhustlerx.com/ | sha256sum | cut -d' ' -f1)
+local_hash=$(sha256sum dist/waitlist.html | cut -d' ' -f1)
+if [ "$live_hash" != "$local_hash" ]; then
+  echo "ROOT DOMAIN DRIFT: live root does not match dist/waitlist.html" >&2
+  exit 1
+fi
+
 echo "Verifying key URLs..."
 for u in "" "robots.txt" "sitemap.xml" "token-wrapped.png" "token-visualization.html" \
          "godseye-plugin.zip" "api/purchase/status?tx_ref=none" \
