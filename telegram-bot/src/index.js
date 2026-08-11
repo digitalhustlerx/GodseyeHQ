@@ -113,6 +113,8 @@ function session(chatId) {
       websitePlatform: null,
       onboardingQuestion: 0,
       onboardingAnswers: [],
+      // Chat-mode conversation history (send to /api/chat for context).
+      onboardingChatHistory: [],
     });
   }
   return sessions.get(key);
@@ -195,6 +197,60 @@ async function send(chatId, text, replyMarkup) {
 
 async function answer(queryId, text) {
   return telegram("answerCallbackQuery", { callback_query_id: queryId, ...(text ? { text } : {}) });
+}
+
+// Show the Telegram "typing…" indicator so the LLM turn feels alive.
+async function sendTyping(chatId) {
+  try {
+    await telegram("sendChatAction", { chat_id: chatId, action: "typing" });
+  } catch (_) {
+    /* best-effort */
+  }
+}
+
+// Stream an LLM reply into Telegram: open a message, then periodically
+// edit it in-place as new text arrives. This is how a Telegram bot fakes
+// token-by-token streaming (paced chunk edits). Bounded to ~28 edits, then
+// a final full-text update so we don't hammer the Bot API.
+const lastStreamedMessageId = new Map(); // chatId -> message_id of last streamed reply
+async function streamReply(chatId, textStream) {
+  const MAX_EDITS = 28;
+  const CHAT_API_LIMIT = 4096;
+  let messageId = null;
+  let buffer = "";
+  let edits = 0;
+
+  const flush = async (final) => {
+    let shown = buffer;
+    if (shown.length > CHAT_API_LIMIT) shown = shown.slice(0, CHAT_API_LIMIT);
+    if (!shown && !final) return;
+    const payload = { chat_id: chatId, text: shown };
+    try {
+      if (messageId == null) {
+        const sent = await telegram("sendMessage", payload);
+        messageId = sent.message_id;
+        lastStreamedMessageId.set(String(chatId), messageId);
+      } else {
+        await telegram("editMessageText", { ...payload, message_id: messageId });
+      }
+      edits += 1;
+    } catch (_) {
+      /* ignore mid-stream edit race */
+    }
+  };
+
+  for await (const delta of textStream) {
+    buffer += delta;
+    if (edits < MAX_EDITS && buffer.length % 40 < 4) {
+      await flush(false);
+      await new Promise((r) => setTimeout(r, 220)); // pace edits to look streamed
+    }
+  }
+  await flush(true);
+  return buffer;
+}
+function fullMsgId(chatId) {
+  return lastStreamedMessageId.get(String(chatId)) ?? null;
 }
 
 async function setupBusinessRoom(chat, ownerTelegramId) {
@@ -354,6 +410,12 @@ const COMMANDS_KYBD = inlineKeyboard([
   [{ text: "🖥 List my sites", callback_data: "cmd:sites" }],
   [{ text: "🔗 Manage WordPress", callback_data: "ob:connect_site" }],
 ]);
+// Chat-mode keyboard: shown after "Continue without a website" so the user can
+// keep chatting freely or jump to plans / connect a site later.
+const CHAT_MODE_KYBD = inlineKeyboard([
+  [{ text: "💬 Chat with me", callback_data: "ob:chat_prompt" }],
+  [{ text: "💳 See paid plans", callback_data: "preview:pricing" }],
+]);
 
 const DEMO_TASK_TEXT = "Create a draft post titled 'Hello Godseye' with the content block 'This post was created from Telegram.'";
 
@@ -465,14 +527,28 @@ async function handleCallback(chatId, queryId, data) {
 
   if (data === "ob:website_no") {
     state.hasWebsite = false;
-    state.onboardingStep = 10;
-    return send(chatId, [
-      "✅ No problem. We'll set up your business workflow first.",
-      "",
-      "Tell me what you do and the first repeatable job you want off your plate.",
-      "",
-      "A license is only needed later if you activate a paid plan for live integrations.",
-    ].join("\n"));
+    // CHAT MODE: user chose not to connect a website → onboarding ENDS here and
+    // they go straight to free LLM conversation. Set step 99 (chat mode) so any
+    // message hits the /api/chat streaming loop, not the canned wizard.
+    state.onboardingStep = 99;
+    state.onboardingChatHistory = [];
+    return send(
+      chatId,
+      [
+        "✅ You're set up — no website needed.",
+        "",
+        "Now you can just talk to me, like a partner, and I'll help you plan, organize, and think things through. What are you working on today?",
+        "",
+        "• Ask me anything about running your business",
+        "• I'll keep answers short and you can steer anytime",
+      ].join("\n"),
+      CHAT_MODE_KYBD
+    );
+  }
+
+  if (data === "ob:chat_prompt") {
+    state.onboardingStep = 99;
+    return send(chatId, "Go ahead — tell me what you're working on or what's stuck. I'll reply right here in the chat.");
   }
 
   if (data === "ob:wordpress") {
@@ -818,6 +894,92 @@ async function handleMessage(message) {
     // the wizard is awaiting one is treated as /connect with that key.
     if (state.onboardingStep === 2 && /^GS-[A-Z0-9-]{4,}$/i.test(text.trim())) {
       return await handleCommand(chatId, `/connect ${text.trim()}`);
+    }
+
+    // === CHAT MODE (step 99) — user clicked "Continue without a website" ===
+    // Onboarding has ended. Every message goes to the LLM (/api/chat SSE) for a
+    // real back-and-forth, streamed into Telegram as it generates.
+    if (state.onboardingStep === 99) {
+      const userText = text.trim();
+      if (!userText) return await send(chatId, "Send me a message and I'll reply.", CHAT_MODE_KYBD);
+
+      await sendTyping(chatId);
+
+      // Keep a rolling history for context (last 16 turns).
+      if (!Array.isArray(state.onboardingChatHistory)) state.onboardingChatHistory = [];
+      const history = state.onboardingChatHistory.slice(-16);
+      history.push({ role: "user", content: userText });
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/chat`, {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            "x-godseye-bot-key": BOT_INTERNAL_KEY,
+          },
+          // 25s cap so a slow/cold local LLM can't hang the bot's poll loop for
+          // the whole chat turn; streaming still yields chunks within this budget.
+          signal: AbortSignal.timeout(25000),
+          body: JSON.stringify({
+            telegramId: String(chatId),
+            profile: state.previewProfile || null,
+            messages: history,
+          }),
+        });
+
+        if (res.status === 429) {
+          const data = await res.json();
+          return await send(chatId, data?.error || "You've hit your free chat limit.", PREVIEW_KYBD);
+        }
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          throw new Error(data?.error || `Chat request failed with HTTP ${res.status}`);
+        }
+
+        if (!res.body) throw new Error("No stream in chat response");
+
+        // Parse SSE deltas and emit them as a streaming sequence.
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        const stream = (async function* () {
+          let buf = "";
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            buf += decoder.decode(value, { stream: true });
+            const events = buf.split("\n\n");
+            buf = events.pop() || "";
+            for (const evt of events) {
+              const line = evt.split("\n").find((l) => l.startsWith("data: "));
+              if (!line) continue;
+              let json;
+              try {
+                json = JSON.parse(line.slice(6));
+              } catch {
+                continue;
+              }
+              if (json.done || json.error) return;
+              if (json.delta) yield json.delta;
+            }
+          }
+        })();
+
+        const full = await streamReply(chatId, stream);
+        state.onboardingChatHistory.push({ role: "user", content: userText });
+        state.onboardingChatHistory.push({ role: "assistant", content: full });
+        if (state.onboardingChatHistory.length > 32) {
+          state.onboardingChatHistory = state.onboardingChatHistory.slice(-16);
+        }
+        // Keep the chat-mode keyboard attached to the last message for easy follow-up.
+        await telegram("editMessageReplyMarkup", {
+          chat_id: chatId,
+          message_id: fullMsgId(chatId),
+          reply_markup: CHAT_MODE_KYBD,
+        }).catch(() => {});
+        return;
+      } catch (error) {
+        return await send(chatId, `Godseye error: ${error instanceof Error ? error.message : "Unknown error"}`, CHAT_MODE_KYBD);
+      }
     }
 
     if (state.onboardingStep === 10 && state.onboardingIntent === "convo_warm") {

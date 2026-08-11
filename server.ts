@@ -537,6 +537,19 @@ async function startServer() {
   `);
   const TW_COLS = db.prepare("PRAGMA table_info(telegram_workspaces)").all() as Array<{ name: string }>;
   if (!TW_COLS.some((c) => c.name === "profile_json")) db.exec("ALTER TABLE telegram_workspaces ADD COLUMN profile_json TEXT DEFAULT '{}'");
+
+  // Free-chat usage ledger. Bounds how many free LLM turns a Telegram user gets
+  // (daily + total), so the "Continue without a website" chat mode is a bounded
+  // teaser, not an open token faucet. Counts reset per day via the date key.
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS chat_usage (
+      telegram_id TEXT PRIMARY KEY,
+      day TEXT NOT NULL,
+      count INTEGER NOT NULL DEFAULT 0,
+      total INTEGER NOT NULL DEFAULT 0,
+      updated_at TEXT DEFAULT (datetime('now'))
+    );
+  `);
   const telegramBotKeyValid = (req: any) => {
     const configured = process.env.GODSEYE_BOT_INTERNAL_KEY || "";
     const supplied = String(req.headers["x-godseye-bot-key"] || "");
@@ -633,6 +646,170 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
     } catch (error: any) {
       console.error("Gemini API Error:", error);
       res.status(500).json({ error: error.message || "Failed to generate simulation" });
+    }
+  });
+
+  // ===== Godseye Free Chat (LLM streaming) =====
+  // Powers the bot's "Continue without a website" chat mode: user talks to the
+  // LLM directly (no WordPress needed). Streams Gemini deltas over SSE so the bot
+  // can show typing→streamed response. Bounded by the chat_usage ledger so free
+  // chat stays a teaser (DAILY_CAP/day and TOTAL_CAP/user).
+  const CHAT_DAILY_CAP = Number(process.env.GODSEYE_CHAT_DAILY_CAP) || 25;
+  const CHAT_TOTAL_CAP = Number(process.env.GODSEYE_CHAT_TOTAL_CAP) || 100;
+
+  function chatUsageCheck(telegramId: string): { code: string; message: string } | null {
+    const today = new Date().toISOString().slice(0, 10);
+    const row = db.prepare("SELECT day, count, total FROM chat_usage WHERE telegram_id = ?").get(telegramId) as { day: string; count: number; total: number } | undefined;
+    const count = row && row.day === today ? row.count : 0;
+    const total = row?.total ?? 0;
+    if (total >= CHAT_TOTAL_CAP) return { code: "total_cap", message: `You've used your free Godseye chat allowance (${CHAT_TOTAL_CAP} messages). Pick a plan to keep your agent working.` };
+    if (count >= CHAT_DAILY_CAP) return { code: "daily_cap", message: `You've hit today's free limit (${CHAT_DAILY_CAP} messages). Come back tomorrow or pick a plan for unlimited.` };
+    return null;
+  }
+
+  function chatUsageIncrement(telegramId: string): void {
+    const today = new Date().toISOString().slice(0, 10);
+    db.prepare(`
+      INSERT INTO chat_usage (telegram_id, day, count, total, updated_at)
+      VALUES (?, ?, 1, 1, datetime('now'))
+      ON CONFLICT(telegram_id) DO UPDATE SET
+        day = CASE WHEN chat_usage.day = excluded.day THEN chat_usage.day ELSE excluded.day END,
+        count = CASE WHEN chat_usage.day = excluded.day THEN chat_usage.count + 1 ELSE 1 END,
+        total = chat_usage.total + 1,
+        updated_at = datetime('now')
+    `).run(telegramId, today);
+  }
+
+  app.post("/api/chat", async (req, res) => {
+    if (!telegramBotKeyValid(req)) return res.status(401).json({ error: "unauthorized" });
+
+    const telegramId = String(req.body?.telegramId || "").trim();
+    const profile = String(req.body?.profile || "").slice(0, 2000) || null;
+    const messages = Array.isArray(req.body?.messages) ? req.body.messages : [];
+    const history = messages.slice(-16); // cost control: last 16 turns only
+
+    if (!telegramId) return res.status(400).json({ error: "telegramId required" });
+    if (!history.length) return res.status(400).json({ error: "messages required" });
+
+    // Bounded free usage
+    const usage = chatUsageCheck(telegramId);
+    if (usage) {
+      return res.status(429).json({ error: usage.message, code: usage.code });
+    }
+
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+    res.flushHeaders?.();
+
+    const send = (obj: unknown) => res.write(`data: ${JSON.stringify(obj)}\n\n`);
+    const sendError = (message: string) => { send({ error: message }); res.end(); };
+
+    // System prompt: Godseye brand voice, plain/normie-friendly for service
+    // businesses and solopreneurs. Profile personalizes the assistant.
+    const systemInstruction = [
+      "You are Godseye, a friendly AI business operator working with someone on Telegram.",
+      "You help small service businesses and solopreneurs with planning, operations, customer replies, content, follow-up, and getting work done.",
+      "Talk plainly and warmly, like a helpful partner — not corporate and not salesy.",
+      "Keep answers concise (Telegram-sized, usually under 150 words). Use short lines and occasional emojis, never walls of text.",
+      "Ask ONE clarifying question at a time when you need more context.",
+      "Be practical and action-oriented: name concrete next steps the user can take.",
+      profile ? `Business context the user gave you: "${profile}". Use it to personalize.` : "",
+      "You do NOT simulate or claim actions happen on a website, store, or account. Advise and plan; actual execution happens elsewhere.",
+    ].filter(Boolean).join("\n");
+
+    try {
+      // Provider routing: prefer paid Gemini if a real key is configured; else
+      // fall back to the local Ollama runtime (project default: local-first).
+      const geminiKey = process.env.GEMINI_API_KEY || "";
+      const hasGemini = Boolean(geminiKey && !/dummy|you_|placeholder/i.test(geminiKey));
+      const OLLAMA_URL = process.env.OLLAMA_URL || "http://127.0.0.1:11434";
+      const OLLAMA_MODEL = process.env.OLLAMA_MODEL || "qwen3.5:4b";
+
+      if (!hasGemini) {
+        // ---- Local Ollama streaming (no API key required) ----
+        const chatRes = await fetch(`${OLLAMA_URL}/api/chat`, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            model: OLLAMA_MODEL,
+            stream: true,
+            messages: [
+              { role: "system", content: systemInstruction },
+              ...history.map((m: any) => ({ role: m.role === "assistant" ? "assistant" : "user", content: String(m.content || "") })),
+            ],
+            options: { temperature: 0.7 },
+          }),
+        });
+        if (!chatRes.ok || !chatRes.body) throw new Error(`Ollama chat failed with HTTP ${chatRes.status}`);
+
+        const reader = chatRes.body.getReader();
+        const decoder = new TextDecoder();
+        let full = "";
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          const chunk = decoder.decode(value, { stream: true });
+          for (const line of chunk.split("\n")) {
+            const trimmed = line.trim();
+            if (!trimmed.startsWith("{")) continue;
+            let j;
+            try {
+              j = JSON.parse(trimmed);
+            } catch {
+              continue;
+            }
+            const delta = j.message?.content || j.response || "";
+            if (delta) {
+              full += delta;
+              send({ delta });
+            }
+            if (j.done) {
+              reader.cancel();
+              break;
+            }
+          }
+        }
+        if (full.trim()) {
+          chatUsageIncrement(telegramId);
+          send({ done: true, full });
+        } else {
+          sendError("Godseye returned an empty response. Try again.");
+          return;
+        }
+        res.end();
+        return;
+      }
+
+      // ---- Paid Gemini streaming ----
+      const result = await ai.models.generateContentStream({
+        model: "gemini-3.5-flash",
+        contents: {
+          role: "user",
+          parts: history.map((m: any) => ({ text: String(m.content || "") })).join("\n"),
+        },
+        config: { systemInstruction, temperature: 0.7 },
+      });
+
+      let full = "";
+      for await (const chunk of result) {
+        const delta = chunk.text || "";
+        if (!delta) continue;
+        full += delta;
+        send({ delta });
+      }
+      // Count a turn only after a successful (non-empty) generation.
+      if (full.trim()) {
+        chatUsageIncrement(telegramId);
+        send({ done: true, full });
+      } else {
+        sendError("Godseye returned an empty response. Try again.");
+        return;
+      }
+      res.end();
+    } catch (error: any) {
+      console.error("Gemini chat stream error:", error?.message || error);
+      if (!res.writableEnded) sendError(error?.message || "Streaming failed");
     }
   });
 
