@@ -26,6 +26,7 @@ flagged repeatedly by the completion-watcher and burst-focus crons.
   HMAC-verified webhook → purchase flipped to paid → license + credits issued.
 
 ## Still open (owner decisions — not executable by cron)
+- ~~Polar webhook events toggle~~ — **RESOLVED (08-12 cron): `checkout.completed` is not a real Polar event.** Verified via Polar API: the accepted event enum contains `checkout.created/updated/expired` and `order.*`, but **no `checkout.completed`**. Therefore the "select `checkout.completed` in the dashboard" ask in AGENTS.md/session log and prior reports was a phantom — no such toggle exists. The Hermes endpoint already subscribes to `order.created`, which is a valid activation trigger in `server.ts` `isPaid` (line 1430: `checkout.completed || order.created`). Webhook is fully live for the revenue path via `order.created`. **Close this item — no dashboard action needed.**
 - id-44 waitlist typo (`offigcialvendet@gmail.com` extra "g"): spell-fix or prune
 - DKIM/DMARC for `noreply@godseye.digitalhustlerx.com` (Gmail deliverability)
 - OpenSaaS console :3101 keep-vs-retire
