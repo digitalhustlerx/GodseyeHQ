@@ -1409,7 +1409,10 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
 
     if (webhookSecret && polarSignature) {
       const expectedSig = crypto.createHmac("sha256", webhookSecret).update(rawBody).digest("hex");
-      valid = crypto.timingSafeEqual(Buffer.from(polarSignature), Buffer.from(expectedSig));
+      // Constant-time compare requires equal-length buffers; a malformed/wrong-length
+      // signature must fall through to 401, NOT throw a RangeError and 500.
+      valid = polarSignature.length === expectedSig.length &&
+        crypto.timingSafeEqual(Buffer.from(polarSignature), Buffer.from(expectedSig));
     }
 
     // Fallback: plain secret header (legacy)
