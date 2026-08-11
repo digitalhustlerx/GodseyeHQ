@@ -1276,12 +1276,10 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
     }
   });
 
-  // ===== Plugin Pay-Before-Download: Flutterwave (email + zip) =====
+  // ===== Plugin Pay-Before-Download (email + zip) =====
   // Lightweight "no heavy checkout" capture: customer gives an email + picks a
-  // plan, gets a Flutterwave payment link, and after a verified `charge.success`
-  // webhook receives the plugin zip via email AND a tokenized download link.
-  const FLW_BASE = "https://api.flutterwave.com/v3";
-  // CEO-approved pricing (from the roadmap purchase path).
+  // plan, gets a Polar hosted checkout link, and after a verified Polar
+  // webhook event receives the plugin zip via email AND a tokenized download link.
   const PLAN_PRICES: Record<string, { price: number; label: string }> = {
     starter: { price: 9, label: "Starter" },
     taste: { price: 1, label: "Taste" },
@@ -1397,7 +1395,7 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
   // Webhook — verify Polar event, then flip purchase to paid, issue the download
   // token, email the download link, and (for logged-in users) activate the plan
   // + start the subscription window (cold-start). Runs the SAME fulfillment body
-  // as before; only the event parser changed from Flutterwave to Polar.
+  // as the legacy Flutterwave handler; only the event parser changed to Polar.
   // Polar webhook verification: supports both HMAC-SHA256 signature (current Polar)
   // and plain secret header (legacy). Body must be captured as raw bytes for HMAC.
   app.post("/api/polar-webhook", express.raw({ type: "application/json" }), (req, res) => {
@@ -1705,7 +1703,7 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
     });
   });
 
-  // Purchase status — the success page polls this after Flutterwave redirect.
+  // Purchase status — the success page polls this after the Polar checkout.
   app.get("/api/purchase/status", (req, res) => {
     const txRef = req.query.tx_ref as string | undefined;
     if (!txRef) return res.status(400).json({ error: "Missing tx_ref" });
