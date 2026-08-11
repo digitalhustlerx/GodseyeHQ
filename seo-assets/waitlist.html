@@ -16,14 +16,14 @@
 }
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;-webkit-font-smoothing:antialiased}
-.wrap{max-width:720px;margin:0 auto;padding:70px 24px}
+.wrap{max-width:820px;margin:0 auto;padding:70px 24px}
 .bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:56px}
 .brand{font-family:var(--ds);font-weight:700;letter-spacing:.04em;font-size:18px}.brand span{color:var(--gold)}
 .eyebrow{font-family:var(--dm);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:18px}
 /* Big headings = Georgia, weight 300 (matches the main site) */
 h1{font-family:var(--serif);font-weight:300;font-size:44px;line-height:1.12;letter-spacing:-0.01em;margin-bottom:20px}
 h1 em{color:var(--gold);font-style:italic}
-.sub{color:var(--muted);font-weight:300;font-size:17px;line-height:1.75;margin-bottom:36px;max-width:580px}
+.sub{color:var(--muted);font-weight:300;font-size:17px;line-height:1.75;margin-bottom:36px;max-width:640px}
 /* capture card */
 .capture{background:linear-gradient(160deg, rgba(196,164,132,0.10), var(--surface) 55%);border:1px solid rgba(196,164,132,0.35);border-radius:22px;padding:32px;margin-bottom:28px}
 .capture .cb{font-family:var(--dm);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:12px}
@@ -66,7 +66,45 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .popup-card .code{font-family:var(--dm);font-size:13px;color:var(--gold);background:rgba(196,164,132,.08);border:1px solid var(--gold);border-radius:12px;padding:16px 20px;display:inline-block;margin-bottom:24px;letter-spacing:.05em;word-break:break-all}
 .popup-card .close{width:100%;font-family:var(--dm);font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:13px;padding:16px;border-radius:12px;background:var(--gold);color:#0A0A0A;transition:background .2s}
 .popup-card .close:hover{background:var(--gold-hover)}
-@media(max-width:520px){h1{font-size:32px}.perks{grid-template-columns:1fr}.wrap{padding:48px 20px}}
+@media(max-width:520px){h1{font-size:32px}.orchestrator{font-size:32px}.fleetline{font-size:24px}.values,.agents,.setup,.addons{grid-template-columns:1fr}.wrap{padding:48px 20px}}
+
+/* ===== G4 body sections (promoted from variant4-agentic) ===== */
+.glow{position:fixed;top:-100px;left:50%;transform:translateX(-50%);width:640px;height:420px;background:radial-gradient(ellipse at center,rgba(196,164,132,.12),transparent 70%);pointer-events:none;z-index:-1;animation:fadeFloat 8s ease-in-out infinite}
+@keyframes fadeFloat{0%,100%{opacity:.7}50%{opacity:1}}
+.orchestrator{font-family:var(--serif);font-weight:300;font-size:52px;line-height:1.05;letter-spacing:-0.02em;margin-bottom:14px}
+.orchestrator .gold{color:var(--gold);font-style:italic}
+.fleetline{font-family:var(--serif);font-weight:300;font-size:31px;line-height:1.18;color:var(--text);margin-bottom:24px;max-width:720px}
+.fleetline em{color:var(--gold);font-style:italic}
+.spots{font-family:var(--dm);font-size:11px;letter-spacing:.06em;text-align:center;color:var(--gold);margin:-6px 0 18px}
+.values{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:44px}
+.value{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px}
+.value .ic{font-size:22px;margin-bottom:12px}
+.value .t{font-family:var(--serif);font-weight:300;font-size:18px;margin-bottom:8px}
+.value .d{color:var(--muted);font-weight:300;font-size:13.5px;line-height:1.65}
+.run{color:var(--dim);font-weight:300;font-size:14px;line-height:1.7;margin-bottom:44px;max-width:640px}
+.run strong{color:var(--gold);font-weight:400}
+.audience{text-align:center;margin-bottom:44px}
+.audience .label,.platforms .label{font-family:var(--dm);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);text-align:center;margin-bottom:18px}
+.audience .run{max-width:640px;margin:0 auto}
+.platforms{margin-bottom:44px}
+.marquee{overflow:hidden;white-space:nowrap;position:relative;-webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
+.marquee-track{display:inline-block;white-space:nowrap;animation:scroll 26s linear infinite}
+.marquee-track span{font-family:var(--dm);font-size:13px;letter-spacing:.05em;color:var(--muted);border:1px solid var(--border);background:var(--surface);border-radius:10px;padding:12px 20px;margin:0 8px;display:inline-block}
+@keyframes scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.section{margin:56px 0 0}
+.section .lab{font-family:var(--dm);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:16px;text-align:center}
+.section h3{font-family:var(--serif);font-weight:300;font-size:28px;line-height:1.15;text-align:center;margin-bottom:28px}
+.agents,.setup,.addons{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.agent,.opt,.addon{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px}
+.addon{border-color:rgba(196,164,132,.3)}
+.agent .ic,.opt .ic,.addon .ic{font-size:22px;margin-bottom:12px}
+.agent .n,.opt .n{font-family:var(--serif);font-weight:300;font-size:18px;margin-bottom:8px;color:var(--text)}
+.addon .n{font-family:var(--serif);font-weight:300;font-size:18px;margin-bottom:8px;color:var(--gold)}
+.agent .d,.opt .d,.addon .d{color:var(--muted);font-weight:300;font-size:13.5px;line-height:1.65}
+.socials{display:flex;justify-content:center;gap:18px;margin-top:22px}
+.socials a{font-family:var(--dm);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);text-decoration:none}
+.socials a:hover{color:var(--gold)}
+
 </style>
 <script defer src="/tracker.js"></script>
 </head>
@@ -91,13 +129,62 @@ button:disabled{opacity:.5;cursor:not-allowed}
     <div id="errBox" class="err hidden"></div>
   </div>
 
-  <!-- Perks -->
-  <div class="perks">
-    <div class="perk"><div class="ic">💬</div><div class="t">Tell it once, it handles the rest</div><div class="d">Show it a task one time. It learns, and from then on it just does it, on schedule, without you asking twice.</div></div>
-    <div class="perk"><div class="ic">🧠</div><div class="t">It thinks while you sleep</div><div class="d">Between sessions it reviews what happened, spots what could go better, and comes back with sharper suggestions.</div></div>
-    <div class="perk"><div class="ic">🛡️</div><div class="t">You stay in control</div><div class="d">It only touches what you let it. Everything ships through you. Cut its access any time, in a word.</div></div>
-    <div class="perk"><div class="ic">💸</div><div class="t">Founders' credit bonus</div><div class="d">First 100 signups get a bonus credit pack on top of their free starting credits. Your edge for being early.</div></div>
+<!-- Short proof points: compact, human, and easy to scan -->
+  <div class="values">
+    <div class="value"><div class="ic">⚙️</div><div class="t">Automates the repeat work</div><div class="d">Show it your process once. It remembers the pattern and keeps it moving.</div></div>
+    <div class="value"><div class="ic">🎯</div><div class="t">Keeps leads moving</div><div class="d">It can find prospects, organize outreach, and keep follow-ups from slipping.</div></div>
+    <div class="value"><div class="ic">🔔</div><div class="t">Nudges you forward</div><div class="d">Your goals, tasks, and next steps arrive in the Telegram chat you already use.</div></div>
+    <div class="value"><div class="ic">🔭</div><div class="t">Looks ahead</div><div class="d">It watches for problems and opportunities before they become urgent.</div></div>
   </div>
+
+  <p class="run"><strong>24/7, without the human limits.</strong> No tiredness. No clocking out. No forgotten follow-up. The fleet keeps working while you focus on the parts of business that need you.</p>
+
+  <section class="audience">
+    <div class="label">WHO IT IS FOR</div>
+    <p class="run">For solo founders, creators, service businesses, online stores, and small teams that want more work handled without adding another full-time role.</p>
+  </section>
+
+  <div class="platforms">
+    <div class="label">Supported platforms</div>
+    <div class="marquee">
+      <div class="marquee-track">
+        <span>WordPress</span><span>Elementor</span><span>WooCommerce</span><span>Shopify</span><span>GitHub</span><span>Vercel</span><span>Telegram</span><span>Instagram</span><span>TikTok</span><span>Facebook</span><span>X / Twitter</span><span>Email</span><span>Google Analytics</span><span>More</span>
+        <span>WordPress</span><span>Elementor</span><span>WooCommerce</span><span>Shopify</span><span>GitHub</span><span>Vercel</span><span>Telegram</span><span>Instagram</span><span>TikTok</span><span>Facebook</span><span>X / Twitter</span><span>Email</span><span>Google Analytics</span><span>More</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- The fleet: named agents people can picture -->
+  <section class="section">
+    <div class="lab">The fleet</div>
+    <h3>One hire. Every role it takes to run a business.</h3>
+    <div class="agents">
+      <div class="agent"><div class="ic">🎬</div><div class="n">Content & Reels Agent</div><div class="d">Drafts your posts, scripts your TikTok & Reels, pulls the trending audio, and reminds you what to publish today.</div></div>
+      <div class="agent"><div class="ic">💬</div><div class="n">Receptionist Agent</div><div class="d">Replies to clients, books appointments, and follows up so warm leads never go cold.</div></div>
+      <div class="agent"><div class="ic">📦</div><div class="n">Store & Inventory Agent</div><div class="d">Tracks orders, updates products, and keeps your stock and prices straight across your store.</div></div>
+      <div class="agent"><div class="ic">🛡️</div><div class="n">24/7 Site-Health Agent</div><div class="d">Watches your site around the clock and brings you the fix before you even notice it broke.</div></div>
+    </div>
+  </section>
+
+  <!-- Setup / configuration = perceived value -->
+  <section class="section">
+    <div class="lab">Built for the way you run things</div>
+    <h3>Set your own stage. It grows with you.</h3>
+    <div class="setup">
+      <div class="opt"><div class="ic">🧠</div><div class="n">Shared or your own brain</div><div class="d">Start on our infrastructure or bring your own server and keys. It works the same — your business, your data, your control.</div></div>
+      <div class="opt"><div class="ic">⚡</div><div class="n">Runs harder as you grow</div><div class="d">One task at a time at first. As your business grows, the fleet handles more at once — exactly like upgrading to more powerful hardware.</div></div>
+    </div>
+  </section>
+
+  <!-- Add-ons: cron + extras = recurring value -->
+  <section class="section">
+    <div class="lab">Add-ons</div>
+    <h3>Automations that run while you sleep.</h3>
+    <div class="addons">
+      <div class="addon"><div class="ic">⏰</div><div class="n">Custom Cron Jobs</div><div class="d">Schedule it once — daily leads reports, weekly content, monthly follow-ups. Set the clock and it does the work.</div></div>
+      <div class="addon"><div class="ic">⚙️</div><div class="n">Extra Agent Slots</div><div class="d">Spawn a specialist when the work grows past one agent — on-demand, and retired when you don't need it.</div></div>
+    </div>
+  </section>
 
   <div class="foot">
     <a href="/blog/">Read the Godseye field notes</a> · <a href="https://t.me/GodseyeXbot">@GodseyeXbot</a>
