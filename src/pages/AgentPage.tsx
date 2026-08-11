@@ -177,7 +177,7 @@ export function AgentPage({ slug }: { slug: string }) {
       {/* CTA — top */}
       <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-16">
         <Link
-          to="/start"
+          to="https://app.digitalhustlerx.com/signup"
           className="inline-flex items-center gap-2 bg-[#C4A484] hover:bg-[#b59574] text-black font-bold text-xs uppercase tracking-widest px-8 py-4 rounded-full transition-all active:scale-95 shadow-md"
         >
           Hire this agent <ArrowRight className="w-4 h-4" />
@@ -263,7 +263,7 @@ export function AgentPage({ slug }: { slug: string }) {
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <Link
-            to="/start"
+            to="https://app.digitalhustlerx.com/signup"
             className="inline-flex items-center gap-2 bg-[#C4A484] hover:bg-[#b59574] text-black font-bold text-xs uppercase tracking-widest px-8 py-4 rounded-full transition-all active:scale-95 shadow-md"
           >
             Hire this agent <ArrowRight className="w-4 h-4" />

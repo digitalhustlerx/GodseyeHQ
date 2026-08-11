@@ -31,7 +31,7 @@ export default function FeaturesPage() {
             <Link to="/pricing" className="w-full sm:w-auto bg-[#C4A484] hover:bg-[#b59574] text-black font-bold text-[10px] uppercase tracking-widest px-8 py-3.5 rounded-full transition-all">
               View Plans
             </Link>
-            <Link to="/start" className="w-full sm:w-auto bg-white/5 hover:bg-white/10 border border-white/10 text-[#F2F2F2] font-bold text-[10px] uppercase tracking-widest px-8 py-3.5 rounded-full transition-all">
+            <Link to="https://app.digitalhustlerx.com/signup" className="w-full sm:w-auto bg-white/5 hover:bg-white/10 border border-white/10 text-[#F2F2F2] font-bold text-[10px] uppercase tracking-widest px-8 py-3.5 rounded-full transition-all">
               Get started
             </Link>
           </div>
@@ -154,7 +154,7 @@ export default function FeaturesPage() {
             <Link to="/pricing" className="w-full sm:w-auto bg-[#F2F2F2] text-[#0A0A0A] hover:bg-white text-[10px] uppercase tracking-widest font-bold px-8 py-3.5 rounded-full transition-all">
               View Plans
             </Link>
-            <Link to="/start" className="w-full sm:w-auto bg-transparent hover:bg-white/5 border border-white/20 text-[#F2F2F2] text-[10px] uppercase tracking-widest font-bold px-8 py-3.5 rounded-full transition-all">
+            <Link to="https://app.digitalhustlerx.com/signup" className="w-full sm:w-auto bg-transparent hover:bg-white/5 border border-white/20 text-[#F2F2F2] text-[10px] uppercase tracking-widest font-bold px-8 py-3.5 rounded-full transition-all">
               Get started
             </Link>
           </div>

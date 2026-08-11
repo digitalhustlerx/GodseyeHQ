@@ -157,7 +157,7 @@ export default function DocsPage() {
       <div className="text-center space-y-4 border-t border-white/5 pt-12">
         <p className="text-sm text-white/50 font-light">Ready to start?</p>
         <Link
-          to="/start"
+          to="https://app.digitalhustlerx.com/signup"
           className="inline-flex items-center gap-2 bg-[#C4A484] hover:bg-[#b59574] text-black text-[10px] uppercase tracking-widest font-bold py-3.5 rounded-full px-5 transition-all active:scale-95 shadow-md"
         >
           Get Started &rarr;

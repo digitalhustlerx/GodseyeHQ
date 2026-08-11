@@ -164,14 +164,14 @@ export default function Layout({ children }: { children: ReactNode }) {
               </Link>
             ) : (
               <Link
-                to="/login?next=/account"
+                to="https://app.digitalhustlerx.com/login"
                 className="text-[10px] uppercase tracking-widest font-bold bg-white/5 hover:bg-white/10 text-[#F2F2F2] border border-white/10 px-6 py-3 rounded-full flex items-center gap-1.5 transition-all active:scale-95"
               >
                 Log In
               </Link>
             )}
             <Link
-              to="/start"
+              to="https://app.digitalhustlerx.com/signup"
               className="text-[10px] uppercase tracking-widest font-bold bg-[#F2F2F2] hover:bg-white text-[#0A0A0A] px-6 py-3 rounded-full flex items-center gap-1.5 transition-all active:scale-95 shadow-md"
             >
               Get started
@@ -234,7 +234,7 @@ export default function Layout({ children }: { children: ReactNode }) {
               </Link>
             ) : (
               <Link
-                to="/login?next=/account"
+                to="https://app.digitalhustlerx.com/login"
                 onClick={() => setMobileMenuOpen(false)}
                 className="text-xs font-semibold bg-white/5 text-white border border-white/10 py-2.5 rounded-lg text-center"
               >
@@ -242,7 +242,7 @@ export default function Layout({ children }: { children: ReactNode }) {
               </Link>
             )}
             <Link
-              to="/start"
+              to="https://app.digitalhustlerx.com/signup"
               onClick={() => setMobileMenuOpen(false)}
               className="flex-1 text-center text-xs font-semibold bg-[#C4A484] text-black py-2.5 rounded-lg"
             >
@@ -311,7 +311,7 @@ export default function Layout({ children }: { children: ReactNode }) {
               <li><Link to="/features" className="hover:text-[#C4A484] transition-colors">Features</Link></li>
               <li><Link to="/agents/lead-gen" className="hover:text-[#C4A484] transition-colors">Hire an Agent</Link></li>
               <li><Link to="/pricing" className="hover:text-[#C4A484] transition-colors">Pricing</Link></li>
-              <li><Link to="/start" className="hover:text-[#C4A484] transition-colors">Get Started</Link></li>
+              <li><Link to="https://app.digitalhustlerx.com/signup" className="hover:text-[#C4A484] transition-colors">Get Started</Link></li>
               <li><Link to="/community/" className="hover:text-[#C4A484] transition-colors">Living with Agents</Link></li>
               <li><Link to="/docs" className="hover:text-[#C4A484] transition-colors">Docs</Link></li>
             </ul>
