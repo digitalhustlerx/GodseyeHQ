@@ -623,12 +623,9 @@ export default function LandingPage() {
         </div>
 
         <div className="text-center">
-          <p className="text-[10px] uppercase tracking-wider text-white/40 font-mono mb-2">Or buy hours</p>
+          <p className="text-[10px] uppercase tracking-wider text-white/40 font-mono mb-2">Need more credits?</p>
           <div className="flex flex-wrap items-center justify-center gap-3">
-            <span className="px-4 py-2 bg-white/5 border border-white/10 rounded-full text-xs text-white/70">1h Trial — $9</span>
-            <span className="px-4 py-2 bg-white/5 border border-white/10 rounded-full text-xs text-white/70">10h Pack — $69</span>
-            <span className="px-4 py-2 bg-white/5 border border-white/10 rounded-full text-xs text-white/70">50h Pack — $249</span>
-            <span className="px-4 py-2 bg-white/5 border border-white/10 rounded-full text-xs text-white/70">100h Pack — $399</span>
+            <span className="px-4 py-2 bg-white/5 border border-white/10 rounded-full text-xs text-white/70">Wallet Top-Up — $10</span>
           </div>
           <Link to="/pricing" className="inline-block mt-4 text-xs text-[#C4A484] hover:text-[#b59574] font-semibold uppercase tracking-wider">See full pricing →</Link>
         </div>

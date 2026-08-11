@@ -68,21 +68,6 @@ export const PRICING_PLANS: PricingPlan[] = [
       "Dedicated support channel"
     ],
     polarProductId: "b13480b8-f4ae-4051-aa1c-36ac31303ce7"
-  },
-  {
-    id: "burst",
-    name: "Burst",
-    price: "Free",
-    credits: "Limited windows",
-    sites: "No subscription",
-    features: [
-      "No subscription required",
-      "Burst access to your resources in limited time windows",
-      "Use your credits or keys for a set block of hours",
-      "Perfect for a quick job without committing to a plan",
-      "Upsell path to a plan when you need always-on access"
-    ],
-    polarProductId: "burst-access"
   }
 ];
 
