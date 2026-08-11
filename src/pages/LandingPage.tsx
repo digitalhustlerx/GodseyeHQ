@@ -8,32 +8,32 @@ const HERO_SLIDES = [
   {
     // Slide 1 — THE HOOK
     badge: "HIRE AI AGENTS FOR YOUR BUSINESS",
-    h1: <>Hire AI agents that work 24 hours, 365 days.<br /><span className="italic text-[#C4A484]">Better reliability than any human.</span></>,
-    p: "Your store manager. Your content writer. Your administrator. Your receptionist. Your support agent. Whatever you point it at, it becomes — for less than one part-timer costs. No salaries. No sick days. No drama. Just work, done right, all the time.",
+    h1: <>AI agents that work around the clock.<br /><span className="italic text-[#C4A484]">More reliable than any hire.</span></>,
+    p: "Your store manager, content writer, administrator, receptionist, and support — all in one. Point it at any task and it gets to work. No salaries, no sick days, no drama. Just work, done right.",
   },
   {
     // Slide 2 — THE CONVERSATION
     badge: "LIVES ON TELEGRAM",
-    h1: <>You don't need a website. You don't need a dashboard.<br /><span className="italic text-[#C4A484]">You need someone handling things. So you don't have to.</span></>,
-    p: "Everything happens in a group chat — on Telegram, where you already are. Your agent sets it up, sorts your business into sections, and gets to work. Booking clients. Replying to messages. Posting on social. Sending reminders. Tracking orders. You check in when you want. The rest of the time, it's handling things you'd otherwise stress over.",
+    h1: <>No website. No dashboard.<br /><span className="italic text-[#C4A484]">Just someone handling things.</span></>,
+    p: "Everything happens in a Telegram chat — where you already are. Your agent sets things up, organizes your business, and gets to work. Booking clients, replying to messages, posting on social, sending reminders. You check in when you want. The rest of the time, it handles things.",
   },
   {
     // Slide 3 — THE ROLES
     badge: "ONE HIRE. EVERY ROLE.",
-    h1: <>It becomes whatever you want it to be.<br /><span className="italic text-[#C4A484]">Point it at a problem. It solves it.</span></>,
-    p: "Your receptionist — replying to clients and booking appointments. Your social media manager — posting your work, writing captions, scheduling content. Your administrator — tracking orders, organizing files, sending reminders. Your personal assistant — reminding you, researching for you, handling whatever you throw at it. One agent. Or a fleet of them. Orchestrated, autonomous, always working.",
+    h1: <>One agent. Every role.<br /><span className="italic text-[#C4A484]">Point it at a problem. It solves it.</span></>,
+    p: "Receptionist — replying to clients and booking appointments. Social media manager — posting your work, writing captions. Administrator — tracking orders, organizing files. One agent, or a fleet. Always working.",
   },
   {
     // Slide 4 — THE ONE-MAN ARMY
     badge: "BUILT FOR ONE-MAN ARMIES",
-    h1: <>You're doing the work of five people.<br /><span className="italic text-[#C4A484]">Now you don't have to.</span></>,
-    p: "You sell lashes. You do hair. You run a store. You manage clients. You're the marketing, the admin, the customer service — all at once. Your agent takes every role off your plate. You stay lean. You stay creative. Everything else gets handled — 24/7, 365.",
+    h1: <>Doing the work of five people?<br /><span className="italic text-[#C4A484]">Not anymore.</span></>,
+    p: "You sell lashes. You do hair. You run a store. You manage clients. You're the marketing, the admin, the customer service. Your agent takes every role off your plate. You stay lean and creative — everything else gets handled.",
   },
   {
     // Slide 5 — THE SIMPLE TRUTH
     badge: "BUILD WHATEVER YOU WANT TO BUILD",
-    h1: <>Tell it what you need.<br /><span className="italic text-[#C4A484]">It builds it. Handles it. Runs it.</span></>,
-    p: "You don't need to be technical. You don't need to understand websites or plugins or dashboards. You just tell your agent what your business does and what you need help with — and it starts. It converses with you, understands your style, and gets to work. Building whatever you want to build. Handling whatever you don't want to. That's it.",
+    h1: <>Tell it what you need.<br /><span className="italic text-[#C4A484]">It handles the rest.</span></>,
+    p: "No technical skills needed. Just tell your agent what your business does and what you need help with. It understands your style and gets to work — building, handling, running whatever you don't want to.",
   },
 ];
 
@@ -341,22 +341,22 @@ export default function LandingPage() {
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-              <button
-                onClick={() => setShowWaitlist(true)}
+              <a
+                href="/signup"
                 className="btn-shine w-full sm:w-auto bg-[#C4A484] hover:bg-[#b59574] text-black px-10 py-4 rounded-full font-bold text-xs uppercase tracking-widest transition-all shadow-md text-center cursor-pointer"
               >
-                Get On The Waitlist →
-              </button>
-              <button
-                onClick={() => setShowWaitlist(true)}
+                Get Started →
+              </a>
+              <a
+                href="/pricing"
                 className="w-full sm:w-auto bg-transparent hover:bg-white/5 border border-white/20 text-[#F2F2F2] px-10 py-4 rounded-full font-bold text-xs uppercase tracking-widest transition-all text-center cursor-pointer"
               >
-                Hire Your Agent
-              </button>
+                See Pricing
+              </a>
             </div>
 
             <p className="text-[10px] uppercase tracking-wider text-white/40 font-semibold font-mono">
-              No website required · Just Telegram · First 100 get 50% off for a year
+              No website required · Just Telegram · Start free today
             </p>
           </div>
 
