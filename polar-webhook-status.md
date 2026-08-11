@@ -94,3 +94,23 @@ script) toggling it OFF on a schedule. The hourly guard now contains it, but the
 **identify and stop whatever disables `639653fe`** — otherwise this is a continuing fight
 against an unknown actor. Candidate leads: agents acting on stale `enabled:false` snapshots,
 a sync job that overwrites endpoint config, or a Polar dashboard toggle.
+
+---
+
+## 🔧 Tightened guard cadence (2026-08-11 ~23:16 completion agent)
+
+New finding: re-disable cadence now EXCEEDS the hourly guard's heal window. The day's
+disables (22:17, 22:41) were only ~24min apart — faster than the `0 * * * *` guard, which
+only heals on the hour (leaving up to a ~60min revenue window, and in the 22:41 case a
+~19min window until 23:00).
+
+Action taken (reversible): changed crontab guard from `0 * * * *` (hourly) to
+`*/10 * * * *` (every 10 min) → closes the silent-payment-breakage window to ≤10 min.
+Verified: manual run exit 0, live Polar API confirms `639653fe enabled=True`,
+order.created/order.paid/order.updated/order.refunded subscribed.
+
+Root cause NOT yet contained: no Hermes cron prompt instructs disabling this endpoint,
+and no such logic exists in the repo (git clean). Repo is not the actor. Prime suspect is
+an external parallel agent cluster (OMP orchestration running on this box) acting on a
+stale/misread endpoint snapshot. Guard remains a stopgap — still need to identify + stop
+that actor. Revert anytime: `crontab /root/.crontab.bak-polar-guard-20260811`.
