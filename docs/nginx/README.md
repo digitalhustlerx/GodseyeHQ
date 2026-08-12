@@ -1,27 +1,52 @@
-# Godseye Nginx — Canonical Config
+# GodsEye Nginx — Canonical Config
 
-**HAZARD (recurs TWICE this month: 2026-08-15, 2026-08-19):**
-The `location = /` block on `godseye.digitalhustlerx.com` was silently changed from
+The canonical public root is the multi-hero GodsEye landing/application page.
+The legacy waitlist/G4 page is served only at `/waitlist.html` and must not replace `/`.
 
-    try_files /waitlist.html /index.html;   # CORRECT — main domain root = waitlist
+## Source of truth
 
-to
-
-    try_files /index.html =404;             # WRONG — serves the SPA shell (615B) at root
-
-This breaks AGENTS.md rule: **main domain root = waitlist** (strict lead capture).
-The SPA is at `/app/`, NOT `/`.
-
-## Source of truth and remediation
-
-- **Canonical vhost:** `./godseye.digitalhustlerx.com.conf` (copied verbatim from the live
-  `/etc/nginx/sites-available/`, verified serving 200/18923B on 2026-08-19).
-- **Live files to keep in sync** (must match, md5 checksum):
+- **Canonical vhost:** `./godseye.digitalhustlerx.com.conf`
+- **Live files that must stay synchronized:**
   - `/etc/nginx/sites-available/godseye.digitalhustlerx.com`
   - `/etc/nginx/sites-enabled/godseye.digitalhustlerx.com`
-- **Apply:** `cp docs/nginx/godseye.digitalhustlerx.com.conf /etc/nginx/sites-available/` then the same to sites-enabled, then `nginx -t` then `systemctl restart nginx`.
-- **Verify root serves waitlist:** `curl -s -o /dev/null -w '%{http_code} %{size_download}B' https://godseye.digitalhustlerx.com/` — expect `200 18923B` (or `wc -c < dist/waitlist.html`).
+- **Canonical root rule:**
+
+```nginx
+location = / {
+    try_files /index.html =404;
+}
+```
+
+The `/app/` route remains an alternate SPA route. It is not the primary public entry.
+
+## Apply safely
+
+Before any edit, create a backup. Then copy the tracked config to both live locations,
+run `nginx -t`, and reload nginx:
+
+```bash
+cp /etc/nginx/sites-enabled/godseye.digitalhustlerx.com \
+  /root/nginx-backups/godseye.digitalhustlerx.com.before-edit-$(date +%s)
+cp docs/nginx/godseye.digitalhustlerx.com.conf \
+  /etc/nginx/sites-available/godseye.digitalhustlerx.com
+cp docs/nginx/godseye.digitalhustlerx.com.conf \
+  /etc/nginx/sites-enabled/godseye.digitalhustlerx.com
+nginx -t && systemctl reload nginx
+```
+
+## Verification
+
+```bash
+curl -fsSL https://godseye.digitalhustlerx.com/ | grep -o \
+  'GodsEye — AI Agents for Your Business'
+grep -q 'try_files /index.html =404;' \
+  /etc/nginx/sites-enabled/godseye.digitalhustlerx.com
+```
+
+The deployment guard in `scripts/deploy.sh` performs the live-root hash and hero-marker
+checks automatically. Never restore `waitlist.html` to `/` without explicit approval.
 
 ## Root-cause note
-Unknown what repointed it at 09:55 on 08-19. Check `.bash_history` / scheduled agent tasks on
-the host. If any automation touches nginx, point it at THIS file as the deterministic source.
+
+If the live root changes unexpectedly, inspect scheduled agents, deployment scripts, shell
+history, and both nginx config paths before changing browser cache or rebuilding assets.
