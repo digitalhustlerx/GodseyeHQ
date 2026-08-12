@@ -124,8 +124,8 @@ const AUDIENCES = [
   {
     icon: "💻",
     title: "The Developer",
-    quote: "I want to self-host and extend it.",
-    body: "Full open-source option. Run it on your own VPS. Bring your own API keys. Extend with MCP. It's your infrastructure, not a black box.",
+    quote: "I want full control over my agent.",
+    body: "Bring your own API keys. Extend with MCP. Customize every behavior. Your agent works the way you want — no black box.",
   },
 ];
 
@@ -163,7 +163,7 @@ const FAQS = [
   },
   {
     q: "Is my data safe?",
-    a: "Yes. You can self-host on your own server with your own keys. Even on our cloud, your data is isolated and never shared. Your business stays your business.",
+    a: "Yes. Your data is isolated and never shared. You control what your agent accesses. Your business stays your business.",
   },
   {
     q: "What does \"spawn more agents\" mean?",
@@ -204,46 +204,7 @@ export default function LandingPage() {
   // Shows the REAL early-adopter spots-left from /api/waitlist/stats (never a fake
   // number), and logs popup_impression / popup_click so we can measure adoption
   // from a clean baseline.
-  const [showPopup, setShowPopup] = useState(false);
-  const [impressionLogged, setImpressionLogged] = useState(false);
-  const [stats, setStats] = useState<null | {
-    count: number;
-    spotsTotal: number;
-    spotsLeft: number;
-    pct: number;
-    waitlistOpen: boolean;
-  }>(null);
 
-  // Fetch real live adoption stats once.
-  useEffect(() => {
-    let alive = true;
-    (async () => {
-      try {
-        const r = await fetch("/api/waitlist/stats");
-        const d = await r.json();
-        if (alive) setStats(d);
-      } catch {}
-    })();
-    return () => { alive = false; };
-  }, []);
-
-  // Entrance + log popup_impression exactly once (self-hosted tracker event).
-  useEffect(() => {
-    const t = setTimeout(() => {
-      setShowPopup(true);
-      if (!impressionLogged) {
-        setImpressionLogged(true);
-        try {
-          fetch("/api/track", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ event: "popup_impression", selector: "waitlist-popup", page: "/" }),
-          });
-        } catch {}
-      }
-    }, 6000);
-    return () => clearTimeout(t);
-  }, [impressionLogged]);
 
   // Launch is live — no countdown needed.
 
@@ -386,9 +347,7 @@ export default function LandingPage() {
               Get Started →
             </a>
           </div>
-          <p className="text-[11px] text-white/40 font-light">
-            First <strong className="text-[#C4A484]">100</strong> founders lock in a <strong className="text-[#C4A484]">bonus credit pack</strong>.
-          </p>
+
         </div>
       </section>
 
@@ -517,7 +476,7 @@ export default function LandingPage() {
           </div>
 
           <div className="bg-white/5 border border-[#C4A484]/20 rounded-2xl p-6 max-w-2xl mx-auto mt-8">
-            <p className="text-sm text-white/80 font-light">🔒 <strong className="text-[#C4A484]">Your data stays yours.</strong> Self-host on your own server with your own keys. Nothing leaves your infrastructure. Full control. Zero surprises.</p>
+            <p className="text-sm text-white/80 font-light">🔒 <strong className="text-[#C4A484]">Your data stays yours.</strong> Your business data is isolated, encrypted, and never shared. Full control over what your agent accesses. Zero surprises.</p>
           </div>
         </div>
       </section>
@@ -565,7 +524,7 @@ export default function LandingPage() {
           ))}
           <div className="flex items-center justify-between px-6 py-5 bg-[#C4A484]/5 border-t border-[#C4A484]/20">
             <span className="text-sm font-bold text-white">Total with Godseye</span>
-            <span className="text-lg font-black text-[#C4A484]">$9-99/mo</span>
+            <span className="text-lg font-black text-[#C4A484]">$15-99/mo</span>
           </div>
         </div>
 
@@ -581,9 +540,9 @@ export default function LandingPage() {
         <div className="text-center max-w-2xl mx-auto space-y-4">
           <span className="text-[10px] uppercase tracking-widest text-[#C4A484] font-semibold font-mono">Pricing</span>
           <h2 className="text-3xl md:text-5xl font-light tracking-tighter text-[#F2F2F2]" style={{ fontFamily: "'Georgia', serif" }}>
-            Hire by the hour. Or put it on retainer.
+            Plans that grow with you.
           </h2>
-          <p className="text-xs md:text-sm text-white/60 font-light">Buy hours when you need them. Or keep an agent on standby. Cancel anytime.</p>
+          <p className="text-xs md:text-sm text-white/60 font-light">Start free. Upgrade when you need more. Cancel anytime.</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-5xl mx-auto">
@@ -700,48 +659,6 @@ export default function LandingPage() {
           <p className="text-[10px] text-white/30 font-mono">© 2026 Godseye. Built by DigitalHustlerX.</p>
         </div>
       </section>
-
-      {/* ═══ FLOATING SIGNUP CTA ═══
-          Animated gold trigger, bottom-right. Entrances after 6s, gently bobs,
-          pulses a gold glow, and sends user to /signup on click. */}
-      {showPopup && (
-        <a
-          href="https://app.digitalhustlerx.com/signup"
-          onClick={() => {
-            setShowPopup(false);
-            try {
-              fetch("/api/track", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ event: "popup_click", selector: "signup-cta", page: "/" }),
-              });
-            } catch {}
-          }}
-          aria-label="Get started"
-          className="popup-shine animate-popupEntrance fixed bottom-5 right-5 z-40 w-[264px] rounded-2xl border border-[#C4A484]/40 bg-[#0A0A0A]/95 p-3 text-left shadow-2xl backdrop-blur-md hover:border-[#C4A484] transition-colors cursor-pointer"
-        >
-          {/* Top row: eye icon + live CTA */}
-          <div className="flex items-center gap-3">
-            <span className="animate-popupFloat flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#C4A484] text-black">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" />
-                <circle cx="12" cy="12" r="3" />
-              </svg>
-            </span>
-            <span className="text-left">
-              <span className="block text-xs font-bold text-[#C4A484] uppercase tracking-widest font-mono">
-                🚀 Godseye is live
-              </span>
-              <span className="block text-[13px] text-white/90 font-light leading-tight" style={{ fontFamily: "'Georgia', serif" }}>
-                Start your first agent today.
-              </span>
-            </span>
-          </div>
-
-          {/* Pulsing gold attention dot */}
-          <span className="animate-popupPulse absolute -top-1 -right-1 h-3.5 w-3.5 rounded-full border-2 border-[#0A0A0A] bg-[#C4A484]" />
-        </a>
-      )}
 
     </div>
   );
