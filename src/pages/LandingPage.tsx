@@ -319,6 +319,9 @@ export default function LandingPage() {
             <p className="text-[10px] uppercase tracking-wider text-white/40 font-semibold font-mono">
               No website required · Just Telegram · Start free today
             </p>
+            <p className="text-xs text-white/50 font-light">
+              Already have an account? <a href="https://app.digitalhustlerx.com/login" className="text-[#C4A484] hover:text-[#b59574] underline">Log in</a>
+            </p>
           </div>
 
           {/* Slide Dots */}
@@ -339,13 +342,16 @@ export default function LandingPage() {
           <h2 className="text-2xl md:text-3xl font-light text-[#F2F2F2]" style={{ fontFamily: "'Georgia', serif" }}>
             Start your first agent today.
           </h2>
-          <div>
+          <div className="space-y-3">
             <a
               href="https://app.digitalhustlerx.com/signup"
               className="inline-block bg-[#C4A484] text-black px-8 py-3 rounded-full font-bold text-xs uppercase tracking-widest hover:bg-[#b59574] transition-all cursor-pointer"
             >
               Get Started →
             </a>
+            <p className="text-xs text-white/50 font-light">
+              Already have an account? <a href="https://app.digitalhustlerx.com/login" className="text-[#C4A484] hover:text-[#b59574] underline">Log in</a>
+            </p>
           </div>
 
         </div>
