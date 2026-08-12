@@ -63,7 +63,7 @@ export default function CommunityPage() {
     <div className="space-y-24 pb-20">
       <section className="px-4 pt-16 md:pt-24 max-w-5xl mx-auto text-center space-y-8">
         <span className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white/5 border border-white/10 rounded-full text-[10px] uppercase tracking-widest text-[#C4A484] font-mono font-bold">
-          <Users className="w-3.5 h-3.5" /> Living with Agents
+          <Users className="w-3.5 h-3.5" /> GodsEye Agent Setup
         </span>
         <h1 className="text-5xl md:text-8xl font-light tracking-tighter leading-[0.95] text-[#F2F2F2] font-display">
           Stop asking what AI can do.<br /><span className="italic text-[#C4A484]">Start building with it.</span>
@@ -75,7 +75,7 @@ export default function CommunityPage() {
           <a href="#apply" className="bg-[#C4A484] hover:bg-[#b59574] text-black px-10 py-4 rounded-full font-bold text-xs uppercase tracking-widest transition-all">Apply for a setup <ArrowRight className="inline w-4 h-4 ml-1" /></a>
           <a href="https://t.me/GodseyeXbot" target="_blank" rel="noreferrer" className="border border-white/20 hover:bg-white/5 text-white px-10 py-4 rounded-full font-bold text-xs uppercase tracking-widest transition-all">Talk to the bot</a>
         </div>
-        <p className="text-xs text-white/40">Five founding deployment slots · Applications reviewed before payment</p>
+        <p className="text-xs text-white/40">Founding setup access · Applications reviewed before payment</p>
       </section>
 
       <section className="px-4 max-w-6xl mx-auto grid md:grid-cols-3 gap-5">
@@ -89,7 +89,7 @@ export default function CommunityPage() {
       </section>
 
       <section className="px-4 max-w-6xl mx-auto space-y-10">
-        <div className="text-center space-y-3"><span className="text-[10px] uppercase tracking-widest text-[#C4A484] font-mono">Choose your path</span><h2 className="text-3xl md:text-5xl font-light text-white">Start where you are.</h2></div>
+        <div className="text-center space-y-3"><span className="text-[10px] uppercase tracking-widest text-[#C4A484] font-mono">Setup options</span><h2 className="text-3xl md:text-5xl font-light text-white">Start where you are.</h2></div>
         <div className="grid md:grid-cols-3 gap-6">
           {paths.map((path) => <div key={path.title} className={`rounded-3xl border p-7 flex flex-col ${path.featured ? "border-[#C4A484] bg-[#C4A484]/5" : "border-white/10 bg-[#121212]"}`}>
             {path.featured && <span className="text-[10px] uppercase tracking-widest text-[#C4A484] font-mono mb-4">Most requested</span>}

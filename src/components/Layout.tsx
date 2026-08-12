@@ -74,12 +74,12 @@ export default function Layout({ children }: { children: ReactNode }) {
     { to: "/templates", label: "Templates" },
     { to: "/pricing", label: "Pricing" },
     { to: "/docs", label: "Docs" },
-    { to: "/community", label: "Agents School" },
     { to: "/blog", label: "Blog" },
   ];
 
   // "Agents" parent dropdown — every agent buyer page lives under /agents/<slug>.
   const agentsLinks = [
+    { to: "/agents/setup", label: "Agent Setup" },
     { to: "/agents/lead-gen", label: "Lead Generation" },
     { to: "/agents/team", label: "Chief of Staff" },
     { to: "/agents/home", label: "Home & Life" },

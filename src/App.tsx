@@ -48,6 +48,7 @@ export default function App() {
           <Route path="/templates" element={<TemplatesPage />} />
           <Route path="/community" element={<CommunityPage />} />
           <Route path="/community/" element={<CommunityPage />} />
+          <Route path="/agents/setup" element={<CommunityPage />} />
           <Route path="/agents/lead-gen" element={<AgentPage slug="lead-gen" />} />
           <Route path="/agents/team" element={<AgentPage slug="team" />} />
           <Route path="/agents/home" element={<AgentPage slug="home" />} />
