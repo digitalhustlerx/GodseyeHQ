@@ -10,6 +10,7 @@ import AuthPage from "./pages/AuthPage";
 import AccountPage from "./pages/AccountPage";
 import TemplatesPage from "./pages/TemplatesPage";
 import { AgentPage } from "./pages/AgentPage";
+import CommunityPage from "./pages/CommunityPage";
 
 // Blog is served as static, crawlable HTML from dist/blog/ (SEO).
 // React Router only handles client-side paths; force a full page load so
@@ -45,6 +46,8 @@ export default function App() {
           <Route path="/signup" element={<AuthPage mode="signup" />} />
           <Route path="/account" element={<AccountPage />} />
           <Route path="/templates" element={<TemplatesPage />} />
+          <Route path="/community" element={<CommunityPage />} />
+          <Route path="/community/" element={<CommunityPage />} />
           <Route path="/agents/lead-gen" element={<AgentPage slug="lead-gen" />} />
           <Route path="/agents/team" element={<AgentPage slug="team" />} />
           <Route path="/agents/home" element={<AgentPage slug="home" />} />

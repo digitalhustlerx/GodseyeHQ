@@ -495,6 +495,29 @@ async function startServer() {
   const app = express();
   app.use(express.json());
 
+  // Founding Agents School / forward-deployment applications.
+  // Qualification first; payment is sent manually after scope confirmation.
+  app.post("/api/forward-deployment-leads", (req, res) => {
+    const { name, email, telegram, work, goal, vps } = req.body || {};
+    const cleanEmail = String(email || "").trim().toLowerCase();
+    if (!name || !cleanEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail) || !work || !goal) {
+      return res.status(400).json({ error: "Name, valid email, work, and goal are required." });
+    }
+    db.exec(`CREATE TABLE IF NOT EXISTS forward_deployment_leads (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      email TEXT NOT NULL,
+      telegram TEXT,
+      work TEXT NOT NULL,
+      goal TEXT NOT NULL,
+      vps TEXT,
+      created_at TEXT DEFAULT (datetime('now'))
+    )`);
+    db.prepare("INSERT INTO forward_deployment_leads (name,email,telegram,work,goal,vps) VALUES (?,?,?,?,?,?)")
+      .run(String(name).trim(), cleanEmail, String(telegram || "").trim(), String(work).trim(), String(goal).trim(), String(vps || "").trim());
+    return res.json({ ok: true });
+  });
+
   // Read-only license/site endpoints used by the Telegram WordPress onboarding.
   // License keys are scoped to site lookups; WordPress credentials are never stored here.
   app.get("/api/licenses/:licenseKey", (req, res) => {

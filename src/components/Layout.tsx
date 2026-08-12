@@ -74,7 +74,7 @@ export default function Layout({ children }: { children: ReactNode }) {
     { to: "/templates", label: "Templates" },
     { to: "/pricing", label: "Pricing" },
     { to: "/docs", label: "Docs" },
-    { to: "/community/", label: "Community" },
+    { to: "/community", label: "Agents School" },
     { to: "/blog", label: "Blog" },
   ];
 
