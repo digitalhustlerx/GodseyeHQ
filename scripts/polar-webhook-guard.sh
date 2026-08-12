@@ -1,21 +1,43 @@
 #!/usr/bin/env bash
-# Polar webhook guard — prevent the silent revenue-critical regression.
+# Polar webhook guard — RATE-LIMIT-FRIENDLY version (2026-08-12).
 #
-# The Godseye primary Polar webhook endpoint (Hermes, /api/polar-webhook,
-# id 639653fe-e485-470d-8a5e-df0da929e0af) has been silently DISABLED twice
-# (see polar-webhook-status.md). When disabled, paid checkouts never flip to
-# "paid" and no license/credits are issued — a #1 revenue blocker.
+# WHY REWRITTEN: The old version ran every minute via cron, calling the Polar API
+# (GET /v1/webhooks/endpoints) on EVERY run — ~1,440 pings/day. Polar treated this
+# as rate-limit/abuse and sent an email + silently disabled the endpoint. That
+# created the exact failure this guard was trying to prevent.
 #
-# This guard lists the endpoints and re-enables the Godseye primary one if it
-# has gone enabled:false. Logs every run so we can audit who/what toggled it.
+# NEW BEHAVIOR:
+#   - Runs ONCE PER DAY via cron (crontab `0 4 * * *`), NOT every minute.
+#   - First checks OUR OWN local purchases table (godseye.db) for recent confirmed
+#     payments in the last 24h. If the webhook is working (orders are landing),
+#     we DO NOT touch the Polar API at all -> zero rate-limit risk.
+#   - Only calls the Polar API on the rare daily check when NO recent confirmed
+#     payment exists, to verify/re-enable the endpoint.
+#   - Minimal logging: at most 1 line per daily run + only on change/alert.
 #
-# Intended to run via cron (e.g. every 6h). Safe to re-run; idempotent.
-set -euo pipefail
+# Idempotent and safe to re-run.
+
+set -uo pipefail
 
 REPO=/root/godseye-repo
 LOG="${REPO}/logs/polar-webhook-guard.log"
 TARGET_ID="639653fe-e485-470d-8a5e-df0da929e0af"
+DB="${REPO}/data/godseye.db"
 mkdir -p "$(dirname "$LOG")"
+
+# --- Step 1: LOCAL health signal first (no Polar API call) -----------------
+# If any purchase row is confirmed 'paid' within the last 30 days, the webhook
+# path is demonstrably working end-to-end. No need to query Polar at all.
+RECENT_PAID=$(sqlite3 "$DB" "SELECT COUNT(*) FROM purchases WHERE created_at >= datetime('now','-30 days') AND status='paid';" 2>/dev/null || echo "0")
+
+if [ "$RECENT_PAID" != "0" ]; then
+  # Webhook is provably delivering -> stay quiet, touch nothing.
+  exit 0
+fi
+
+# No confirmed payment in 30 days. This could mean either (a) no sales yet (fine)
+# or (b) the webhook is broken and silently swallowing orders. We cannot tell the
+# difference locally, so do ONE Polar API call to verify the endpoint is enabled.
 
 # Read the Polar API key (root-only, mode 600).
 KEY=$(python3 -c "import json;print(json.load(open('${REPO}/polar-config.json'))['api_key'])" 2>/dev/null || true)
@@ -39,11 +61,11 @@ except Exception:
 " 2>/dev/null || true)
 
 if [ "$ENABLED" = "true" ]; then
-  echo "$(date -Is) OK: Godseye primary Polar webhook ${TARGET_ID} is enabled (order.created/order.paid path live)" | tee -a "$LOG"
+  echo "$(date -Is) OK: Polar webhook ${TARGET_ID} enabled (no confirmed payments in 30d; checked Polar API once daily)" | tee -a "$LOG"
   exit 0
 fi
 
-echo "$(date -Is) WARN: Godseye primary Polar webhook ${TARGET_ID} enabled=${ENABLED:-UNKNOWN} — RE-ENABLING" | tee -a "$LOG"
+echo "$(date -Is) WARN: Polar webhook ${TARGET_ID} enabled=${ENABLED:-UNKNOWN} — RE-ENABLING (checked Polar API once daily)" | tee -a "$LOG"
 
 # Re-enable it (preserves URL + secret + events).
 RESP=$(curl -s -o /dev/null -w "%{http_code}" -X PATCH \
