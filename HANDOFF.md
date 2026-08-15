@@ -1,97 +1,66 @@
-# Godseye HQ — Agent Handoff
+# GodsEye — Current Handoff
 
-> Current milestone: **Canonical multi-hero pre-launch landing approved**
-> Last Updated: 2026-08-11
+**Updated:** 2026-08-15
+**Status:** Live, documented, active development
 
-## Quick Start
+## Read first
+
+1. `AGENTS.md`
+2. `PRD.md`
+3. `GODSEYE-PRODUCT-STANDARD.md`
+4. `docs/PRE-LAUNCH-LANDING-MILESTONE-PRD.md`
+5. `drafts/COPY-7-DECISIONS-CARD.md`
+
+## Canonical flow
 
 ```text
-1. READ /root/godseye-repo/PRD.md
-2. READ /root/godseye-repo/AGENTS.md
-3. READ /root/godseye-repo/docs/PRE-LAUNCH-LANDING-MILESTONE-PRD.md
-4. EDIT only /root/godseye-repo
-5. Build: cd /root/godseye-repo && npm run build
-6. Deploy: ./scripts/deploy.sh
-7. Verify https://godseye.digitalhustlerx.com
+https://godseye.digitalhustlerx.com/
+  → https://app.digitalhustlerx.com/signup
+  → authenticated app/dashboard
+  → plan and checkout
+  → confirmed payment webhook
+  → licensed live execution
 ```
 
-## Canonical architecture
+## Current verified state
 
-| Surface | URL | Role |
-|---|---|---|
-| Public pre-launch landing/application | https://godseye.digitalhustlerx.com | Canonical multi-hero GodsEye page; public front door |
-| Signup | https://app.digitalhustlerx.com/signup | OpenSaaS branded auth |
-| Login | https://app.digitalhustlerx.com/login | OpenSaaS branded auth |
-| Authenticated app | https://app.digitalhustlerx.com | Dashboard, account, pricing, subscriptions |
-| Legacy public alias | https://godseye.shop | Redirects to canonical public page |
-| Legacy purchase alias | https://buy.godseye.shop | Redirects to app pricing |
+- Public landing HTTP 200.
+- Signup HTTP 200.
+- Login HTTP 200.
+- Forgot-password HTTP 200.
+- OpenSaaS service active.
+- Nginx syntax valid.
+- GodsEye TypeScript check passes.
+- Polar handler supports `order.paid` in source.
+- Resend configured.
+- Gemini configured, but Telegram bot chat still has a separate 403 issue.
 
-The OpenSaaS marketing landing page must not flash between the public GodsEye page and signup/login. The temporary sslip.io hostname is not customer-facing.
+## Important runtime paths
 
-## Current milestone
+- Canonical source: `/root/godseye-repo`
+- SQLite: `/root/godseye-repo/data/godseye.db`
+- OpenSaaS source: `/root/open-saas`
+- OpenSaaS frontend artifact: `/root/open-saas/template/app/.wasp/out/web-app/build`
+- OpenSaaS server artifact: `/root/open-saas/template/app/.wasp/out/server/bundle/server.js`
+- OpenSaaS service: `opensaas.service`, port 3101
+- Separate customer backend: `godseye-customer-backend.service`, port 3107
 
-The multi-hero GodsEye application page is the canonical root at `godseye.digitalhustlerx.com`. It is the approved pre-launch landing baseline for field tweaking. It contains the hero slider, feature sections, agent fleet, integrations, pricing, FAQ, and footer navigation. Its Get Started and Log In CTAs point directly to the canonical OpenSaaS auth URLs.
+## Safety
 
-See `docs/PRE-LAUNCH-LANDING-MILESTONE-PRD.md` for acceptance criteria and remaining work.
+Back up before edits. Do not blindly commit mixed OpenSaaS working-tree changes. Do not create duplicate Polar webhooks or poll Polar repeatedly. Verify generated Wasp client/server artifacts before restarting production. Never expose secrets.
 
-## Remaining work
+## Next section
 
-1. Field-tweak the canonical multi-hero page copy, spacing, hero timing, and CTA placement.
-2. Configure production SMTP and verify confirmation email delivery.
-3. Complete authenticated signup → login → dashboard → logout dogfood testing.
-4. Audit all public links and outcomes.
-5. Continue aligning the OpenSaaS app UI with GodsEye design tokens.
+Investigate the Gemini Telegram bot 403 separately from landing copy, Polar webhooks, and OpenSaaS first-paint work.
 
-## Deployment
-
-```bash
-cd /root/godseye-repo
-npm run build
-./scripts/deploy.sh
-nginx -t && systemctl reload nginx
-git add -A && git commit -m "<message>" && git push origin main
-```
-
-Do not run destructive Wasp rebuilds casually. OpenSaaS production uses a Wasp static client at `.wasp/out/web-app/build/` and API/auth server on port 3101; consult the `wasp-framework-deployment` skill before changing it.
-
-## GitHub
-
-`https://github.com/digitalhustlerx/GodseyeHQ`
-
-## Source of truth
-
-`/root/godseye-repo` is the only Godseye repo to edit. Legacy directories are reference-only and must not be modified unless explicitly requested.
-
-— End handoff —
-
-## Legacy reference
-
-The previous handoff described the old waitlist-gated phase and is superseded by this milestone baseline.
-
-## Verification
-
-Always verify the actual live title, hero markers, and CTA targets, not only HTTP status:
+## Standard verification
 
 ```bash
-curl -sk https://godseye.digitalhustlerx.com/ | grep -o '<title>[^<]*'
-curl -sk https://godseye.digitalhustlerx.com/ | grep -Eo 'Previous slide|Next slide|Slide [1-5]' | sort -u
-curl -sk https://godseye.digitalhustlerx.com/ | grep -o 'https://app.digitalhustlerx.com/[^" ]*'
+systemctl is-active godseye-backend.service godseye-landing-api.service godseye-telegram-bot.service opensaas.service
+curl -sk -o /dev/null -w '%{http_code}\n' https://godseye.digitalhustlerx.com/
 curl -sk -o /dev/null -w '%{http_code}\n' https://app.digitalhustlerx.com/signup
 curl -sk -o /dev/null -w '%{http_code}\n' https://app.digitalhustlerx.com/login
+curl -sk -o /dev/null -w '%{http_code}\n' https://app.digitalhustlerx.com/forgot-password
 ```
 
-## Ownership
-
-This milestone was approved by the product owner as the baseline before launch. Future field tweaks should be small, reviewable, and preserved in Git history.
-
-## Versioning
-
-Milestone name: `pre-launch landing baseline`
-
-## Notes
-
-Do not reintroduce waitlist/capture copy or temporary auth domains into the primary flow without explicit product approval.
-
-## End
-
-
+No production services are to be stopped as part of documentation-only work.
