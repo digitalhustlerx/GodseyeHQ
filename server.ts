@@ -1424,7 +1424,13 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
   app.post("/api/polar-webhook", express.raw({ type: "application/json" }), (req, res) => {
     const webhookSecret = process.env.POLAR_WEBHOOK_SECRET;
     const rawBody = Buffer.isBuffer(req.body) ? req.body : Buffer.from(JSON.stringify(req.body || {}));
-    const eventType = req.body?.type || "";
+    let event: any = {};
+    try {
+      event = JSON.parse(rawBody.toString("utf8"));
+    } catch {
+      return res.status(400).json({ error: "Invalid JSON body" });
+    }
+    const eventType = String(event.type || event.event || "");
 
     // Verify HMAC-SHA256 signature (Polar's current format)
     const polarSignature = String(req.headers["polar-signature"] || "");
@@ -1448,12 +1454,11 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
       return res.status(401).json({ error: "Invalid webhook signature" });
     }
 
-    const event = req.body || {};
     const data = event.data || {};
 
     // We only act on confirmed, successful checkouts / orders.
     const isPaid =
-      (eventType === "checkout.completed" || eventType === "order.created") &&
+      (eventType === "checkout.completed" || eventType === "order.created" || eventType === "order.paid") &&
       String(data.status || "").toLowerCase() !== "failed";
 
     if (isPaid) {
