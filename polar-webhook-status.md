@@ -148,3 +148,14 @@ not a fix. Verify after every new disable that a manual `PATCH enabled:true` res
 
 
 --- Recurrence fixed (2026-08-15 17:30 WAT cron): webhook 639653fe was enabled:false, re-enabled True. Guard log confirms daily re-disable (08-13/14/15) despite 04:00 guard. Root cause suspected: external/Polar auto-disable; owner verify delivery host + secret match. Revenue path live.
+
+
+## 7th+ recurrence found & fixed + guard tightened to 2x/day (2026-08-15 ~20:07 CEST / ~21:07 WAT — proactive follow-up cron)
+
+Manual sweep found `639653fe` **enabled=FALSE** (live Polar API), ~9h after the 10:32 guard-fix (so ~14h revenue window before the next 04:00 scheduled run). PATCH {"enabled":true} -> HTTP 200, re-listed enabled=True. Backend route live (401 on unsigned = correct HMAC rejection).
+
+Root cause STILL uncontained — this is now the **7th+ independent re-disable of the SAME endpoint**. External actor confirmed (repo git-clean, no local disabler in box crontab). Guard is the only thing holding it.
+
+**Action taken (reversible):** added a **second daily guard run at `0 16 * * *`** (crontab now `0 4 * * *` and `0 16 * * *`) -> halves worst-case silent-payment window to ~12h while keeping Polar API calls at 2/day (no rate-limit risk vs the old every-10min cadence that Polar self-disabled). Backup of prior crontab: /root/.crontab.bak-before-2x-20260815.
+
+**Owner action still required (cron cannot fix):** identify and stop whatever toggles `639653fe` OFF on a schedule — dashboard user, parallel OMP agent cluster acting on stale snapshots, or Polar auto-disable. Candidate: verify delivery host + webhook secret match, and audit who holds Polar endpoint write access. Until stopped, this stays a repeated fight.
