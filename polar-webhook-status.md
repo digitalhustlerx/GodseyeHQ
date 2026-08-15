@@ -146,3 +146,5 @@ checkout won't activate. **Root cause remains uncontained and is now confirmed e
 and stop the parallel agent/OMP process toggling `639653fe` off — the guard is a stopgap,
 not a fix. Verify after every new disable that a manual `PATCH enabled:true` restores it.
 
+
+--- Recurrence fixed (2026-08-15 17:30 WAT cron): webhook 639653fe was enabled:false, re-enabled True. Guard log confirms daily re-disable (08-13/14/15) despite 04:00 guard. Root cause suspected: external/Polar auto-disable; owner verify delivery host + secret match. Revenue path live.
