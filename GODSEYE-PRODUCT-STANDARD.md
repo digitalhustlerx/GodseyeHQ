@@ -3,7 +3,9 @@
 > **Status:** Working product standard — strategy and UX source of truth
 > **Owner:** DigitalHustlerX
 > **Product:** Godseye
-> **Last updated:** 2026-08-06
+> **Last updated:** 2026-08-15
+>
+> **Canonical status note:** Product strategy in this document is authoritative for customer experience and licensing. Runtime/URL/payment facts are authoritative in `PRD.md`; where older sections mention Supabase, placeholder Polar wiring, legacy waitlist gating, or `godseye.shop` as a primary surface, follow `PRD.md` and the live system instead.
 
 This document standardises the Godseye offer across the Telegram bot, dashboard, licensing, checkout, onboarding, website, documentation, and blog content.
 
