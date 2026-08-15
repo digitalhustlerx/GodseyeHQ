@@ -159,3 +159,15 @@ Root cause STILL uncontained — this is now the **7th+ independent re-disable o
 **Action taken (reversible):** added a **second daily guard run at `0 16 * * *`** (crontab now `0 4 * * *` and `0 16 * * *`) -> halves worst-case silent-payment window to ~12h while keeping Polar API calls at 2/day (no rate-limit risk vs the old every-10min cadence that Polar self-disabled). Backup of prior crontab: /root/.crontab.bak-before-2x-20260815.
 
 **Owner action still required (cron cannot fix):** identify and stop whatever toggles `639653fe` OFF on a schedule — dashboard user, parallel OMP agent cluster acting on stale snapshots, or Polar auto-disable. Candidate: verify delivery host + webhook secret match, and audit who holds Polar endpoint write access. Until stopped, this stays a repeated fight.
+
+## 8th+ recurrence and guard tightened (2026-08-15 ~23:35 WAT - proactive follow-up agent)
+
+Live-verified state (2026-08-15 23:31 via Polar API): '639653fe' enabled=true (revenue path LIVE). All 4 services active. Landing/signup/login/forgot-password all HTTP 200. '2b33d0cc' (OpenSaaS) currently enabled=false - quiesced, not blocking.
+
+Still recurring - guard cadence 2x/day provably insufficient. Guard log shows endpoint flipped OFF 3 separate times on 2026-08-15 despite 04:00+16:00 guard: 10:32, 20:07 (7th+ recurrence, ~9h window since 10:32 fix), 21:13 (~1h window). So 2x/day still leaves multi-hour gaps.
+
+Root cause is EXTERNAL and still OPEN. No process in this repo runs at 10:32/20:07/21:13. Backend journal shows no Polar interaction at those times. Only polar-webhook-guard.sh and polar-wire-benefit.sh call the Polar API, and only the guard runs on cron. Disables come from outside this repo cron - likely manual Polar-dashboard user or a dev/session acting externally. OWNER MUST AUDIT who/what has dashboard access to toggle 639653fe.
+
+Action taken (2026-08-15): guard tightened 2x/day to every 3h (15 */3 * * *). Backup: scripts/polar-webhook-guard.sh.bak-20260815. Local-first short-circuit retained (Polar API only when no confirmed paid purchase in 30d; max 8 pings/day only when needed - avoids recreating the original rate-limit-abuse disable loop). Worst-case silent blackout now ~max 3h instead of ~6-12h.
+
+Still blocking real revenue reliability: underlying 'who disables it' root cause is unowned. Guard is a band-aid. Until toggle source is found, sales at risk of silent webhook failure between guard runs.
