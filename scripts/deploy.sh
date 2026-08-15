@@ -29,8 +29,9 @@ if ! grep -q "GodsEye — AI Agents for Your Business" dist/index.html; then
   echo "CANONICAL ROOT CHECK FAILED: multi-hero title missing from dist/index.html" >&2
   exit 1
 fi
-if ! grep -q "Previous slide\|Next slide" dist/index.html; then
-  echo "CANONICAL ROOT CHECK FAILED: hero slider markers missing from dist/index.html" >&2
+# Vite SPA: the hero slider lives in the compiled JS bundle, not the HTML shell.
+if ! grep -rq "Previous slide" dist/assets/*.js 2>/dev/null; then
+  echo "CANONICAL ROOT CHECK FAILED: hero slider markers missing from built JS bundle" >&2
   exit 1
 fi
 
