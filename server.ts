@@ -1374,7 +1374,7 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          product_id: productId,
+          products: [productId],
           success_url,
           customer_email: String(email).toLowerCase().trim(),
           metadata: { plan_id, plan_name: label, tx_ref },
