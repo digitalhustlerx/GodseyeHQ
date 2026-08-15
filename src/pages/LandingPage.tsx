@@ -147,11 +147,11 @@ const FAQS = [
   },
   {
     q: "Do I need to be technical?",
-    a: "Not at all. If you can send a text message, you can use Godseye. It's just a chat.",
+    a: "Not at all. If you can send a text message, you can use GodsEye. It's just a chat.",
   },
   {
     q: "How is this different from ChatGPT or other AI tools?",
-    a: "ChatGPT talks to you. Godseye talks to you AND does the work. It replies to your clients. Posts your content. Processes your orders. Reads your analytics. It doesn't just give advice — it executes.",
+    a: "ChatGPT talks to you. GodsEye talks to you AND does the work. It replies to your clients. Posts your content. Processes your orders. Reads your analytics. It doesn't just give advice — it executes.",
   },
   {
     q: "Can it really manage my whole business?",
@@ -337,7 +337,7 @@ export default function LandingPage() {
       <section className="px-4 max-w-3xl mx-auto">
         <div className="rounded-3xl border border-[#C4A484]/25 bg-[#121212] px-6 py-10 text-center space-y-5">
           <span className="text-[10px] uppercase tracking-widest text-[#C4A484] font-semibold font-mono">
-            🚀 Godseye is live
+            🚀 GodsEye is live
           </span>
           <h2 className="text-2xl md:text-3xl font-light text-[#F2F2F2]" style={{ fontFamily: "'Georgia', serif" }}>
             Start your first agent today.
@@ -490,7 +490,7 @@ export default function LandingPage() {
       {/* ═══ 7. WHO IS THIS FOR? ═══ */}
       <section className="px-4 max-w-7xl mx-auto space-y-14">
         <div className="text-center max-w-2xl mx-auto space-y-3">
-          <span className="text-[10px] uppercase tracking-widest text-[#C4A484] font-semibold font-mono">Who uses Godseye?</span>
+          <span className="text-[10px] uppercase tracking-widest text-[#C4A484] font-semibold font-mono">Who uses GodsEye?</span>
           <h2 className="text-3xl md:text-5xl font-light tracking-tighter text-[#F2F2F2]" style={{ fontFamily: "'Georgia', serif" }}>
             Anyone who runs anything.
           </h2>
@@ -529,14 +529,14 @@ export default function LandingPage() {
             </div>
           ))}
           <div className="flex items-center justify-between px-6 py-5 bg-[#C4A484]/5 border-t border-[#C4A484]/20">
-            <span className="text-sm font-bold text-white">Total with Godseye</span>
+            <span className="text-sm font-bold text-white">Total with GodsEye</span>
             <span className="text-lg font-black text-[#C4A484]">$15-99/mo</span>
           </div>
         </div>
 
         <div className="text-center max-w-xl mx-auto">
           <p className="text-sm text-white/60 leading-relaxed font-light">
-            You're spending hundreds a month on fragmented tools. Godseye replaces all of them for the price of one. And it actually does the work — not just gives you a dashboard to do it yourself.
+            You're spending hundreds a month on fragmented tools. GodsEye replaces all of them for the price of one. And it actually does the work — not just gives you a dashboard to do it yourself.
           </p>
         </div>
       </section>
@@ -654,7 +654,7 @@ export default function LandingPage() {
       <section className="px-4 max-w-7xl mx-auto border-t border-white/10 pt-12 pb-8">
         <div className="text-center space-y-4">
           <p className="text-sm text-white/60 font-light italic" style={{ fontFamily: "'Georgia', serif" }}>
-            Godseye — your business, running from a chat.
+            GodsEye — your business, running from a chat.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4 text-[10px] uppercase tracking-wider text-white/40 font-mono">
             <Link to="/start" className="hover:text-[#C4A484]">How It Works</Link>
@@ -662,7 +662,7 @@ export default function LandingPage() {
             <Link to="/features" className="hover:text-[#C4A484]">Features</Link>
             <Link to="/docs" className="hover:text-[#C4A484]">Docs</Link>
           </div>
-          <p className="text-[10px] text-white/30 font-mono">© 2026 Godseye. Built by DigitalHustlerX.</p>
+          <p className="text-[10px] text-white/30 font-mono">© 2026 GodsEye. Built by DigitalHustlerX.</p>
         </div>
       </section>
 

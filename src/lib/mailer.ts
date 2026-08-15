@@ -3,7 +3,7 @@ import crypto from "crypto";
 
 // Dependency-free local SMTP sender. Speaks plain SMTP over 127.0.0.1:25 to the
 // Postfix relay that ships on this VPS. No nodemailer, no external provider —
-// fully local-first, matching the Godseye VPS deployment.
+// fully local-first, matching the GodsEye VPS deployment.
 export type MailResult = { ok: boolean; error?: string; size?: number };
 
 export interface MailOptions {
@@ -15,7 +15,7 @@ export interface MailOptions {
   html?: string;
 }
 
-const DEFAULT_FROM = "Godseye <noreply@godseye.digitalhustlerx.com>";
+const DEFAULT_FROM = "GodsEye <noreply@godseye.digitalhustlerx.com>";
 
 function sanitize(val: string): string {
   // Strip CR/LF to prevent header injection through user-supplied fields.

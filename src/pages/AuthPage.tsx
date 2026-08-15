@@ -61,7 +61,7 @@ export default function AuthPage({
             {mode === "login" ? "Welcome back" : "Create your account"}
           </h1>
           <p className="text-sm text-white/50 font-light">
-            {mode === "login" ? "Log in to manage your Godseye subscription." : "Sign up to get your agent working in minutes."}
+            {mode === "login" ? "Log in to manage your GodsEye subscription." : "Sign up to get your agent working in minutes."}
           </p>
         </div>
 

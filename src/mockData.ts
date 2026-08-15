@@ -151,10 +151,10 @@ export const SELF_HOST_PLANS: SelfHostPlan[] = [
     name: "White-Glove Setup",
     setupFee: "$299 setup",
     monthlyFee: "$49/mo managed",
-    description: "We provision your VPS, install Godseye, configure your WP sites, hand over keys. You own your data.",
+    description: "We provision your VPS, install GodsEye, configure your WP sites, hand over keys. You own your data.",
     features: [
       "Full VPS provisioning & hardening",
-      "Godseye installation & configuration",
+      "GodsEye installation & configuration",
       "WordPress site connections setup",
       "Ongoing updates, backups & monitoring",
       "Email support (4h SLA)"
@@ -168,12 +168,12 @@ export const SELF_HOST_PLANS: SelfHostPlan[] = [
     name: "Migration Package",
     setupFee: "$599 one-time",
     monthlyFee: "",
-    description: "We move your existing WP sites from cPanel/Bluehost/HostGator to a self-hosted Godseye VPS. Zero downtime.",
+    description: "We move your existing WP sites from cPanel/Bluehost/HostGator to a self-hosted GodsEye VPS. Zero downtime.",
     features: [
       "cPanel / Plesk / DirectAdmin migration",
       "DNS & SSL configuration",
       "Database transfer & verification",
-      "Godseye integration setup",
+      "GodsEye integration setup",
       "Zero-downtime cutover"
     ],
     ctaLabel: "Book a migration",
@@ -199,7 +199,7 @@ export const SELF_HOST_PLANS: SelfHostPlan[] = [
     name: "White-Label (Agencies)",
     setupFee: "",
     monthlyFee: "$999/mo",
-    description: "Run Godseye under your own brand for your clients. Powered by Godseye, branded as your agency.",
+    description: "Run GodsEye under your own brand for your clients. Powered by GodsEye, branded as your agency.",
     features: [
       "Custom branding & domain",
       "Multi-tenant client management",

@@ -210,15 +210,15 @@ function fill(template: string, ctx: DripRecipientCtx): string {
 const EMAILS: EmailDef[] = [
   {
     key: "e1",
-    subject: "You're in the first 500 — welcome to Godseye",
+    subject: "You're in the first 500 — welcome to GodsEye",
     buildText: (c) =>
       fill(
         `Hi {first_name},\n\n` +
         `You're on the list, and your spot in the first 500 is locked.\n\n` +
-        `That means two things the moment Godseye opens:\n` +
+        `That means two things the moment GodsEye opens:\n` +
         `  • 500 free credits, no time limit\n` +
         `  • Early-bird pricing, held for you forever\n\n` +
-        `Why waitlist for Godseye?\n` +
+        `Why waitlist for GodsEye?\n` +
         `Because managing WordPress should be a chat, not a chore.\n` +
         `Instead of emailing your developer (again), you type in Telegram:\n\n` +
         `  "update the pricing page"\n` +
@@ -228,19 +228,19 @@ const EMAILS: EmailDef[] = [
         `We'll email you the moment doors open — no noise before then.\n` +
         `Reply to this email if there's a WordPress task driving you crazy right now.\n` +
         `We read every one.\n\n` +
-        `— The Godseye team\n`,
+        `— The GodsEye team\n`,
         c
       ),
     buildHtml: (c) =>
       `${BODY}<h2 style="color:#fff;">You're in the first 500</h2>` +
       `<p>Hi ${c.first_name},</p>` +
-      `<p>You're on the list, and your spot in the first 500 is locked. That means two things the moment Godseye opens:</p>` +
+      `<p>You're on the list, and your spot in the first 500 is locked. That means two things the moment GodsEye opens:</p>` +
       `<ul><li><strong>500 free credits</strong>, no time limit</li><li><strong>Early-bird pricing</strong>, held for you forever</li></ul>` +
       `<p>Managing WordPress should be a chat, not a chore. Instead of emailing your developer (again), you type in Telegram:</p>` +
       `<p style="font-family:monospace">"update the pricing page"<br>"write a 500-word post about our new feature"<br>"update all plugins and fix the broken layout"</p>` +
       `<p>...and it's done.</p>` +
       `<p>We'll email you the moment doors open — no noise before then. Reply to this email if there's a WordPress task driving you crazy right now. We read every one.</p>` +
-      `${footer("— The Godseye team")}</div></div>`,
+      `${footer("— The GodsEye team")}</div></div>`,
   },
   {
     key: "e2",
@@ -248,7 +248,7 @@ const EMAILS: EmailDef[] = [
     buildText: (c) =>
       fill(
         `Hi {first_name},\n\n` +
-        `The simplest way to show you what Godseye does is to name the things you'll say to it:\n\n` +
+        `The simplest way to show you what GodsEye does is to name the things you'll say to it:\n\n` +
         `  ✍️ "Write a 500-word post for my blog about our new product."\n` +
         `  🧩 "Install WooCommerce and set it up for my shop."\n` +
         `  🔧 "Update all my plugins and fix the broken homepage layout."\n` +
@@ -263,13 +263,13 @@ const EMAILS: EmailDef[] = [
     buildHtml: (c) =>
       `${BODY}<h2 style="color:#fff;">What "chat with your agent" actually looks like</h2>` +
       `<p>Hi ${c.first_name},</p>` +
-      `<p>The simplest way to show you what Godseye does is to name the things you'll say to it:</p>` +
+      `<p>The simplest way to show you what GodsEye does is to name the things you'll say to it:</p>` +
       `<p style="font-family:monospace">✍️ "Write a 500-word post for my blog about our new product."<br>🧩 "Install WooCommerce and set it up for my shop."<br>🔧 "Update all my plugins and fix the broken homepage layout."<br>🛡️ "Run a health check and tell me if anything's risky."</p>` +
       `<p><strong>Real sentences. That's the whole interface.</strong></p>` +
       `<p>You connect your WordPress site from Telegram once, and from then on your site answers to chat — not FTP, not git, not a stack of admin logins.</p>` +
       `<p>The first 500 of you keep 500 free credits to try all of it the day we open.</p>` +
       `<p>You're currently <strong>#${c.waitlist_position ?? "the list"}</strong> on the list.</p>` +
-      `${footer("— The Godseye team")}</div></div>`,
+      `${footer("— The GodsEye team")}</div></div>`,
   },
   {
     key: "e3",
@@ -277,7 +277,7 @@ const EMAILS: EmailDef[] = [
     buildText: (c) =>
       fill(
         `Hi {first_name},\n\n` +
-        `Here's exactly what happens when Godseye opens:\n\n` +
+        `Here's exactly what happens when GodsEye opens:\n\n` +
         `  1. Connect your WordPress site from Telegram (one link, one time).\n` +
         `  2. Start chatting — install, write, update, fix, whatever the site needs.\n` +
         `  3. Done. It works while you work on anything else.\n\n` +
@@ -291,12 +291,12 @@ const EMAILS: EmailDef[] = [
     buildHtml: (c) =>
       `${BODY}<h2 style="color:#fff;">3 steps. That's the whole setup.</h2>` +
       `<p>Hi ${c.first_name},</p>` +
-      `<p>Here's exactly what happens when Godseye opens:</p>` +
+      `<p>Here's exactly what happens when GodsEye opens:</p>` +
       `<ol><li>Connect your WordPress site from Telegram (one link, one time).</li><li>Start chatting — install, write, update, fix, whatever the site needs.</li><li>Done. It works while you work on anything else.</li></ol>` +
       `<p>No dashboards to learn. No developers to pay per change.</p>` +
       `<p>Your spot in the first 500 comes with <strong>500 free credits</strong> and price-lock. Credits never expire. If we don't launch, you don't pay — full stop.</p>` +
       `<p>See you at launch.</p>` +
-      `${footer("— The Godseye team")}</div></div>`,
+      `${footer("— The GodsEye team")}</div></div>`,
   },
   {
     key: "e4",
@@ -305,7 +305,7 @@ const EMAILS: EmailDef[] = [
       fill(
         `Hi {first_name},\n\n` +
         `We're days out.\n\n` +
-        `When Godseye opens, the first 500 (you included) get:\n` +
+        `When GodsEye opens, the first 500 (you included) get:\n` +
         `  • 500 free credits\n` +
         `  • Early-bird pricing held forever: Starter $9/mo, Pro $29/mo, Elite $99/mo\n` +
         `  • Your price never goes up as long as you're in\n` +
@@ -320,16 +320,16 @@ const EMAILS: EmailDef[] = [
       `${BODY}<h2 style="color:#fff;">Doors open soon — your early-bird price is almost live</h2>` +
       `<p>Hi ${c.first_name},</p>` +
       `<p>We're days out.</p>` +
-      `<p>When Godseye opens, the first 500 (you included) get:</p>` +
+      `<p>When GodsEye opens, the first 500 (you included) get:</p>` +
       `<ul><li><strong>500 free credits</strong></li><li><strong>Early-bird pricing held forever:</strong> Starter $9/mo, Pro $29/mo, Elite $99/mo</li><li><strong>Your price never goes up</strong> as long as you're in</li></ul>` +
       `<p>That locked-in price only exists for the first 500. When the list fills, it's normal pricing, and those spots stay filled.</p>` +
       `<p>If you know a site owner who's done paying developers for every small change, forward this — invited members skip the line.</p>` +
       `<p>We'll send one more email: the second doors actually open.</p>` +
-      `${footer("— The Godseye team")}</div></div>`,
+      `${footer("— The GodsEye team")}</div></div>`,
   },
   {
     key: "e5",
-    subject: "Godseye is live — your early-bird price is waiting",
+    subject: "GodsEye is live — your early-bird price is waiting",
     buildText: (c) =>
       fill(
         `Hi {first_name},\n\n` +
@@ -344,11 +344,11 @@ const EMAILS: EmailDef[] = [
         `Every plan comes with your locked early-bird rate and a cancel-anytime guarantee.\n` +
         `Credits never expire.\n\n` +
         `This is the email we promised — no further pushes unless you want one.\n\n` +
-        `— The Godseye team\n`,
+        `— The GodsEye team\n`,
         c
       ),
     buildHtml: (c) =>
-      `${BODY}<h2 style="color:#fff;">Godseye is live — your early-bird price is waiting</h2>` +
+      `${BODY}<h2 style="color:#fff;">GodsEye is live — your early-bird price is waiting</h2>` +
       `<p>Hi ${c.first_name},</p>` +
       `<p>Doors are open.</p>` +
       `${BUTTON(c.purchase_link || "https://godseye.digitalhustlerx.com", "Claim your early-bird spot →")}` +
@@ -356,7 +356,7 @@ const EMAILS: EmailDef[] = [
       `<p><strong>Choose what fits:</strong><br>🧑 Starter — $9/mo: 500 credits, 1 site<br>🚀 Pro — $29/mo: 2,000 credits, 3 sites<br>🌟 Elite — $99/mo: 10,000 credits, 10 sites</p>` +
       `<p>Every plan comes with your locked early-bird rate and a cancel-anytime guarantee. Credits never expire.</p>` +
       `<p>This is the email we promised — no further pushes unless you want one.</p>` +
-      `${footer("— The Godseye team")}</div></div>`,
+      `${footer("— The GodsEye team")}</div></div>`,
   },
   {
     key: "e6",
@@ -369,10 +369,10 @@ const EMAILS: EmailDef[] = [
         `If the reason you haven't claimed is "I'm not sure it'll handle my setup,"\n` +
         `that's exactly what your 500 free credits are for — real use, no obligation.\n\n` +
         `Or if you'd rather hand the whole thing to someone else: reply "custom"\n` +
-        `and we'll quote a done-for-you setup. We get you on Godseye and working\n` +
+        `and we'll quote a done-for-you setup. We get you on GodsEye and working\n` +
         `in two weeks.\n\n` +
         `Either way, the spot is yours until {{early_bird_deadline}}.\n\n` +
-        `— The Godseye team\n`,
+        `— The GodsEye team\n`,
         c
       ),
     buildHtml: (c) =>
@@ -380,9 +380,9 @@ const EMAILS: EmailDef[] = [
       `<p>Hi ${c.first_name},</p>` +
       `<p>The first 500 marker is filling. Your early-bird price is still held for you, but once the list fills it's normal pricing and that rate goes away.</p>` +
       `<p>If the reason you haven't claimed is "I'm not sure it'll handle my setup," that's exactly what your <strong>500 free credits</strong> are for — real use, no obligation.</p>` +
-      `<p>Or if you'd rather hand the whole thing to someone else: reply "custom" and we'll quote a done-for-you setup. We get you on Godseye and working in two weeks.</p>` +
+      `<p>Or if you'd rather hand the whole thing to someone else: reply "custom" and we'll quote a done-for-you setup. We get you on GodsEye and working in two weeks.</p>` +
       `<p>Either way, the spot is yours until <strong>${c.early_bird_deadline || "the first 500 is full"}</strong>.</p>` +
-      `${footer("— The Godseye team")}</div></div>`,
+      `${footer("— The GodsEye team")}</div></div>`,
   },
 ];
 

@@ -1,4 +1,4 @@
-// Minimal auth client for the Godseye account system.
+// Minimal auth client for the GodsEye account system.
 // Talks to the same-origin /api/auth/* endpoints (proxied to the Node backend).
 
 export interface User {

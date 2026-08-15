@@ -5,7 +5,7 @@ const ONBOARDING_STEPS = [
   {
     icon: Rocket,
     title: "Create your account",
-    body: "Sign up with your email. You get 50 free credits to try Godseye immediately — no card required.",
+    body: "Sign up with your email. You get 50 free credits to try GodsEye immediately — no card required.",
     cta: "Sign up free",
     href: "https://app.digitalhustlerx.com/signup",
   },

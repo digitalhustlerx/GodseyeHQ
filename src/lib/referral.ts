@@ -54,7 +54,7 @@ export function referralUrl(token: string): string {
 
 // GOD-8 §4 — waitlist banner copy (verbatim).
 export const WAITLIST_REFERRAL_COPY =
-  "Godseye does more with your people in it. Share your invite link — if the people you work with sign up, you both get launch pricing locked in. No spam, no points-tracking dashboard. Just a better network on the same tool.";
+  "GodsEye does more with your people in it. Share your invite link — if the people you work with sign up, you both get launch pricing locked in. No spam, no points-tracking dashboard. Just a better network on the same tool.";
 
 // GOD-8 §4 — in-product "Bring your team" copy (verbatim).
 export const IN_PRODUCT_REFERRAL_COPY =
