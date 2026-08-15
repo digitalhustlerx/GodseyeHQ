@@ -4,6 +4,8 @@
 > **Repo:** /root/godseye-repo (branch `main` → `origin/main` `ed5c5b9`, clean except a transient in-flight `src/mockData.ts` edit by a concurrent process — see below)
 > **Status:** **One regression found & fixed this run (main-domain root was serving the SPA shell, not the waitlist page).** G4 promotion + typo-duplicate + DKIM remain open for owner.
 
+> ⚠️ **READ-ONLY ARCHIVE — reconciled 2026-08-16.** This incident was a **`dist/`-wipe bug**, not an nginx config requirement. The `try_files /waitlist.html /index.html;` line cited as "AGENTS.md rule #6" references an old rule that the **current canonical AGENTS.md** has replaced with: *"The root is the multi-hero landing. The waitlist page is an explicit alternate route, not a fallback for `/`."* (line 54) and *"Do not switch the canonical root to the waitlist without approval."* (line 172). The root must serve the multi-hero landing, never the waitlist. The underlying `dist/`-wipe bug is structurally fixed by `scripts/restore-seo-assets.sh` (commit `4999a14`). Preserve for reference only; do not re-apply root→waitlist.
+
 ---
 
 ## 🔴 Found & fixed this run — waitlist landing page was missing from `dist/`

@@ -3,6 +3,12 @@
 > **Repo:** /root/godseye-repo (branch `main`, working tree clean, in sync with `origin/main`)
 > **Status:** **🔴 Critical regression found & fixed this run — the G4 waitlist landing page had silently stopped serving at the main-domain root `/` again.** This is the same "waitlist root → SPA shell" hazard flagged on 08-15; restored the correct nginx `location = /` and verified all surfaces healthy.
 
+> ⚠️ **SUPERSEDED — SOURCE-OF-TRUTH CORRECTION (2026-08-16 reconciliation).** This report is **dated in the future** relative to its repo state and is a stale artifact from an earlier loop iteration. It repeatedly cites an **"AGENTS.md rule #6" and a quoted root=waitlist rule that DO NOT EXIST in the current AGENTS.md**. The current canonical `AGENTS.md` (2026-08-15 snapshot) states the OPPOSITE in two places: *"The root is the multi-hero landing. The waitlist page is an explicit alternate route, not a fallback for `/`."* and *"Do not switch the canonical root to the waitlist without approval."*
+>
+> **Corrected history:** the 08-15 incident this report recalls was a `dist/`-wipe bug (bare `npm run build` deleted `waitlist.html`, so root fell through to the SPA shell) — now structurally fixed by `scripts/restore-seo-assets.sh` (commit `4999a14`). It was NOT an nginx `location = /` need to point at `waitlist.html`. The live and `.bak` configs both serve the canonical multi-hero landing at `/` (`try_files /index.html =404;`), which is the approved state.
+>
+> **Action for future loops: DO NOT re-apply `try_files /waitlist.html /index.html;` at root.** That would violate current AGENTS.md. If `dist/` is ever missing assets again, run `./scripts/deploy.sh` (self-heals the SEO/waitlist tree). Any genuine "root serving wrong page" report must be cross-checked against line 54 and line 172 of the current `AGENTS.md` before any nginx edit.
+
 ---
 
 ## 🔴 Found & fixed this run — G4 waitlist page was NOT served at root `/` (critical)
