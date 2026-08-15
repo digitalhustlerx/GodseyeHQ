@@ -747,7 +747,7 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
       const geminiKey = process.env.GEMINI_API_KEY || "";
       const hasGemini = Boolean(geminiKey && !/dummy|you_|placeholder/i.test(geminiKey));
       const OLLAMA_URL = process.env.OLLAMA_URL || "http://127.0.0.1:11434";
-      const OLLAMA_MODEL = process.env.OLLAMA_MODEL || "qwen3.5:4b";
+      const OLLAMA_MODEL = process.env.OLLAMA_MODEL || "tinyllama:latest";
 
       if (!hasGemini) {
         // ---- Local Ollama streaming (no API key required) ----
