@@ -93,7 +93,7 @@ Do not create duplicate webhooks or poll Polar aggressively. The handler support
 
 ## Gemini rule
 
-Gemini is configured. If Telegram bot chat returns 403, investigate the bot runtime/environment and provider response. Do not report the key as simply “missing” without current evidence.
+`GEMINI_API_KEY` exists in `/root/godseye-repo/.env` and `.env.local`, but both values return `API_KEY_INVALID` from `generativelanguage.googleapis.com` (verified live 2026-08-16) — a likely contributor to the Telegram bot chat 403. The bot service env (`/etc/godseye/telegram.env`) contains no GEMINI variable at all. Report the key as present-but-invalid; do not claim it is "configured and working" without live verification of the specific key.
 
 ## OpenSaaS rule
 
