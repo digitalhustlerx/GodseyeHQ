@@ -36,7 +36,7 @@ QUESTIONS = [
         "flags": [
             (r"\$\s?\d", "specific price claim"),
             (r"(only|just|basically)\s+a?\s*wordpress", "positioned as WordPress-only"),
-            (r"wordpress\s+plugin", "called a WordPress plugin"),
+            (r"is\s+(indeed\s+|basically\s+|just\s+)?a\s+(wordpress|wp)?\s*plugin", "called a WordPress plugin"),
         ],
     },
     {
@@ -62,7 +62,7 @@ QUESTIONS = [
         ),
         "flags": [
             (r"^yes", "says it is a WordPress plugin"),
-            (r"plugin", "calls it a plugin"),
+            (r"is\s+(indeed\s+|basically\s+|just\s+)?a\s+(wordpress|wp)?\s*plugin", "calls it a plugin"),
             (r"only\s+works", "limits it to WordPress"),
         ],
     },
@@ -196,13 +196,18 @@ def judge(voice, pairs):
     sys_prompt = (
         "You audit what AI models say about a product. For each item you are given the "
         "buyer question, the CANONICAL TRUTH about the product, and a MODEL ANSWER. "
-        "Decide if the model answer CONTRADICTS, distorts, or misrepresents the truth "
-        "(wrong pricing or any specific price, wrong positioning e.g. calling it a "
-        "WordPress plugin when it is a whole-business agent, claiming full autonomy "
-        "when the customer approves everything, wrong URLs, wrong free/paid story). "
-        "Minor wording differences that don't change the meaning are NOT contradictions. "
-        "Return ONLY a JSON array, one object per item, in the same order: "
-        '[{"index":0,"contradiction":true/false,"issue":"short reason","quote":"exact misleading phrase from the model answer"}]'
+        'Classify the model answer with kind: "contradiction" = the model AFFIRMATIVELY '
+        'states something false or distorted about the product (wrong pricing or any '
+        "specific price, wrong positioning e.g. calling it a WordPress plugin when it is "
+        "a whole-business agent, claiming full autonomy when the customer approves "
+        "everything, wrong official URLs, wrong free/paid story, misidentifying it as a "
+        'different product entirely); "gap" = the model says it has no information / no '
+        'such product exists / cannot recall it (a knowledge or brand-footprint gap, NOT '
+        'a false claim); "refusal" = the model refuses to answer on policy grounds; '
+        '"ok" = consistent with the truth. Minor wording differences that do not change '
+        "meaning are NOT contradictions. Return ONLY a JSON array, one object per item, "
+        'in the same order: [{"index":0,"kind":"contradiction","issue":"short reason",'
+        '"quote":"exact misleading phrase from the model answer"}]'
     )
     user_payload = json.dumps([
         {"question": p["q"], "truth": p["truth"], "model_answer": a}
@@ -288,23 +293,34 @@ def main():
         })
 
     # ---- compile findings ----
-    findings = []
+    findings = []      # hard contradictions → alert
+    gaps = []          # brand-footprint gaps / refusals → compact summary
+    seen_det = set()
     for r in results:
         v = r["voice"]
         for f in r["det_flags"]:
+            dedupe_key = (v, f["label"], f["q"])
+            if dedupe_key in seen_det:
+                continue
+            seen_det.add(dedupe_key)
             findings.append(f"❌ {v}: {f['label']} — \"{f['context'][:140]}\"")
         if r["judge"]:
             for j in r["judge"]:
-                if isinstance(j, dict) and j.get("contradiction"):
-                    q = j.get("index", "?")
+                if not isinstance(j, dict):
+                    continue
+                kind = j.get("kind", "contradiction" if j.get("contradiction") else "ok")
+                if kind == "contradiction":
                     findings.append(
-                        f"⚠️ {v} (Q{int(q)+1}): {j.get('issue','')} — \"{j.get('quote','')[:120]}\"")
+                        f"⚠️ {v} (Q{int(j.get('index', 0)) + 1}): {j.get('issue', '')} — \"{j.get('quote', '')[:120]}\"")
+                elif kind in ("gap", "refusal"):
+                    gaps.append((v, kind, j.get("issue", "")))
 
     if mode == "json":
         print(json.dumps({
             "voices_ok": [r["voice"] for r in results],
             "voices_failed": voice_failures,
             "findings": findings,
+            "gaps": [{"voice": g[0], "kind": g[1], "issue": g[2]} for g in gaps],
             "clean": not findings,
         }, ensure_ascii=False, indent=2))
         return
@@ -314,20 +330,34 @@ def main():
         for f in findings:
             print(f)
         print(f"\nVoices checked: {', '.join(r['voice'] for r in results)}")
-    else:
-        if mode == "report":
-            print("✅ ALL CLEAR — no model contradicts canonical GodsEye truth.")
-            print(f"Voices checked ({len(results)}):")
+        return
+
+    # no contradictions: gap summary (always in report/verbose, compact in cron)
+    if gaps:
+        seen_v = set()
+        lines = []
+        for v, kind, issue in gaps:
+            if v in seen_v:
+                continue
+            seen_v.add(v)
+            lines.append(f"  • {v}: {kind} — {issue[:110]}")
+        print("🧿 GodsEye brand footprint gaps (models don't know the product yet):")
+        print("\n".join(lines))
+        return
+
+    if mode == "report":
+        print("✅ ALL CLEAR — no model contradicts canonical GodsEye truth.")
+        print(f"Voices checked ({len(results)}):")
+        for r in results:
+            print(f"  • {r['voice']} ({r['model']})")
+        for i, qitem in enumerate(QUESTIONS):
+            print(f"\n— Q{i+1}: {qitem['q']}")
             for r in results:
-                print(f"  • {r['voice']} ({r['model']})")
-            for i, qitem in enumerate(QUESTIONS):
-                print(f"\n— Q{i+1}: {qitem['q']}")
-                for r in results:
-                    if r["answers"][i]:
-                        print(f"  [{r['voice']}] {r['answers'][i][:220]}")
-        # cron mode: silent when clean (no output = no alert)
-        if voice_failures:
-            print(f"⚠️ Voice failures: {len(voice_failures)} — {'; '.join(f'{v}: {e[:60]}' for v,e in voice_failures)}")
+                if r["answers"][i]:
+                    print(f"  [{r['voice']}] {r['answers'][i][:220]}")
+    # cron mode: silent when clean
+    if voice_failures:
+        print(f"⚠️ Voice failures: {len(voice_failures)} — {'; '.join(f'{v}: {e[:60]}' for v, e in voice_failures)}")
 
 
 if __name__ == "__main__":
