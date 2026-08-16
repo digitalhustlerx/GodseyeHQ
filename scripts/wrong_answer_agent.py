@@ -37,6 +37,7 @@ QUESTIONS = [
             (r"\$\s?\d", "specific price claim"),
             (r"(only|just|basically)\s+a?\s*wordpress", "positioned as WordPress-only"),
             (r"is\s+(indeed\s+|basically\s+|just\s+)?a\s+(wordpress|wp)?\s*plugin", "called a WordPress plugin"),
+            (r"(gps|fleet\s*(tracking|management)|surveillance|location\s*tracking)", "misidentified as GPS/tracking product"),
         ],
     },
     {
