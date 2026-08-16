@@ -19,6 +19,7 @@ import re
 import sys
 import time
 import urllib.request
+from concurrent.futures import ThreadPoolExecutor
 
 # --------------------------------------------------------------------------
 # 1. Canonical truth (source: /root/godseye-repo/PRD.md + AGENTS.md, 2026-08-15)
@@ -159,7 +160,7 @@ def _read_key_sources():
 # --------------------------------------------------------------------------
 # 3. Calls
 # --------------------------------------------------------------------------
-def _chat(base, key, model, messages, timeout=75, max_tokens=600, temp=0.3, retries=2):
+def _chat(base, key, model, messages, timeout=60, max_tokens=600, temp=0.3, retries=1):
     body = json.dumps({
         "model": model,
         "messages": messages,
@@ -269,16 +270,17 @@ def main():
     results = []          # per voice: {voice, answers[], flags[], judge_claims[]}
     voice_failures = []
 
-    for voice in voices:
+    def run_voice(voice):
         answers = []
-        for qi, qitem in enumerate(QUESTIONS):
+        failures = []
+        for qitem in QUESTIONS:
             a = ask_voice(voice, qitem["q"])
             if a and not a.startswith("__VOICE_FAILED__"):
                 answers.append(a)
             else:
-                voice_failures.append((voice["label"], a if a else "no response"))
+                failures.append((voice["label"], a if a else "no response"))
                 answers.append("")
-            time.sleep(1.0)  # pace calls to respect free-tier rate limits
+            time.sleep(0.6)  # gentle intra-voice pacing
         pairs = [(qitem, answers[i]) for i, qitem in enumerate(QUESTIONS)
                  if answers[i]]
         claims = judge(voice, pairs) if pairs else None
@@ -289,13 +291,19 @@ def main():
                 for h in deterministic_flags(qitem, answers[i]):
                     det.append({"q": qitem["q"][:60], "label": h["label"], "context": h["context"]})
 
-        results.append({
+        return {
             "voice": voice["label"],
             "model": voice["model"],
             "answers": answers,
             "det_flags": det,
             "judge": claims,
-        })
+            "failures": failures,
+        }
+
+    with ThreadPoolExecutor(max_workers=min(4, len(voices))) as pool:
+        for r in pool.map(run_voice, voices):
+            results.append(r)
+            voice_failures.extend(r["failures"])
 
     # ---- compile findings ----
     findings = []      # hard contradictions → alert
