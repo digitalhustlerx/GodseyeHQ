@@ -449,11 +449,12 @@ function welcomeText(state, stats = { spotsLeft: 100 }) {
     "",
     "You can talk to me like you'd talk to a partner. No forms, no setup needed to start.",
   ];
+  const spotsLeft = Number.isFinite(Number(stats.spotsLeft)) ? Math.max(0, Number(stats.spotsLeft)) : 100;
+  lines.push("", `🔥 Founder Pass: ${spotsLeft} spots left. You get a free starter allowance to try it; first 100 founders keep the special rate.`);
   if (amConnected) {
     lines.push("", `You're ready to go. Connected site: \`${state.siteId || "see /sites"}\` — try a demo task.`);
   } else {
-    const spotsLeft = Number.isFinite(Number(stats.spotsLeft)) ? Math.max(0, Number(stats.spotsLeft)) : 100;
-    lines.push("", `🔥 Founder Pass: ${spotsLeft} spots left. You get a free starter allowance to try it; first 100 founders keep the special rate.`);
+    lines.push("", "You're in the Founder Pass — start your free trial now.");
   }
   if (state.referralCode) {
     lines.push("", `🎁 You have a referral bonus (${state.referralCode}) — extra credits when you activate.`);
