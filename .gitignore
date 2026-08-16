@@ -13,3 +13,6 @@ coverage/
 !.env.example
 polar-config.json
 .labs-staging/
+
+# server edit backups (may contain secrets)
+*.bak-*

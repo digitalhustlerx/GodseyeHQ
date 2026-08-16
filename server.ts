@@ -743,34 +743,38 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
 
     try {
       // Provider routing: prefer paid Gemini if a real key is configured; else
-      // fall back to the local Ollama runtime (project default: local-first).
+      // fall back to a hosted DeepSeek-class model via a configurable
+      // OpenAI-compatible endpoint (default: the local FreeLLMAPI gateway's
+      // "auto" route). No local Ollama/tinyllama — it is too weak for agent work.
       const geminiKey = process.env.GEMINI_API_KEY || "";
       const hasGemini = Boolean(geminiKey && !/dummy|you_|placeholder/i.test(geminiKey));
-      const OLLAMA_URL = process.env.OLLAMA_URL || "http://127.0.0.1:11434";
-      const OLLAMA_MODEL = process.env.OLLAMA_MODEL || "tinyllama:latest";
+      const DS_BASE_URL = process.env.DEEPSEEK_BASE_URL || "http://100.118.153.40:3001/v1";
+      const DS_API_KEY = process.env.DEEPSEEK_API_KEY || "";
+      const DS_MODEL = process.env.DEEPSEEK_MODEL || "auto";
 
       if (!hasGemini) {
-        // ---- Local Ollama streaming (no API key required) ----
-        // Fail fast (20s) when Ollama is down/slow so the bot doesn't hang the
-        // whole turn. A 500-class error below is caught and sent as a clean SSE
-        // error the bot can surface as a friendly "try again later" message.
-        const chatRes = await fetch(`${OLLAMA_URL}/api/chat`, {
+        // ---- Hosted DeepSeek-class streaming (OpenAI-compatible) ----
+        // Fail fast (20s) when the gateway is down/slow so the bot doesn't
+        // hang the whole turn.
+        const chatRes = await fetch(`${DS_BASE_URL}/chat/completions`, {
           method: "POST",
-          headers: { "content-type": "application/json" },
+          headers: {
+            "content-type": "application/json",
+            authorization: `Bearer ${DS_API_KEY}`,
+          },
           signal: AbortSignal.timeout(20000),
           body: JSON.stringify({
-            model: OLLAMA_MODEL,
+            model: DS_MODEL,
             stream: true,
             messages: [
               { role: "system", content: systemInstruction },
               ...history.map((m: any) => ({ role: m.role === "assistant" ? "assistant" : "user", content: String(m.content || "") })),
             ],
-            options: { temperature: 0.7 },
+            temperature: 0.7,
           }),
         });
         if (!chatRes.ok || !chatRes.body) {
-          // Ollama live but the model failed/inference timed out on its side.
-          // Match the bot's friendly message so users see a clean nudge.
+          // Gateway live but the model failed on its side. Friendly nudge.
           sendError("Godseye's chat engine is warming up — try again in a minute.");
           return res.end();
         }
@@ -778,12 +782,15 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
         const reader = chatRes.body.getReader();
         const decoder = new TextDecoder();
         let full = "";
+        let buf = "";
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
-          const chunk = decoder.decode(value, { stream: true });
-          for (const line of chunk.split("\n")) {
-            const trimmed = line.trim();
+          buf += decoder.decode(value, { stream: true });
+          for (const line of buf.split("\n")) {
+            let trimmed = line.trim();
+            if (trimmed.startsWith("data:")) trimmed = trimmed.slice(5).trim();
+            if (!trimmed || trimmed === "[DONE]") continue;
             if (!trimmed.startsWith("{")) continue;
             let j;
             try {
@@ -791,16 +798,18 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
             } catch {
               continue;
             }
-            const delta = j.message?.content || j.response || "";
+            const delta = j.choices?.[0]?.delta?.content || j.choices?.[0]?.delta?.reasoning || "";
             if (delta) {
               full += delta;
               send({ delta });
             }
-            if (j.done) {
+            if (j.choices?.[0]?.finish_reason) {
               reader.cancel();
               break;
             }
           }
+          // keep only the (possibly partial) trailing line
+          buf = buf.endsWith("\n") ? "" : buf.slice(buf.lastIndexOf("\n") + 1);
         }
         if (full.trim()) {
           chatUsageIncrement(telegramId);
