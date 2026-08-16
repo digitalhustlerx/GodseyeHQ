@@ -5,7 +5,7 @@ GodsEye Wrong-Answer Agent — weekly AI lie detector for the product.
 Asks diverse external LLMs (NVIDIA NIM hosted models + opencode-go gateway)
 the top GodsEye buyer questions, compares their answers against the canonical
 truth (PRD.md / AGENTS.md), and reports contradictions: wrong pricing claims,
-wrong positioning, wrong autonomy claims, wrong URLs.
+wrong positioning, wrong autonomy claims, wrong URLs, misidentification.
 
 Usage:
   python3 wrong_answer_agent.py           # cron mode: print findings only (silent when clean)
@@ -15,11 +15,10 @@ Usage:
 Keys are read from existing config files; nothing is printed, logged, or stored.
 """
 import json
-import os
 import re
 import sys
+import time
 import urllib.request
-import urllib.error
 
 # --------------------------------------------------------------------------
 # 1. Canonical truth (source: /root/godseye-repo/PRD.md + AGENTS.md, 2026-08-15)
@@ -166,21 +165,31 @@ def _read_key_sources():
 # --------------------------------------------------------------------------
 # 3. Calls
 # --------------------------------------------------------------------------
-def _chat(base, key, model, messages, timeout=45, max_tokens=600, temp=0.3):
+def _chat(base, key, model, messages, timeout=75, max_tokens=600, temp=0.3, retries=2):
     body = json.dumps({
         "model": model,
         "messages": messages,
         "max_tokens": max_tokens,
         "temperature": temp,
     }).encode()
-    req = urllib.request.Request(
-        base.rstrip("/") + "/chat/completions",
-        data=body,
-        headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
-    )
-    with urllib.request.urlopen(req, timeout=timeout) as r:
-        d = json.loads(r.read().decode())
-    return d["choices"][0]["message"]["content"]
+    last_err = None
+    for attempt in range(retries + 1):
+        if attempt:
+            time.sleep(5 * attempt)  # exponential backoff on failure
+        try:
+            req = urllib.request.Request(
+                base.rstrip("/") + "/chat/completions",
+                data=body,
+                headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
+            )
+            with urllib.request.urlopen(req, timeout=timeout) as r:
+                d = json.loads(r.read().decode())
+            return d["choices"][0]["message"]["content"]
+        except Exception as e:
+            last_err = e
+    if last_err is not None:
+        raise last_err
+    raise RuntimeError("request failed with no recorded error")
 
 
 def ask_voice(voice, question):
@@ -275,6 +284,7 @@ def main():
             else:
                 voice_failures.append((voice["label"], a if a else "no response"))
                 answers.append("")
+            time.sleep(1.0)  # pace calls to respect free-tier rate limits
         pairs = [(qitem, answers[i]) for i, qitem in enumerate(QUESTIONS)
                  if answers[i]]
         claims = judge(voice, pairs) if pairs else None
