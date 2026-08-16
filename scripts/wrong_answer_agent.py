@@ -132,32 +132,26 @@ def _read_key_sources():
             "model": "deepseek-ai/deepseek-v4-flash-0731",
         })
         voices.append({
-            "label": "NVIDIA Kimi",
-            "base": nv.get("baseURL", "https://integrate.api.nvidia.com/v1"),
-            "key": nv["apiKey"],
-            "model": "moonshotai/kimi-k2.6",
-        })
-        voices.append({
-            "label": "NVIDIA Mistral",
-            "base": nv.get("baseURL", "https://integrate.api.nvidia.com/v1"),
-            "key": nv["apiKey"],
-            "model": "mistralai/mistral-large-2-instruct",
-        })
-        voices.append({
-            "label": "NVIDIA Llama",
+            "label": "NVIDIA Llama-3.3",
             "base": nv.get("baseURL", "https://integrate.api.nvidia.com/v1"),
             "key": nv["apiKey"],
             "model": "meta/llama-3.3-70b-instruct",
         })
-
-    oc = _oc_provider("provider-opencode-go")
-    if oc.get("apiKey"):
         voices.append({
-            "label": "OpenCode Go",
-            "base": oc.get("baseURL", "https://opencode.ai/zen/go/v1"),
-            "key": oc["apiKey"],
-            "model": "deepseek-v4-flash",
+            "label": "NVIDIA Llama-3.1",
+            "base": nv.get("baseURL", "https://integrate.api.nvidia.com/v1"),
+            "key": nv["apiKey"],
+            "model": "meta/llama-3.1-70b-instruct",
         })
+        voices.append({
+            "label": "NVIDIA MiniMax",
+            "base": nv.get("baseURL", "https://integrate.api.nvidia.com/v1"),
+            "key": nv["apiKey"],
+            "model": "minimaxai/minimax-m3",
+        })
+        # NOTE: moonshotai/kimi-k2.6 and mistralai/mistral-large-2-instruct are
+        # listed in /v1/models but return 404 on this account ("Function not
+        # found") — replaced with models verified callable (2026-08-16).
 
     return voices
 
