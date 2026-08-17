@@ -1,19 +1,17 @@
 #!/usr/bin/env bash
-# Polar webhook guard — RATE-LIMIT-FRIENDLY version (2026-08-12).
+# Polar webhook guard — RATE-LIMIT-FRIENDLY + NO-BLIND-SPOT version (2026-08-17).
 #
-# WHY REWRITTEN: The old version ran every minute via cron, calling the Polar API
-# (GET /v1/webhooks/endpoints) on EVERY run — ~1,440 pings/day. Polar treated this
-# as rate-limit/abuse and sent an email + silently disabled the endpoint. That
-# created the exact failure this guard was trying to prevent.
-#
-# NEW BEHAVIOR:
-#   - Runs ONCE PER DAY via cron (crontab `0 4 * * *`), NOT every minute.
-#   - First checks OUR OWN local purchases table (godseye.db) for recent confirmed
-#     payments in the last 24h. If the webhook is working (orders are landing),
-#     we DO NOT touch the Polar API at all -> zero rate-limit risk.
-#   - Only calls the Polar API on the rare daily check when NO recent confirmed
-#     payment exists, to verify/re-enable the endpoint.
-#   - Minimal logging: at most 1 line per daily run + only on change/alert.
+# HISTORY:
+#   2026-08-12 v1: ran every minute, called Polar API every run (~1,440/day).
+#                 Polar rate-limited/abused it and disabled the endpoint.
+#   2026-08-17 v2: every-3h cron. Bug: short-circuited (exit 0) when local DB
+#                 had ANY 'paid' row in last 30 days -> if Polar externally
+#                 disabled the webhook during a sales window, the guard never
+#                 checked and orders were silently swallowed (strikes #10-#12).
+#   2026-08-17 v3 (this): ALWAYS does ONE Polar API GET per run (max 8/day —
+#                 negligible versus the 1,440/day that caused the original
+#                 ban). Local paid-row count no longer skips the check; it only
+#                 escalates the WARN severity (missed orders possible).
 #
 # Idempotent and safe to re-run.
 
@@ -21,62 +19,80 @@ set -uo pipefail
 
 REPO=/root/godseye-repo
 LOG="${REPO}/logs/polar-webhook-guard.log"
+TMP="${REPO}/logs/.polar-endpoints.json"
 TARGET_ID="639653fe-e485-470d-8a5e-df0da929e0af"
 DB="${REPO}/data/godseye.db"
 mkdir -p "$(dirname "$LOG")"
 
-# --- Step 1: LOCAL health signal first (no Polar API call) -----------------
-# If any purchase row is confirmed 'paid' within the last 30 days, the webhook
-# path is demonstrably working end-to-end. No need to query Polar at all.
+# --- Step 1: LOCAL health signal (no API call) -----------------------------
+# Confirmed-paid rows in last 30 days. Used ONLY to warn loudly if the webhook
+# is found disabled during an active sales window — never to skip the check.
 RECENT_PAID=$(sqlite3 "$DB" "SELECT COUNT(*) FROM purchases WHERE created_at >= datetime('now','-30 days') AND status='paid';" 2>/dev/null || echo "0")
-
+PAID_24H=$(sqlite3 "$DB" "SELECT COUNT(*) FROM purchases WHERE created_at >= datetime('now','-1 day') AND status='paid';" 2>/dev/null || echo "0")
+SEV=""
 if [ "$RECENT_PAID" != "0" ]; then
-  # Webhook is provably delivering -> stay quiet, touch nothing.
-  exit 0
+  SEV=" [CAUTION: ${RECENT_PAID} paid orders in last 30d (${PAID_24H} in 24h) — disabled webhook = missed-order risk]"
 fi
 
-# No confirmed payment in 30 days. This could mean either (a) no sales yet (fine)
-# or (b) the webhook is broken and silently swallowing orders. We cannot tell the
-# difference locally, so do ONE Polar API call to verify the endpoint is enabled.
-
-# Read the Polar API key (root-only, mode 600).
+# --- Step 2: ONE Polar API GET per run — ALWAYS. ----------------------------
+# v3 fix: the old version skipped this whenever RECENT_PAID>0, which let an
+# externally disabled webhook go unnoticed for up to 30 days.
 KEY=$(python3 -c "import json;print(json.load(open('${REPO}/polar-config.json'))['api_key'])" 2>/dev/null || true)
 if [ -z "$KEY" ]; then
   echo "$(date -Is) ERROR: no Polar API key in polar-config.json" | tee -a "$LOG"
   exit 1
 fi
 
-LIST=$(curl -sL -H "Authorization: Bearer $KEY" "https://api.polar.sh/v1/webhooks/endpoints" 2>/dev/null || true)
-
-# Is the target enabled?
-ENABLED=$(echo "$LIST" | python3 -c "
+curl -sL -H "Authorization: Bearer $KEY" "https://api.polar.sh/v1/webhooks/endpoints" -o "$TMP" 2>/dev/null || true
+ENABLED=$(python3 - "$TMP" "$TARGET_ID" <<'PYEOF'
 import json,sys
 try:
-    d=json.load(sys.stdin)
+    d=json.load(open(sys.argv[1]))
     for e in d.get('items',[]):
-        if e.get('id')=='${TARGET_ID}':
+        if e.get('id')==sys.argv[2]:
             print(str(e.get('enabled')).lower()); break
 except Exception:
     pass
-" 2>/dev/null || true)
+PYEOF
+)
 
 if [ "$ENABLED" = "true" ]; then
-  echo "$(date -Is) OK: Polar webhook ${TARGET_ID} enabled (no confirmed payments in 30d; checked Polar API once daily)" | tee -a "$LOG"
+  echo "$(date -Is) OK: webhook ${TARGET_ID} enabled (recent_paid_30d=${RECENT_PAID})" | tee -a "$LOG"
   exit 0
 fi
 
-echo "$(date -Is) WARN: Polar webhook ${TARGET_ID} enabled=${ENABLED:-UNKNOWN} — RE-ENABLING (checked Polar API once daily)" | tee -a "$LOG"
+echo "$(date -Is) WARN: webhook ${TARGET_ID} enabled=${ENABLED:-UNKNOWN} — RE-ENABLING${SEV}" | tee -a "$LOG"
 
-# Re-enable it (preserves URL + secret + events).
+# --- Step 3: re-enable + verify (preserves URL + secret + events) -----------
 RESP=$(curl -s -o /dev/null -w "%{http_code}" -X PATCH \
   -H "Authorization: Bearer $KEY" -H "Content-Type: application/json" \
   -d '{"enabled": true}' \
   "https://api.polar.sh/v1/webhooks/endpoints/${TARGET_ID}" 2>/dev/null || true)
 
 echo "$(date -Is) PATCH re-enable HTTP ${RESP}" | tee -a "$LOG"
-if [ "$RESP" = "200" ] || [ "$RESP" = "204" ]; then
-  echo "$(date -Is) RESOLVED: webhook re-enabled" | tee -a "$LOG"
+if [ "$RESP" != "200" ] && [ "$RESP" != "204" ]; then
+  echo "$(date -Is) ERROR: re-enable failed HTTP ${RESP} — needs manual check" | tee -a "$LOG"
+  exit 1
+fi
+
+# Verify the patch actually took (defense against silent no-op).
+curl -sL -H "Authorization: Bearer $KEY" "https://api.polar.sh/v1/webhooks/endpoints" -o "$TMP" 2>/dev/null || true
+NOW_ENABLED=$(python3 - "$TMP" "$TARGET_ID" <<'PYEOF'
+import json,sys
+try:
+    d=json.load(open(sys.argv[1]))
+    for e in d.get('items',[]):
+        if e.get('id')==sys.argv[2]:
+            print(str(e.get('enabled')).lower()); break
+except Exception:
+    pass
+PYEOF
+)
+
+if [ "$NOW_ENABLED" = "true" ]; then
+  echo "$(date -Is) RESOLVED: webhook re-enabled and verified${SEV}" | tee -a "$LOG"
+  exit 0
 else
-  echo "$(date -Is) ERROR: re-enable failed with HTTP ${RESP} — needs manual check" | tee -a "$LOG"
+  echo "$(date -Is) ERROR: webhook still enabled=${NOW_ENABLED:-UNKNOWN} after PATCH 200 — manual check" | tee -a "$LOG"
   exit 1
 fi
