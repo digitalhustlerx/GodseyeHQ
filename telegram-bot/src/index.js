@@ -374,6 +374,7 @@ function formatSite(site) {
 // ---------- Onboarding wizard ----------
 
 const WELCOME_KYBD = inlineKeyboard([
+  [{ text: "💬 Get to talking", callback_data: "ob:get_to_talking" }],
   [{ text: "👋 Tell me how it's going", callback_data: "ob:convo_warm" }],
   [{ text: "💬 What can Godseye help with?", callback_data: "ob:action_plan" }],
   [{ text: "🔑 I'm already a customer", callback_data: "ob:have_license" }],
@@ -510,6 +511,17 @@ async function handleCallback(chatId, queryId, data) {
       "",
       "No wrong answer. I'll work with whatever you say.",
     ].join("\n"));
+  }
+
+  if (data === "ob:get_to_talking") {
+    state.hasWebsite = false;
+    state.onboardingStep = 99;
+    state.onboardingChatHistory = [];
+    return send(chatId, [
+      "Go ahead — what's on your mind?",
+      "",
+      "You can talk to me like a partner. Ask me anything about your business, and I'll help you plan, organize, or think things through.",
+    ].join("\n"), CHAT_MODE_KYBD);
   }
 
   if (data === "ob:business_setup") {
