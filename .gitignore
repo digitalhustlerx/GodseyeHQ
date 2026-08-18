@@ -16,3 +16,7 @@ app.digitalhustlerx.com
 godseye.digitalhustlerx.com
 digitalhustlerx.com
 wp-plugin/dist/
+
+# Rendered HTML/PDF print exports of docs (canonical source is committed as markdown)
+drafts/fde-analysis.html
+drafts/fde-analysis.pdf
