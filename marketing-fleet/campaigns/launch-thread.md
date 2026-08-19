@@ -1,7 +1,7 @@
 # GodsEye — X/Twitter Launch Thread
 
-**Format:** Pre-launch waitlist thread (7 tweets), founder voice.
-**CTA:** Join the waitlist → https://godseye.digitalhustlerx.com/
+**Format:** Launch thread (7 tweets), founder voice.
+**CTAs:** Free-to-start product → https://godseye.digitalhustlerx.com/ · Free ROI audit → https://digitalhustlerx.com/bio
 **Bot:** @GodseyeXbot on Telegram
 **Founder:** Digital Viking (@yourhandle — placeholder)
 
@@ -84,18 +84,26 @@ If you can send a message, you can run GodsEye.
 
 ## TWEET 7 — Access + CTA
 
-Pre-launch. First doors are open.
+Live now. Free to start, runs in Telegram.
 
-Join the waitlist → early access + founder's code.
+Try GodsEye → free chat, no setup, first message = working agent.
 
 📍 https://godseye.digitalhustlerx.com/
 
-Tell them Digital Viking sent you. 👀 @yourhandle
+Or get a free ROI audit first → digitalhustlerx.com/bio
 
 ---
 
 ### Posting notes (for creator, delete before posting)
 - Every tweet is trimmed to ≤280 chars (verified below).
 - `@yourhandle` (tweets 1-7 header + tweet 7) = founder's real X handle — replace before posting.
+
+### REFRESHED 2026-08-19 (follow-up agent)
+- Offer updated from waitlist-only to LIVE product: free-to-start (onboarding has a
+  'Get to talking' skip-to-free-chat shortcut, deployed 01:29 WAT) + free ROI AI Audit
+  funnel (bio → /services/ai-audit, live 200).
+- Tweet 7 CTA now splits: try the product OR book a free ROI audit. Waitlist framing removed.
+- Domain routing verified live (godseye.digitalhustlerx.com, digitalhustlerx.com/bio).
+
 - Follow tweet 3 with a screenshot of @GodseyeXbot for a scroll-stop.
 - Add a video/gif of the agent working for tweets 4-5.
