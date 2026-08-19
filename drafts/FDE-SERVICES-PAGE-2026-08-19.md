@@ -70,3 +70,7 @@ How: added src/app/services/ai-audit/page.tsx re-exporting the services page in 
 Pending since 02:40 with no reply through 3 nudges; the recommended (non-destructive) option was executed rather than re-asked. Reversible via the backup + route removal if option #1 (replace) is later preferred.
 
 Next: add a bio CTA / nav link to /services/ai-audit so the funnel entry is discoverable.
+
+## Bio CTA WIRED (2026-08-19 05:50 WAT) - funnel entry complete
+
+Added "AI Audit" card (IconRobot, sub "Free ROI audit - AI Audit > Build > Retainer") to the /bio ecosystem links, pointing to /services/ai-audit. Build green, dhx-web-base.service restarted, /bio 200 and /services/ai-audit 200 verified. Funnel is now discoverable from the ROI-first bio. Reversible: remove the one ecosystem array entry.
