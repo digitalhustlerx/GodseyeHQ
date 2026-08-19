@@ -47,4 +47,4 @@ echo "[restore-seo] Normalizing permissions (644 files / 755 dirs)..."
 find dist -type f -exec chmod 644 {} \;
 find dist -type d -exec chmod 755 {} \;
 
-echo "[restore-seo] OK — dist waitlist md5: $(md5sum dist/waitlist.html | awk '{print $1}')"
+echo "[restore-seo] OK — dist root index md5: $(md5sum dist/index.html | awk '{print $1}') (waitlist deliberately not deployed to / per AGENTS.md)"
