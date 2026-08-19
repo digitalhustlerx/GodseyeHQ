@@ -476,7 +476,7 @@ function previewWelcomeText() {
   return [
     "✨ Let's set up your business space.",
     "",
-    "Answer 5 short questions, one at a time:",
+    "Answer 3 short questions, one at a time:",
     "1) What do you do?",
     "2) What takes too much time?",
     "3) What stresses you most?",
@@ -1137,10 +1137,8 @@ async function handleMessage(message) {
       state.onboardingAnswers[state.onboardingQuestion] = answer;
       const questions = [
         "What do you do, or what are you building?",
-        "What is taking too much of your time right now?",
-        "What is stressing you most in the business?",
+        "What's the #1 thing eating your time right now?",
         "What would you love to stop doing yourself?",
-        "What result would make this feel worthwhile this week?",
       ];
       state.onboardingQuestion += 1;
       if (state.onboardingQuestion < questions.length) {
