@@ -33,7 +33,8 @@ cp /root/godseye-repo/seo-assets/token-wrapped.html       dist/token-wrapped.htm
 cp /root/godseye-repo/seo-assets/godseye-tiers.html          dist/godseye-tiers.html
 cp /root/godseye-repo/seo-assets/godseye-insight-report.html dist/godseye-insight-report.html
 cp /root/godseye-repo/seo-assets/godseye-launch-posts.html   dist/godseye-launch-posts.html
-cp /root/godseye-repo/seo-assets/waitlist.html               dist/waitlist.html
+# DISABLED: waitlist.html was being served instead of React SPA index.html
+# cp /root/godseye-repo/seo-assets/waitlist.html               dist/waitlist.html
 cp /root/godseye-repo/seo-assets/tracker.js                  dist/tracker.js
 # SEO fundamentals
 cp /root/godseye-repo/seo-assets/robots.txt   dist/robots.txt
