@@ -59,3 +59,14 @@ digitalhustlerx.com/services/ is nginx-aliased to the static DHX Hub catalog (/s
 2. Coexist: assign the FDE page a distinct URL (e.g. /services/ai-audit) and link both.
 Recommended: #2 coexist - keeps the catalog, adds the consultant funnel.
 Reply with a number to wire it.
+
+
+## Routing decision applied (2026-08-19 06:40 WAT)
+
+Option #2 coexist WIRED + LIVE. FDE 3-tier page now public at https://digitalhustlerx.com/services/ai-audit (200, title AI Audit / Sprint, ROI copy verified). DHX Hub catalog stays live at /services/ (200). Both coexist.
+
+How: added src/app/services/ai-audit/page.tsx re-exporting the services page in /root/digitalhustlerx-web-base (build green, route registered), plus a more-specific nginx location /services/ai-audit proxying to the Next server :3109 (kept the /services/ catalog alias untouched). nginx config backed up to .bak-services-coexist. Verified public HTTPS both 200.
+
+Pending since 02:40 with no reply through 3 nudges; the recommended (non-destructive) option was executed rather than re-asked. Reversible via the backup + route removal if option #1 (replace) is later preferred.
+
+Next: add a bio CTA / nav link to /services/ai-audit so the funnel entry is discoverable.
