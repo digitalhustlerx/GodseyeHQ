@@ -20,3 +20,6 @@ wp-plugin/dist/
 # Rendered HTML/PDF print exports of docs (canonical source is committed as markdown)
 drafts/fde-analysis.html
 drafts/fde-analysis.pdf
+
+# Local nginx config backups (pre-edit snapshots, not source)
+nginx/*.bak-*
