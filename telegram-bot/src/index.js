@@ -1147,8 +1147,10 @@ async function handleMessage(message) {
           reply_markup: CHAT_MODE_KYBD,
         }).catch(() => {});
         // P3: occasional soft upgrade nudge every 10 chat turns (soft monetization).
+        // Only for free/unconnected users — never nudge a paid or connected customer.
+        const amPaid = !!(state.licenseKey || state.siteId);
         state.chatMsgCount = (state.chatMsgCount || 0) + 1;
-        if (state.chatMsgCount >= 10) {
+        if (!amPaid && state.chatMsgCount >= 10) {
           state.chatMsgCount = 0;
           const used = (state.onboardingChatHistory?.length ?? 0);
           await send(
