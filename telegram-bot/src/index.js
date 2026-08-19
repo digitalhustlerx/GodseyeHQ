@@ -119,6 +119,14 @@ function session(chatId) {
       onboardingAnswers: [],
       // Chat-mode conversation history (send to /api/chat for context).
       onboardingChatHistory: [],
+      // Email capture (P0 onboarding gap). Collected BEFORE chat mode so the
+      // free funnel yields a real lead and the Telegram identity can bridge to
+      // the web account / activation ledger. `email` is stored via the profile
+      // persist path, so it survives restarts.
+      email: null,
+      emailCollected: false,
+      // One-time "free tier limits" disclosure shown when first entering chat.
+      freeTierShown: false,
     });
   }
   return sessions.get(key);
@@ -374,10 +382,9 @@ function formatSite(site) {
 // ---------- Onboarding wizard ----------
 
 const WELCOME_KYBD = inlineKeyboard([
-  [{ text: "💬 Get to talking", callback_data: "ob:get_to_talking" }],
+  [{ text: "🚀 Start free", callback_data: "ob:get_to_talking" }],
   [{ text: "👋 Tell me how it's going", callback_data: "ob:convo_warm" }],
-  [{ text: "💬 What can Godseye help with?", callback_data: "ob:action_plan" }],
-  [{ text: "🔑 I'm already a customer", callback_data: "ob:have_license" }],
+  [{ text: "🔑 I'm a customer", callback_data: "ob:have_license" }],
 ]);
 const WEBSITE_KYBD = inlineKeyboard([
   [{ text: "🌐 Yes, I have a website", callback_data: "ob:website_yes" }],
@@ -432,11 +439,12 @@ const COMMANDS_KYBD = inlineKeyboard([
   [{ text: "🖥 List my sites", callback_data: "cmd:sites" }],
   [{ text: "🔗 Manage WordPress", callback_data: "ob:connect_site" }],
 ]);
-// Chat-mode keyboard: shown after "Continue without a website" so the user can
-// keep chatting freely or jump to plans / connect a site later.
+// Chat-mode keyboard: shown after entering free chat so the user can keep
+// chatting freely or jump to plans / connect a site later. No "Chat with me"
+// button — the user is already in chat mode.
 const CHAT_MODE_KYBD = inlineKeyboard([
-  [{ text: "💬 Chat with me", callback_data: "ob:chat_prompt" }],
-  [{ text: "💳 See paid plans", callback_data: "preview:pricing" }],
+  [{ text: "🌐 Connect my website", callback_data: "ob:website_yes" }],
+  [{ text: "💳 See plans", callback_data: "preview:pricing" }],
 ]);
 
 const DEMO_TASK_TEXT = "Create a draft post titled 'Hello Godseye' with the content block 'This post was created from Telegram.'";
@@ -455,7 +463,7 @@ function welcomeText(state, stats = { spotsLeft: 100 }) {
   if (amConnected) {
     lines.push("", `You're ready to go. Connected site: \`${state.siteId || "see /sites"}\` — try a demo task.`);
   } else {
-    lines.push("", "You're in the Founder Pass — start your free trial now.");
+    lines.push("", "You're in the Founder Pass — 25 free messages to try me out. No card, no commitment.");
   }
   if (state.referralCode) {
     lines.push("", `🎁 You have a referral bonus (${state.referralCode}) — extra credits when you activate.`);
@@ -514,6 +522,24 @@ async function handleCallback(chatId, queryId, data) {
   }
 
   if (data === "ob:get_to_talking") {
+    // P0 onboarding: capture email BEFORE dropping the user into chat mode.
+    // This turns the free funnel into a recoverable lead and bridges the
+    // Telegram identity to the web account / activation ledger. Once collected,
+    // we continue into chat mode (step 99) below.
+    const emailPrompt = [
+      "🚀 Let's get you started.",
+      "",
+      "Quick one — what's your email?",
+      "",
+      "I'll save your progress and send your login details if you upgrade. No spam, ever.",
+      "",
+      "Just type it below 👇",
+    ].join("\n");
+    if (!state.emailCollected) {
+      state.onboardingStep = 5; // NEW: email collection step
+      state.onboardingIntent = "start_free";
+      return send(chatId, emailPrompt);
+    }
     state.hasWebsite = false;
     state.onboardingStep = 99;
     state.onboardingChatHistory = [];
@@ -525,6 +551,22 @@ async function handleCallback(chatId, queryId, data) {
   }
 
   if (data === "ob:business_setup") {
+    // P0 onboarding: capture email first (same as Start free) so the free funnel
+    // yields a lead and the web-account bridge exists. Continuation into the
+    // business wizard happens in the step-5 handler.
+    if (!state.emailCollected) {
+      state.onboardingStep = 5; // email collection step
+      state.onboardingIntent = "business_setup";
+      return send(chatId, [
+        "💼 Great — let's build your business space.",
+        "",
+        "Quick one — what's your email?",
+        "",
+        "I'll save your progress and send your login details if you upgrade. No spam, ever.",
+        "",
+        "Just type it below 👇",
+      ].join("\n"));
+    }
     state.onboardingIntent = "business_setup";
     state.onboardingStep = 10;
     state.onboardingQuestion = 0;
@@ -566,12 +608,16 @@ async function handleCallback(chatId, queryId, data) {
     // message hits the /api/chat streaming loop, not the canned wizard.
     state.onboardingStep = 99;
     state.onboardingChatHistory = [];
+    const limitsLine = state.emailCollected && !state.freeTierShown
+      ? "📊 Free tier: 25 messages/day · 100 total\n\n"
+      : "";
+    state.freeTierShown = true;
     return send(
       chatId,
       [
         "✅ You're set up — no website needed.",
         "",
-        "Now you can just talk to me, like a partner, and I'll help you plan, organize, and think things through. What are you working on today?",
+        limitsLine + "Now you can just talk to me, like a partner, and I'll help you plan, organize, and think things through. What are you working on today?",
         "",
         "• Ask me anything about running your business",
         "• I'll keep answers short and you can steer anytime",
@@ -930,6 +976,46 @@ async function handleMessage(message) {
       return await handleCommand(chatId, `/connect ${text.trim()}`);
     }
 
+    // === EMAIL COLLECTION (step 5) — entered from "Start free" / business setup ===
+    // P0 onboarding gap: capture a real lead + bridge Telegram → web before chat.
+    if (state.onboardingStep === 5) {
+      const email = text.trim();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return await send(chatId, "That doesn't look like an email. Try again? (e.g. you@company.com)");
+      }
+      state.email = email;
+      state.emailCollected = true;
+      persistSession(chatId); // persist email with the Telegram identity
+      // Continue the path they were on: Start free → chat mode; business setup → wizard.
+      if (state.onboardingIntent === "business_setup") {
+        state.onboardingStep = 10;
+        state.onboardingQuestion = 0;
+        state.onboardingAnswers = [];
+        return await send(
+          chatId,
+          [
+            "✅ Email saved. Thanks!",
+            "",
+            "✨ Let's build your business space from the ground up.",
+            "",
+            "Tell me what you do and the first repeatable job you want off your plate.",
+            "Example: `I run a salon and need help with bookings and client follow-up.`",
+            "",
+            "First: what do you do, or what are you building?",
+          ].join("\n")
+        );
+      }
+      // Default: Start free → enter chat mode with free-tier transparency once.
+      state.hasWebsite = false;
+      state.onboardingStep = 99;
+      state.onboardingChatHistory = [];
+      const limitsLine = state.freeTierShown
+        ? "Go ahead — what's on your mind? I'm here to help with your business."
+        : "📊 Free tier: 25 messages/day · 100 total\n\nGo ahead — what's on your mind? I'm here to help with your business.";
+      state.freeTierShown = true;
+      return await send(chatId, `✅ You're in.\n\n${limitsLine}`, CHAT_MODE_KYBD);
+    }
+
     // === CHAT MODE (step 99) — user clicked "Continue without a website" ===
     // Onboarding has ended. Every message goes to the LLM (/api/chat SSE) for a
     // real back-and-forth, streamed into Telegram as it generates.
@@ -963,7 +1049,14 @@ async function handleMessage(message) {
 
         if (res.status === 429) {
           const data = await res.json();
-          return await send(chatId, data?.error || "You've hit your free chat limit.", PREVIEW_KYBD);
+          const msg = data?.error || "You've hit your free chat limit.";
+          // Free-tier transparency + a clear path forward at the limit (P0).
+          // Never just a bare error — always offer the upgrade CTA.
+          const body =
+            /today|daily/i.test(msg)
+              ? `⏰ ${msg}\n\nCome back tomorrow, or pick a plan for unlimited access.`
+              : `🎉 ${msg} — you clearly find this useful! Time to go pro.`;
+          return await send(chatId, body, PREVIEW_KYBD);
         }
         if (!res.ok) {
           const data = await res.json().catch(() => ({}));
