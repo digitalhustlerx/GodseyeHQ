@@ -127,6 +127,8 @@ function session(chatId) {
       emailCollected: false,
       // One-time "free tier limits" disclosure shown when first entering chat.
       freeTierShown: false,
+      // Occasional soft upgrade nudge (P3): counts chat turns since last nudge.
+      chatMsgCount: 0,
     });
   }
   return sessions.get(key);
@@ -1144,6 +1146,17 @@ async function handleMessage(message) {
           message_id: fullMsgId(chatId),
           reply_markup: CHAT_MODE_KYBD,
         }).catch(() => {});
+        // P3: occasional soft upgrade nudge every 10 chat turns (soft monetization).
+        state.chatMsgCount = (state.chatMsgCount || 0) + 1;
+        if (state.chatMsgCount >= 10) {
+          state.chatMsgCount = 0;
+          const used = (state.onboardingChatHistory?.length ?? 0);
+          await send(
+            chatId,
+            `💡 You're getting value from this — ${used} messages in.\n[💳 See plans to go unlimited]`,
+            PREVIEW_KYBD
+          ).catch(() => {});
+        }
         return;
       } catch (error) {
         return await send(chatId, `Godseye error: ${error instanceof Error ? error.message : "Unknown error"}`, CHAT_MODE_KYBD);
