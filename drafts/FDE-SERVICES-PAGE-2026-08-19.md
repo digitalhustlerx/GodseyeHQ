@@ -47,3 +47,15 @@ your bio now points into.
 Reply **"build the services page"** → I scaffold `src/app/services/page.tsx` in
 `digitalhustlerx-web-base`, wire the book buttons, rebuild, verify live.
 Or **"make it shorter"** → I cut this to a single-panel version first.
+
+
+## Build status 2026-08-19 02:40 WAT (applied by follow-up agent)
+
+**Built and deployed on the Next backend.** src/app/services/page.tsx created in /root/digitalhustlerx-web-base. TypeScript passes, route registered, prod build green, dhx-web-base.service restarted, serves at http://127.0.0.1:3109/services (title AI Services and Tiers, all 3 tiers + CTAs verified).
+
+**Routing conflict found - needs your call (not auto-changed):**
+digitalhustlerx.com/services/ is nginx-aliased to the static DHX Hub catalog (/srv/digitalhustlers/hub/services/ - Drop Services for the AI Era, ~300 packages). That catalog is a DIFFERENT page. To make the FDE 3-tier page public pick one:
+1. Replace: point the /services/ alias at the Next server (destructive to catalog).
+2. Coexist: assign the FDE page a distinct URL (e.g. /services/ai-audit) and link both.
+Recommended: #2 coexist - keeps the catalog, adds the consultant funnel.
+Reply with a number to wire it.
