@@ -802,7 +802,19 @@ async function handleCommand(chatId, text, fromCallback = true) {
     // the license wizard instead of showing the generic welcome screen.
     if (param === "connect") {
       state.onboardingStep = 2;
-      return send(chatId, "🔑 Welcome back. Send your license key in the format `GS-XXXX-XXXX`.\n\nExample: `/connect GS-1A2B-3C4D`", HAVE_LICENSE_KYBD);
+      return send(
+        chatId,
+        [
+          "🎉 Welcome back — let's get your agent live.",
+          "",
+          "Send your license key in the format `GS-XXXX-XXXX`.",
+          "",
+          "Example: `/connect GS-1A2B-3C4D`",
+          "",
+          "Right after it connects I'll show your plan and the next steps to start giving tasks.",
+        ].join("\n"),
+        HAVE_LICENSE_KYBD
+      );
     }
 
     // Handle referral codes (ref_ prefix)
@@ -880,7 +892,31 @@ async function handleCommand(chatId, text, fromCallback = true) {
       // referral ledger (best-effort, once per license).
       emitActivation(licenseKey, license?.email, state);
       if (!sites.length) {
-        return send(chatId, `✅ License connected (${license.plan ?? "plan"}).\n\nNo connected sites yet. Install the plugin so your site registers, then come back to /sites.`, HAVE_LICENSE_KYBD);
+        const plan = license.plan ?? "active";
+        const emailLine = license.email
+          ? `• Email: \`${license.email}\` (used for your web dashboard login)`
+          : null;
+        return send(
+          chatId,
+          [
+            "🎉 Welcome back! Your plan is active.",
+            "",
+            "Here's what you've got:",
+            `• Plan: ${plan}`,
+            emailLine,
+            "• License: saved — no need to keep it handy",
+            "",
+            "Next steps:",
+            "1. Install the plugin on your WordPress site",
+            "2. Connect it here with /connect",
+            "3. Start giving me tasks",
+            "",
+            `🔗 Install plugin: ${PLANT_PLUGIN_URL}`,
+          ]
+            .filter(Boolean)
+            .join("\n"),
+          HAVE_LICENSE_KYBD
+        );
       }
       state.siteId = sites[0].id;
       state.conversationId = null; // fresh conversation per setup
