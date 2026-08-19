@@ -383,7 +383,7 @@ function formatSite(site) {
 
 const WELCOME_KYBD = inlineKeyboard([
   [{ text: "🚀 Start free", callback_data: "ob:get_to_talking" }],
-  [{ text: "👋 Tell me how it's going", callback_data: "ob:convo_warm" }],
+  [{ text: "💼 Set up my business", callback_data: "ob:business_setup" }],
   [{ text: "🔑 I'm a customer", callback_data: "ob:have_license" }],
 ]);
 const WEBSITE_KYBD = inlineKeyboard([
