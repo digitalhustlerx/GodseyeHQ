@@ -478,10 +478,8 @@ function previewWelcomeText() {
     "",
     "Answer 3 short questions, one at a time:",
     "1) What do you do?",
-    "2) What takes too much time?",
-    "3) What stresses you most?",
-    "4) What would you stop doing yourself?",
-    "5) What result would matter this week?",
+    "2) What's the #1 thing eating your time right now?",
+    "3) What would you love to stop doing yourself?",
     "",
     "Start with your business or idea. Example: `I run a salon.`",
   ].join("\n");
