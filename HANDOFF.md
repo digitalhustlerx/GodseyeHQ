@@ -64,3 +64,9 @@ curl -sk -o /dev/null -w '%{http_code}\n' https://app.digitalhustlerx.com/forgot
 ```
 
 No production services are to be stopped as part of documentation-only work.
+
+## 2026-08-20 follow-up fix (proactive agent)
+- Root cause of rambling bot chat: systemd drop-in `godseye-landing-api.service.d/llm-key.conf` overrode `DEEPSEEK_MODEL` to `gpt-oss-120b`, beating the base unit's `step-3.7-flash`.
+- Fix: removed the stale model line from the drop-in (kept the API key); `systemctl daemon-reload && systemctl restart godseye-landing-api`.
+- Verified: live process now `DEEPSEEK_MODEL=step-3.7-flash`; `/api/chat` returns tight output (probe "Say hello in 3 words" → "Hey there friend", clean `{done:true}`). No reasoning leak.
+- Backup of drop-in before edit: `llm-key.conf.bak-20260820`.
