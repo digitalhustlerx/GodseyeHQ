@@ -747,7 +747,7 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
       // OpenAI-compatible endpoint (default: the local FreeLLMAPI gateway's
       // "auto" route). No local Ollama/tinyllama — it is too weak for agent work.
       const geminiKey = process.env.GEMINI_API_KEY || "";
-      const hasGemini = Boolean(geminiKey && !/dummy|you_|placeholder/i.test(geminiKey));
+      const hasGemini = Boolean(geminiKey && geminiKey.length >= 30 && !/dummy|you_|placeholder/i.test(geminiKey));
       const DS_BASE_URL = process.env.DEEPSEEK_BASE_URL || "http://100.118.153.40:3001/v1";
       const DS_API_KEY = process.env.DEEPSEEK_API_KEY || "";
       const DS_MODEL = process.env.DEEPSEEK_MODEL || "auto";
