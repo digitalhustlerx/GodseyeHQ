@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GitHub Profile — DigitalHustlerX</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #0d1117;
+    color: #c9d1d9;
+    line-height: 1.4;
+    padding: 0.75rem;
+    max-width: 800px;
+    margin: 0 auto;
+    font-size: 0.85rem;
+  }
+
+  .header {
+    text-align: center;
+    padding: 0.5rem 0 0.75rem;
+    border-bottom: 1px solid #21262d;
+    margin-bottom: 0.5rem;
+  }
+
+  .header h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 0.2rem;
+  }
+
+  .header p {
+    font-size: 0.9rem;
+    color: #8b949e;
+    font-weight: 400;
+  }
+
+  .badges {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 0.25rem 0.7rem;
+    border-radius: 2rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: #fff;
+    transition: opacity 0.2s;
+  }
+
+  .badge:hover { opacity: 0.85; }
+
+  .badge-twitter { background: #1DA1F2; }
+  .badge-website { background: #333; }
+  .badge-godseye { background: #C4A484; color: #0d1117; }
+
+  h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.15rem;
+    color: #f0f6fc;
+    margin: 1rem 0 0.5rem;
+    padding-bottom: 0.3rem;
+    border-bottom: 1px solid #21262d;
+  }
+
+  h2 span { margin-right: 0.5rem; }
+
+  .intro {
+    font-size: 0.85rem;
+    color: #8b949e;
+    margin-bottom: 0.75rem;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.5rem 0;
+  }
+
+  th {
+    text-align: left;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: #8b949e;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.4rem 0.75rem;
+    border-bottom: 1px solid #21262d;
+  }
+
+  td {
+    padding: 0.4rem 0.75rem;
+    border-bottom: 1px solid #161b22;
+    font-size: 0.85rem;
+    vertical-align: top;
+  }
+
+  td:first-child {
+    font-weight: 600;
+    color: #58a6ff;
+    white-space: nowrap;
+  }
+
+  td a {
+    color: #58a6ff;
+    text-decoration: none;
+  }
+
+  td a:hover { text-decoration: underline; }
+
+  .status {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .status-live { background: #238636; color: #fff; }
+  .status-wip { background: #9e6a03; color: #fff; }
+
+  .quote {
+    background: #161b22;
+    border-left: 3px solid #C4A484;
+    padding: 0.5rem 0.75rem;
+    margin: 0.5rem 0;
+    border-radius: 0 6px 6px 0;
+    font-style: italic;
+    color: #c9d1d9;
+    font-size: 0.85rem;
+  }
+
+  .beliefs {
+    list-style: none;
+    padding: 0;
+    margin: 0.3rem 0;
+  }
+
+  .beliefs li {
+    padding: 0.2rem 0;
+    padding-left: 1.2rem;
+    position: relative;
+    font-size: 0.8rem;
+  }
+
+  .beliefs li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: #C4A484;
+    font-weight: 600;
+  }
+
+  .beliefs strong {
+    color: #f0f6fc;
+  }
+
+  .footer {
+    text-align: center;
+    padding: 0.5rem 0 0.25rem;
+    border-top: 1px solid #21262d;
+    margin-top: 0.5rem;
+  }
+
+  .footer a {
+    display: inline-block;
+    background: #C4A484;
+    color: #0d1117;
+    padding: 0.4rem 1.2rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+
+  .footer a:hover { opacity: 0.9; }
+
+  .location {
+    text-align: center;
+    color: #8b949e;
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Hey, I'm Marvel 👋</h1>
+  <p>Building AI agents that run businesses.</p>
+  <div class="badges">
+    <a href="https://twitter.com/digihustlerx" class="badge badge-twitter">@digihustlerx</a>
+    <a href="https://digitalhustlerx.com" class="badge badge-website">digitalhustlerx.com</a>
+    <a href="https://godseye.digitalhustlerx.com" class="badge badge-godseye">GodsEye — AI Business Operator</a>
+  </div>
+</div>
+
+<h2><span>🏗️</span> What I Build</h2>
+<p class="intro">Founder shipping AI-native products from Lagos. <strong>Autonomous agents</strong>, <strong>Telegram bots</strong>, <strong>real business automation</strong>.</p>
+
+<table>
+  <thead>
+    <tr><th>Project</th><th>What it does</th><th>Status</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="https://github.com/digitalhustlerx/GodseyeHQ">GodsEye</a></td>
+      <td>AI business operator — Telegram-first agent that manages WordPress sites, runs operations, and executes tasks</td>
+      <td><span class="status status-live">🚀 Live</span></td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/digitalhustlerx/Pandora-Box">Pandora Box</a></td>
+      <td>Multi-agent orchestration — spin up AI agents for any workflow</td>
+      <td><span class="status status-wip">🛠️ Building</span></td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/digitalhustlerx/Social-harness">Social Harness</a></td>
+      <td>Omnichannel inbox — manage all social DMs in one place</td>
+      <td><span class="status status-wip">🛠️ Building</span></td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/digitalhustlerx/hyperframes">HyperFrames</a></td>
+      <td>Programmatic video rendering from HTML/CSS — built for agents</td>
+      <td><span class="status status-wip">🛠️ Building</span></td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/digitalhustlerx/trustclaw">TrustClaw</a></td>
+      <td>Self-hostable personal AI agent with vector memory + Composio tools</td>
+      <td><span class="status status-wip">🛠️ Building</span></td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/digitalhustlerx/paperclip">Paperclip</a></td>
+      <td>Agent orchestration platform</td>
+      <td><span class="status status-wip">🛠️ Building</span></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2><span>🔧</span> Tools & Experiments</h2>
+<p style="font-size:0.85rem; color:#8b949e; margin-bottom:0.5rem;">
+  <a href="https://github.com/digitalhustlerx/scaffold" style="color:#58a6ff; text-decoration:none; font-weight:600;">Scaffold</a> — CLI bootstrapper &nbsp;·&nbsp;
+  <a href="https://github.com/digitalhustlerx/ClawRouter" style="color:#58a6ff; text-decoration:none; font-weight:600;">Claw Router</a> — LLM router (30+ models) &nbsp;·&nbsp;
+  <a href="https://github.com/digitalhustlerx/nexabank" style="color:#58a6ff; text-decoration:none; font-weight:600;">NexaBank</a> — Digital banking SPA &nbsp;·&nbsp;
+  <a href="https://github.com/digitalhustlerx/gstack" style="color:#58a6ff; text-decoration:none; font-weight:600;">gstack</a> — Claude Code setup
+</p>
+
+<h2><span>🧠</span> How I Think About AI</h2>
+<div class="quote">
+  The future isn't "AI tools" — it's AI agents that run your business while you sleep.
+</div>
+<ul class="beliefs">
+  <li><strong>Telegram is the universal interface</strong> — one bot replaces your website, app, and dashboard</li>
+  <li><strong>Agents should think ahead</strong> — not just respond, but propose, plan, and execute with your approval</li>
+  <li><strong>Self-hosted beats SaaS</strong> — own your data, own your agents, own your infrastructure</li>
+  <li><strong>Ship fast, break nothing</strong> — velocity matters, but reliability matters more</li>
+</ul>
+
+<div class="location">📍 Based in Lagos, Nigeria 🇳🇬 — Building for the world from Africa</div>
+
+<div class="footer">
+  <a href="https://digitalhustlerx.com">Let's build →</a>
+</div>
+
+</body>
+</html>
