@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Check, Coins, ChevronDown, ChevronUp } from 'lucide-react';
+import { Check, ChevronDown, ChevronUp } from 'lucide-react';
 import { PRICING_PLANS } from '../mockData';
 
 const FAQ = [
@@ -28,12 +28,6 @@ const FAQ = [
     q: 'Can I connect my own Telegram bot and LLM?',
     a: 'Yes. On every plan you can bring your own Telegram bot and your own LLM API keys, or use the keys we include cheap.',
   },
-];
-
-const CREDIT_PACKS = [
-  { id: 'topup', name: 'Wallet Top-Up', price: '$10', credits: '100' },
-  { id: 'pack-starter', name: 'Starter Pack', price: '$9', credits: '500' },
-  { id: 'pack-pro', name: 'Pro Pack', price: '$29', credits: '2,000' },
 ];
 
 // Comparison table rows. 'text' => display as string, 'check' => ✓, 'dash' => —
@@ -129,19 +123,10 @@ export default function PricingPage() {
                 </span>
               )}
               <h3 className="text-xl font-semibold">{plan.name}</h3>
-              {plan.foundersPercentageOff && (
-                <span className="mt-2 inline-block w-fit rounded-full bg-[#C4A484]/15 border border-[#C4A484]/40 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-widest text-[#C4A484] font-bold">
-                  {plan.foundersPercentageOff} · Founder Pricing
-                </span>
-              )}
               <div className="mt-4 flex items-baseline gap-2">
-                {plan.listPrice && (
-                  <span className="text-lg text-white/35 line-through">{plan.listPrice}</span>
-                )}
-                <span className="text-4xl font-bold">{plan.price}</span>
-                <span className="text-white/50">/month</span>
+                <span className="text-4xl font-bold">Choose a plan</span>
               </div>
-              <p className="mt-2 text-sm text-[#C4A484]">{plan.credits} Credits/mo</p>
+              <p className="mt-2 text-sm text-[#C4A484]">Plan details available after signup</p>
               <p className="mt-1 text-sm text-white/50">{plan.sites}</p>
 
               <ul className="mt-6 flex-1 space-y-2.5">
@@ -197,38 +182,10 @@ export default function PricingPage() {
           </div>
         </div>
 
-        {/* CREDIT PACKS SECTION */}
-        <div className="mt-24">
-          <div className="flex items-center justify-center gap-2">
-            <Coins className="h-6 w-6 text-[#C4A484]" />
-            <h3 className="font-display text-2xl md:text-3xl font-light tracking-tighter text-[#F2F2F2]">Need more credits? Top up anytime.</h3>
-          </div>
-          <div className="mt-8 grid gap-6 md:grid-cols-3">
-            {CREDIT_PACKS.map((pack) => (
-              <div
-                key={pack.name}
-                className="flex flex-col items-center bg-[#121212] border border-white/10 rounded-3xl p-8 text-center"
-              >
-                <Coins className="h-8 w-8 text-[#C4A484]" />
-                <p className="mt-4 text-3xl font-bold">{pack.price}</p>
-                <p className="mt-2 text-sm text-white/60">{pack.credits} credits</p>
-                <button
-                  type="button"
-                  onClick={() =>
-                    (window as any).godseyeCheckout({
-                      id: pack.id,
-                      name: pack.name,
-                      price: pack.price,
-                      credits: pack.credits,
-                    })
-                  }
-                  className="mt-6 w-full bg-white/5 hover:bg-white/10 text-white border border-white/10 py-3.5 rounded-full text-[10px] uppercase tracking-widest font-bold"
-                >
-                  Buy {pack.name}
-                </button>
-              </div>
-            ))}
-          </div>
+        {/* ADD-ONS SECTION */}
+        <div className="mt-24 text-center">
+          <h3 className="font-display text-2xl md:text-3xl font-light tracking-tighter text-[#F2F2F2]">Additional usage options</h3>
+          <p className="mt-3 text-sm text-white/60">Add-ons will be shown after the commercial plan and checkout products are confirmed.</p>
         </div>
 
         {/* FAQ SECTION */}

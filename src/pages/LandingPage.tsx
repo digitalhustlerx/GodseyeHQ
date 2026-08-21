@@ -529,8 +529,8 @@ export default function LandingPage() {
             </div>
           ))}
           <div className="flex items-center justify-between px-6 py-5 bg-[#C4A484]/5 border-t border-[#C4A484]/20">
-            <span className="text-sm font-bold text-white">Total with GodsEye</span>
-            <span className="text-lg font-black text-[#C4A484]">$15-99/mo</span>
+            <span className="text-sm font-bold text-white">Plans that grow with your business</span>
+            <span className="text-lg font-black text-[#C4A484]">Choose a plan</span>
           </div>
         </div>
 
@@ -561,12 +561,11 @@ export default function LandingPage() {
                 <div>
                   <h4 className="text-[10px] uppercase tracking-widest font-bold text-white/50 font-mono">{plan.name}</h4>
                   <div className="flex items-baseline gap-1 mt-2">
-                    <span className="text-3xl font-black text-white">{plan.price}</span>
-                    <span className="text-xs text-white/50 font-light">/month</span>
+                    <span className="text-3xl font-black text-white">Choose a plan</span>
                   </div>
                 </div>
                 <div className="py-3 border-y border-white/10">
-                  <div className="text-[#C4A484] font-bold text-xs uppercase tracking-wider">{plan.credits} Credits/mo</div>
+                  <div className="text-[#C4A484] font-bold text-xs uppercase tracking-wider">Plan details available after signup</div>
                   <div className="text-[11px] text-white/60 font-light mt-1">{plan.sites}</div>
                 </div>
                 <ul className="space-y-2 text-[11px] text-white/75 font-light">
@@ -589,12 +588,7 @@ export default function LandingPage() {
 
         <div className="text-center space-y-4">
           <p className="text-[10px] uppercase tracking-wider text-[#C4A484] font-mono">Add-Ons</p>
-          <p className="text-xs text-white/60 font-light">Need more? Top up your credits anytime.</p>
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            <span className="px-4 py-2 bg-white/5 border border-white/10 rounded-full text-xs text-white/70">Wallet Top-Up — $10 (100 credits)</span>
-            <span className="px-4 py-2 bg-white/5 border border-white/10 rounded-full text-xs text-white/70">Starter Pack — $9 (500 credits)</span>
-            <span className="px-4 py-2 bg-white/5 border border-white/10 rounded-full text-xs text-white/70">Pro Pack — $29 (2,000 credits)</span>
-          </div>
+          <p className="text-xs text-white/60 font-light">Additional usage options will be shown once the commercial plan is confirmed.</p>
           <Link to="/pricing" className="inline-block mt-2 text-xs text-[#C4A484] hover:text-[#b59574] font-semibold uppercase tracking-wider">See full pricing →</Link>
         </div>
       </section>
