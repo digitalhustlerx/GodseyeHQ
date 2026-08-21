@@ -823,7 +823,7 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
             } catch {
               continue;
             }
-            const delta = j.choices?.[0]?.delta?.content || j.choices?.[0]?.delta?.reasoning || "";
+            const delta = j.choices?.[0]?.delta?.content || "";
             if (delta) {
               full += delta;
               send({ delta });
