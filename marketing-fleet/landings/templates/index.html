@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Customer Response Templates — GodsEye</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0A0E1A;--surface:#111827;--surface-hover:#1a2332;--border:rgba(255,255,255,0.06);--brand:#C4A484;--brand-dim:rgba(196,164,132,0.15);--text:#F8FAFC;--text-dim:#94A3B8;--text-muted:#64748B;--radius:16px;--green:#22c55e;--green-bg:rgba(34,197,94,0.08);--red:#ef4444}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+nav{display:flex;align-items:center;justify-content:space-between;padding:20px 40px;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(10,14,26,0.92);backdrop-filter:blur(12px);z-index:100}
+.logo{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.25rem;text-decoration:none;color:var(--text)}.logo span{color:var(--brand)}
+.hero{background:linear-gradient(180deg,#0f1629 0%,var(--bg) 100%);text-align:center;padding:100px 40px 60px}
+.badge{background:var(--green-bg);color:var(--green);display:inline-block;padding:4px 16px;border-radius:50px;font-size:0.75rem;font-weight:600;margin-bottom:16px}
+h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(2.2rem,5vw,3.8rem);font-weight:700;margin-bottom:16px}h1 span{color:var(--brand)}
+.sub{color:var(--text-dim);font-size:1.1rem;max-width:600px;margin:0 auto 32px;font-weight:300}
+.btn{display:inline-flex;align-items:center;gap:8px;background:var(--brand);color:var(--bg);padding:14px 36px;border-radius:50px;font-weight:600;font-size:1rem;text-decoration:none;border:none;cursor:pointer;transition:all 0.3s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(196,164,132,0.25)}
+.templates{max-width:700px;margin:0 auto;padding:60px 24px}
+.tpl{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px;margin-bottom:20px;transition:border-color 0.3s}
+.tpl:hover{border-color:var(--brand)}
+.tpl-num{font-family:'Space Grotesk',sans-serif;color:var(--brand);font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.tpl-title{font-size:1.1rem;font-weight:600;margin-bottom:8px}
+.tpl-desc{color:var(--text-dim);font-size:0.9rem}
+.tpl-preview{background:var(--surface-hover);border-radius:8px;padding:14px;margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:var(--text-dim);border-left:3px solid var(--brand)}
+.how{max-width:700px;margin:0 auto;padding:60px 24px}
+.how h2{font-family:'Space Grotesk',sans-serif;font-size:1.5rem;margin-bottom:24px;text-align:center}
+.step{display:flex;gap:16px;margin-bottom:24px;align-items:flex-start}
+.step-num{width:36px;height:36px;border-radius:50%;background:var(--brand-dim);border:1px solid rgba(196,164,132,0.3);display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:700;color:var(--brand);flex-shrink:0}
+.step-text{font-size:0.95rem;color:var(--text-dim)}
+.step-text strong{color:var(--text)}
+.cta-section{text-align:center;padding:80px 40px}
+.cta-section h2{font-family:'Space Grotesk',sans-serif;font-size:clamp(1.8rem,4vw,2.8rem);margin-bottom:16px}
+.cta-section p{color:var(--text-dim);margin-bottom:32px;font-size:1.05rem}
+.footer{text-align:center;padding:40px;border-top:1px solid var(--border);color:var(--text-muted);font-size:0.85rem}
+@media(max-width:768px)nav{padding:16px 20px}.hero{padding:80px 20px 40px}.cta-section{padding:60px 20px}
+</style>
+</head>
+<body>
+<nav>
+<a href="/" class="logo">GODS<span>EYE</span></a>
+<a href="https://t.me/GodseyeXbot" class="btn" style="padding:8px 20px;font-size:0.85rem;text-decoration:none">Try Free →</a>
+</nav>
+
+<section class="hero">
+<div class="badge">✅ FREE TEMPLATE PACK</div>
+<h1>5 Customer Response Templates <span>Your Agent Uses Automatically</span></h1>
+<p class="sub">Steal these proven responses. Or let your AI agent handle them for you.</p>
+<a href="#templates" class="btn">See the Templates ↓</a>
+</section>
+
+<div class="templates" id="templates">
+<div class="tpl">
+<div class="tpl-num">Template 01</div>
+<div class="tpl-title">Welcome New Customer</div>
+<div class="tpl-desc">First impression that turns a buyer into a fan. Warm, personal, sets expectations.</div>
+<div class="tpl-preview">"Hey [Name]! Welcome aboard. I'm [Business] and I'm thrilled you're here. Here's what happens next: [1-sentence流程]. Any questions? Just reply — I'm here."</div>
+</div>
+<div class="tpl">
+<div class="tpl-num">Template 02</div>
+<div class="tpl-title">Follow Up on Inquiry</div>
+<div class="tpl-desc">The follow-up that closes. Not pushy — just helpful.</div>
+<div class="tpl-preview">"Hey [Name], just checking in on [topic]. Did you get a chance to look at it? Happy to answer any questions or help you get started."</div>
+</div>
+<div class="tpl">
+<div class="tpl-num">Template 03</div>
+<div class="tpl-title">Request a Review</div>
+<div class="tpl-desc">Ask for the testimonial at the right moment — when they're happy.</div>
+<div class="tpl-preview">"Hey [Name]! So glad you loved [result]. Would you mind sharing a quick review? It helps others find us. Just reply with a few words and I'll take care of the rest."</div>
+</div>
+<div class="tpl">
+<div class="tpl-num">Template 04</div>
+<div class="tpl-title">Handle a Complaint</div>
+<div class="tpl-desc">Turn a negative into loyalty. Acknowledge, fix, follow up.</div>
+<div class="tpl-preview">"Hey [Name], I hear you and I'm sorry about [issue]. Here's what I'm doing to fix it: [action]. I'll follow up in [timeframe] to make sure it's right."</div>
+</div>
+<div class="tpl">
+<div class="tpl-num">Template 05</div>
+<div class="tpl-title">Upsell / Cross-sell</div>
+<div class="tpl-desc">Natural upsell that feels like a recommendation, not a sales pitch.</div>
+<div class="tpl-preview">"Hey [Name]! Since you loved [product], you might like [related]. A lot of customers use them together. Want me to set you up?"</div>
+</div>
+</div>
+
+<div class="how">
+<h2>How It Works</h2>
+<div class="step"><div class="step-num">1</div><div class="step-text"><strong>Copy the templates</strong> — use them manually or give them to your agent.</div></div>
+<div class="step"><div class="step-num">2</div><div class="step-text"><strong>Connect your agent</strong> — it learns your voice and handles responses automatically.</div></div>
+<div class="step"><div class="step-num">3</div><div class="step-text"><strong>Watch it work</strong> — your agent responds to customers 24/7 while you focus on growth.</div></div>
+</div>
+
+<section class="cta-section">
+<h2>Your agent uses these automatically.</h2>
+<p>No dashboard. No code. Just text it on Telegram and it gets to work.</p>
+<a href="https://t.me/GodseyeXbot?start=templates" class="btn">Get Your Free Agent →</a>
+</section>
+
+<footer class="footer">© 2026 GodsEye. Built by DigitalHustlerX.</footer>
+</body>
+</html>

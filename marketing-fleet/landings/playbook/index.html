@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lead Magnet Playbook — GodsEye</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0A0E1A;--surface:#111827;--surface-hover:#1a2332;--border:rgba(255,255,255,0.06);--brand:#C4A484;--brand-dim:rgba(196,164,132,0.15);--text:#F8FAFC;--text-dim:#94A3B8;--text-muted:#64748B;--radius:16px;--green:#22c55e;--green-bg:rgba(34,197,94,0.08)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+nav{display:flex;align-items:center;justify-content:space-between;padding:20px 40px;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(10,14,26,0.92);backdrop-filter:blur(12px);z-index:100}
+.logo{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.25rem;text-decoration:none;color:var(--text)}.logo span{color:var(--brand)}
+.hero{background:linear-gradient(180deg,#0f1629 0%,var(--bg) 100%);text-align:center;padding:100px 40px 60px}
+.badge{background:var(--green-bg);color:var(--green);display:inline-block;padding:4px 16px;border-radius:50px;font-size:0.75rem;font-weight:600;margin-bottom:16px}
+h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(2.2rem,5vw,3.8rem);font-weight:700;margin-bottom:16px}h1 span{color:var(--brand)}
+.sub{color:var(--text-dim);font-size:1.1rem;max-width:600px;margin:0 auto 32px;font-weight:300}
+.btn{display:inline-flex;align-items:center;gap:8px;background:var(--brand);color:var(--bg);padding:14px 36px;border-radius:50px;font-weight:600;font-size:1rem;text-decoration:none;border:none;cursor:pointer;transition:all 0.3s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(196,164,132,0.25)}
+.playbook{max-width:700px;margin:0 auto;padding:60px 24px}
+.step-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px;margin-bottom:20px;display:none}
+.step-card.active{display:block}
+.step-num{font-family:'Space Grotesk';color:var(--brand);font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.step-title{font-size:1.1rem;font-weight:600;margin-bottom:16px}
+.step-card label{display:block;font-weight:500;margin-bottom:8px;font-size:0.9rem;color:var(--text-dim)}
+.step-card select,.step-card input{width:100%;padding:12px 16px;background:var(--surface-hover);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.95rem;font-family:'Inter',sans-serif;margin-bottom:16px}
+.step-card select:focus,.step-card input:focus{outline:none;border-color:var(--brand)}
+.step-card select option{background:var(--surface);color:var(--text)}
+.btn-row{display:flex;gap:12px;margin-top:8px}
+.btn-sm{padding:10px 24px;font-size:0.9rem}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}
+.btn-outline:hover{border-color:var(--brand);color:var(--brand)}
+.result-box{background:var(--surface);border:2px solid var(--brand);border-radius:var(--radius);padding:32px;display:none}
+.result-box.show{display:block}
+.result-box h3{font-family:'Space Grotesk';font-size:1.2rem;margin-bottom:12px}
+.result-box p{color:var(--text-dim);font-size:0.95rem;margin-bottom:16px}
+.result-box .idea{background:var(--surface-hover);border-radius:8px;padding:12px 16px;margin-bottom:8px;border-left:3px solid var(--brand)}
+.cta-section{text-align:center;padding:80px 40px}
+.cta-section h2{font-family:'Space Grotesk',sans-serif;font-size:clamp(1.8rem,4vw,2.8rem);margin-bottom:16px}
+.cta-section p{color:var(--text-dim);margin-bottom:32px;font-size:1.05rem}
+.footer{text-align:center;padding:40px;border-top:1px solid var(--border);color:var(--text-muted);font-size:0.85rem}
+@media(max-width:768px)nav{padding:16px 20px}.hero{padding:80px 20px 40px}.cta-section{padding:60px 20px}
+</style>
+</head>
+<body>
+<nav>
+<a href="/" class="logo">GODS<span>EYE</span></a>
+<a href="https://t.me/GodseyeXbot" class="btn" style="padding:8px 20px;font-size:0.85rem;text-decoration:none">Try Free →</a>
+</nav>
+
+<section class="hero">
+<div class="badge">🎯 FREE PLAYBOOK</div>
+<h1>Build a Lead Magnet in <span>10 Minutes</span></h1>
+<p class="sub">Answer 3 questions. Get a custom lead magnet idea. Your agent builds it for you.</p>
+<a href="#playbook" class="btn">Start Building ↓</a>
+</section>
+
+<div class="playbook" id="playbook">
+<div class="step-card active" data-step="1">
+<div class="step-num">Step 1 of 3</div>
+<div class="step-title">What's your business?</div>
+<label>Pick your niche</label>
+<select id="niche">
+<option value="">Select your niche...</option>
+<option value="fitness">Fitness / Personal Training</option>
+<option value="food">Food / Restaurant / Catering</option>
+<option value="beauty">Beauty / Salon / Spa</option>
+<option value="realestate">Real Estate / Property</option>
+<option value="ecommerce">E-commerce / Online Store</option>
+<option value="coaching">Coaching / Consulting</option>
+<option value="agency">Agency / Services</option>
+<option value="saas">SaaS / Software</option>
+<option value="other">Other</option>
+</select>
+<div class="btn-row">
+<button class="btn btn-sm" onclick="nextStep(1)">Next →</button>
+</div>
+</div>
+
+<div class="step-card" data-step="2">
+<div class="step-num">Step 2 of 3</div>
+<div class="step-title">What format works best?</div>
+<label>Choose a format</label>
+<select id="format">
+<option value="">Select a format...</option>
+<option value="checklist">Checklist — "10 things to check before..."</option>
+<option value="calculator">Calculator — "How much are you losing..."</option>
+<option value="template">Template — "Steal this proven..."</option>
+<option value="audit">Audit — "Is your [X] ready for..."</option>
+<option value="guide">Guide — "The complete guide to..."</option>
+<option value="swipe">Swipe File — "50 examples that work..."</option>
+</select>
+<div class="btn-row">
+<button class="btn btn-sm btn-outline" onclick="prevStep(2)">← Back</button>
+<button class="btn btn-sm" onclick="nextStep(2)">Next →</button>
+</div>
+</div>
+
+<div class="step-card" data-step="3">
+<div class="step-num">Step 3 of 3</div>
+<div class="step-title">What's the #1 problem you solve?</div>
+<label>Describe it in one sentence</label>
+<input type="text" id="problem" placeholder="e.g. I help restaurants get more online orders">
+<div class="btn-row">
+<button class="btn btn-sm btn-outline" onclick="prevStep(3)">← Back</button>
+<button class="btn btn-sm" onclick="showPlaybook()">Build My Lead Magnet →</button>
+</div>
+</div>
+
+<div class="result-box" id="resultBox">
+<h3>Your Custom Lead Magnet</h3>
+<p id="resultIdea"></p>
+<div id="resultSteps"></div>
+<a href="https://t.me/GodseyeXbot?start=playbook" class="btn" style="margin-top:20px">Let Your Agent Build It →</a>
+</div>
+</div>
+
+<section class="cta-section">
+<h2>Your agent builds lead magnets for you.</h2>
+<p>No dashboard. No code. Just text it on Telegram and it gets to work.</p>
+<a href="https://t.me/GodseyeXbot" class="btn">Start Free on Telegram →</a>
+</section>
+
+<footer class="footer">© 2026 GodsEye. Built by DigitalHustlerX.</footer>
+
+<script>
+function nextStep(n){document.querySelector(`[data-step="${n}"]`).classList.remove("active");document.querySelector(`[data-step="${n+1}"]`).classList.add("active")}
+function prevStep(n){document.querySelector(`[data-step="${n}"]`).classList.remove("active");document.querySelector(`[data-step="${n-1}"]`).classList.add("active")}
+function showPlaybook(){
+const niche=document.getElementById("niche").value;
+const format=document.getElementById("format").value;
+const problem=document.getElementById("problem").value;
+if(!niche||!format){alert("Please fill in all fields");return}
+const ideas={
+fitness:{checklist:"The 10-Point Fitness Readiness Checklist",calculator:"How Many Clients Are You Losing to Bad Marketing?",template:"The Perfect Client Onboarding Template",audit:"Is Your Gym's Online Presence Ready for 2026?",guide:"The Complete Guide to Getting More Gym Members",swipe:"50 High-Converting Gym Ad Examples"},
+food:{checklist:"The Restaurant Online Ordering Checklist",calculator:"How Much Revenue Are You Losing to Bad Delivery?",template:"The Perfect Catering Proposal Template",audit:"Is Your Restaurant Ready for Online Ordering?",guide:"The Complete Guide to Getting More Restaurant Orders",swipe:"50 High-Converting Restaurant Ad Examples"},
+beauty:{checklist:"The Salon Client Retention Checklist",calculator:"How Many Clients Are You Losing to No-Shows?",template:"The Perfect Beauty Booking Confirmation",audit:"Is Your Salon's Online Presence Ready for 2026?",guide:"The Complete Guide to Getting More Salon Bookings",swipe:"50 High-Converting Salon Ad Examples"},
+realestate:{checklist:"The Home Seller's Pre-Listing Checklist",calculator:"How Much Commission Are You Losing to Slow Follow-Up?",template:"The Perfect Property Listing Description",audit:"Is Your Real Estate Marketing Ready for 2026?",guide:"The Complete Guide to Getting More Real Estate Leads",swipe:"50 High-Converting Real Estate Ad Examples"},
+ecommerce:{checklist:"The E-commerce Conversion Optimization Checklist",calculator:"How Much Revenue Are You Losing to Cart Abandonment?",template:"The Perfect Product Description Template",audit:"Is Your Store Ready for Holiday Traffic?",guide:"The Complete Guide to Getting More Online Sales",swipe:"50 High-Converting E-commerce Ad Examples"},
+coaching:{checklist:"The Coaching Client Acquisition Checklist",calculator:"How Many Clients Are You Losing to Slow Follow-Up?",template:"The Perfect Coaching Proposal Template",audit:"Is Your Coaching Business Ready for Scale?",guide:"The Complete Guide to Getting More Coaching Clients",swipe:"50 High-Converting Coaching Ad Examples"},
+agency:{checklist:"The Agency Client Retention Checklist",calculator:"How Much Revenue Are You Losing to Churn?",template:"The Perfect Client Onboarding Template",audit:"Is Your Agency's Marketing Ready for 2026?",guide:"The Complete Guide to Getting More Agency Clients",swipe:"50 High-Converting Agency Ad Examples"},
+saas:{checklist:"The SaaS Onboarding Optimization Checklist",calculator:"How Many Users Are You Losing to Bad Onboarding?",template:"The Perfect Welcome Email Sequence",audit:"Is Your SaaS Ready for Growth?",guide:"The Complete Guide to Getting More SaaS Signups",swipe:"50 High-Converting SaaS Ad Examples"},
+other:{checklist:"The Business Growth Checklist",calculator:"How Much Revenue Are You Leaving on the Table?",template:"The Perfect Client Proposal Template",audit:"Is Your Business Ready for 2026?",guide:"The Complete Guide to Growing Your Business",swipe:"50 High-Converting Business Ad Examples"}
+};
+const idea=ideas[niche]?.[format]||"Your Custom Lead Magnet";
+document.getElementById("resultIdea").innerHTML=`<strong>${idea}</strong><br><br>Problem: ${problem||"You solve a real problem for your customers."}`;
+document.getElementById("resultSteps").innerHTML=`
+<div class="idea"><strong>Step 1:</strong> Your agent researches what's working in ${niche}</div>
+<div class="idea"><strong>Step 2:</strong> It creates the ${format} with your branding</div>
+<div class="idea"><strong>Step 3:</strong> It builds a landing page with email capture</div>
+<div class="idea"><strong>Step 4:</strong> It connects to your Telegram bot for follow-up</div>`;
+document.getElementById("resultBox").classList.add("show");
+if(window.umami)umami.track('playbook_complete',{niche,format});
+}
+</script>
+</body>
+</html>

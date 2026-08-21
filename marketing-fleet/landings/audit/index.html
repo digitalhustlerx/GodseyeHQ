@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Business Readiness Audit — GodsEye</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0A0E1A;--surface:#111827;--surface-hover:#1a2332;--border:rgba(255,255,255,0.06);--brand:#C4A484;--brand-dim:rgba(196,164,132,0.15);--text:#F8FAFC;--text-dim:#94A3B8;--text-muted:#64748B;--radius:16px;--green:#22c55e;--green-bg:rgba(34,197,94,0.08);--amber:#f59e0b;--red:#ef4444;--red-bg:rgba(239,68,68,0.08)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+nav{display:flex;align-items:center;justify-content:space-between;padding:20px 40px;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(10,14,26,0.92);backdrop-filter:blur(12px);z-index:100}
+.logo{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.25rem;text-decoration:none;color:var(--text)}.logo span{color:var(--brand)}
+.hero{background:linear-gradient(180deg,#0f1629 0%,var(--bg) 100%);text-align:center;padding:100px 40px 60px}
+.badge{background:var(--brand-dim);color:var(--brand);display:inline-block;padding:4px 16px;border-radius:50px;font-size:0.75rem;font-weight:600;margin-bottom:16px}
+h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(2.2rem,5vw,3.8rem);font-weight:700;margin-bottom:16px}h1 span{color:var(--brand)}
+.sub{color:var(--text-dim);font-size:1.1rem;max-width:600px;margin:0 auto 32px;font-weight:300}
+.quiz-wrap{max-width:680px;margin:0 auto;padding:60px 24px}
+.q-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:32px;margin-bottom:24px;display:none}
+.q-card.active{display:block}
+.q-num{font-family:'Space Grotesk',sans-serif;color:var(--brand);font-size:0.8rem;font-weight:600;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px}
+.q-title{font-size:1.2rem;font-weight:600;margin-bottom:20px}
+.q-card label{display:block;background:var(--surface-hover);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:10px;cursor:pointer;transition:all 0.2s;font-size:0.95rem;color:var(--text-dim)}
+.q-card label:hover{border-color:var(--brand);color:var(--text)}
+.q-card input[type=radio]{display:none}
+.q-card input[type=radio]:checked+span{color:var(--text)}
+.q-card label:has(input:checked){border-color:var(--brand);background:var(--brand-dim);color:var(--text)}
+.btn{display:inline-flex;align-items:center;gap:8px;background:var(--brand);color:var(--bg);padding:14px 36px;border-radius:50px;font-weight:600;font-size:1rem;text-decoration:none;border:none;cursor:pointer;transition:all 0.3s;margin-top:20px}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(196,164,132,0.25)}
+.btn:disabled{opacity:0.4;cursor:not-allowed;transform:none;box-shadow:none}
+.progress-bar{height:4px;background:var(--surface-hover);border-radius:2px;margin-bottom:40px;overflow:hidden}
+.progress-fill{height:100%;background:var(--brand);width:0%;transition:width 0.4s ease;border-radius:2px}
+.result-card{background:var(--surface);border:2px solid var(--brand);border-radius:var(--radius);padding:48px;text-align:center;display:none}
+.result-card.active{display:block}
+.score-circle{width:120px;height:120px;border-radius:50%;border:4px solid var(--brand);display:flex;align-items:center;justify-content:center;margin:0 auto 24px;font-family:'Space Grotesk',sans-serif;font-size:2.5rem;font-weight:700;color:var(--brand)}
+.result-title{font-size:1.5rem;font-weight:700;margin-bottom:12px}
+.result-desc{color:var(--text-dim);font-size:1rem;margin-bottom:32px;max-width:500px;margin-left:auto;margin-right:auto}
+.cta-section{text-align:center;padding:80px 40px}
+.cta-section h2{font-family:'Space Grotesk',sans-serif;font-size:clamp(1.8rem,4vw,2.8rem);margin-bottom:16px}
+.cta-section p{color:var(--text-dim);margin-bottom:32px;font-size:1.05rem}
+.footer{text-align:center;padding:40px;border-top:1px solid var(--border);color:var(--text-muted);font-size:0.85rem}
+@media(max-width:768px){nav{padding:16px 20px}.hero{padding:80px 20px 40px}.quiz-wrap{padding:40px 16px}.cta-section{padding:60px 20px}}
+</style>
+</head>
+<body>
+<nav>
+<a href="/" class="logo">GODS<span>EYE</span></a>
+<a href="https://t.me/GodseyeXbot" class="btn" style="padding:8px 20px;font-size:0.85rem;text-decoration:none">Try Free →</a>
+</nav>
+
+<section class="hero">
+<div class="badge">⚡ FREE AUDIT</div>
+<h1>Is Your Business <span>Ready</span> for an AI Agent?</h1>
+<p class="sub">5 questions. 2 minutes. Find out where you're leaving money on the table.</p>
+<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+</section>
+
+<div class="quiz-wrap">
+<div class="q-card active" data-q="1">
+<div class="q-num">Question 1 of 5</div>
+<div class="q-title">How many hours per week do you spend on repetitive tasks?</div>
+<label><input type="radio" name="q1" value="1"><span>Less than 5 hours</span></label>
+<label><input type="radio" name="q1" value="2"><span>5–15 hours</span></label>
+<label><input type="radio" name="q1" value="3"><span>More than 15 hours</span></label>
+<button class="btn next-btn" onclick="nextQ(1)">Next →</button>
+</div>
+
+<div class="q-card" data-q="2">
+<div class="q-num">Question 2 of 5</div>
+<div class="q-title">How many customer messages do you miss or respond late to per week?</div>
+<label><input type="radio" name="q2" value="1"><span>Almost none</span></label>
+<label><input type="radio" name="q2" value="2"><span>A few — I know I miss some</span></label>
+<label><input type="radio" name="q2" value="3"><span>Too many — customers wait days</span></label>
+<button class="btn next-btn" onclick="nextQ(2)">Next →</button>
+</div>
+
+<div class="q-card" data-q="3">
+<div class="q-num">Question 3 of 5</div>
+<div class="q-title">How often do you post content for your business?</div>
+<label><input type="radio" name="q3" value="1"><span>Daily — I have a system</span></label>
+<label><input type="radio" name="q3" value="2"><span>When I remember</span></label>
+<label><input type="radio" name="q3" value="3"><span>Rarely or never</span></label>
+<button class="btn next-btn" onclick="nextQ(3)">Next →</button>
+</div>
+
+<div class="q-card" data-q="4">
+<div class="q-num">Question 4 of 5</div>
+<div class="q-title">How many "hats" do you wear in your business?</div>
+<label><input type="radio" name="q4" value="1"><span>1–2 — I have help</span></label>
+<label><input type="radio" name="q4" value="2"><span>3–5 — I do most things myself</span></label>
+<label><input type="radio" name="q4" value="3"><span>6+ — I'm everything to everyone</span></label>
+<button class="btn next-btn" onclick="nextQ(4)">Next →</button>
+</div>
+
+<div class="q-card" data-q="5">
+<div class="q-num">Question 5 of 5</div>
+<div class="q-title">What's the ONE thing you'd hand off first if you could?</div>
+<label><input type="radio" name="q5" value="1"><span>Customer messages & support</span></label>
+<label><input type="radio" name="q5" value="2"><span>Social media & content</span></label>
+<label><input type="radio" name="q5" value="3"><span>Admin, scheduling, follow-ups</span></label>
+<button class="btn next-btn" onclick="showResult()">See My Score →</button>
+</div>
+
+<div class="result-card" id="resultCard">
+<div class="score-circle" id="scoreCircle">—</div>
+<div class="result-title" id="resultTitle">Your Score</div>
+<div class="result-desc" id="resultDesc"></div>
+<a href="https://t.me/GodseyeXbot" class="btn" id="resultCta">Get Your Free Agent →</a>
+</div>
+</div>
+
+<section class="cta-section">
+<h2>Your agent is waiting.</h2>
+<p>No dashboard. No setup. Just text it on Telegram and it gets to work.</p>
+<a href="https://t.me/GodseyeXbot" class="btn">Start Free on Telegram →</a>
+</section>
+
+<footer class="footer">© 2026 GodsEye. Built by DigitalHustlerX.</footer>
+
+<script>
+let score=0;const total=5;
+function nextQ(n){
+  const sel=document.querySelector(`input[name="q${n}"]:checked`);
+  if(!sel){alert("Pick an answer first");return}
+  score+=parseInt(sel.value);
+  document.querySelector(`[data-q="${n}"]`).classList.remove("active");
+  document.querySelector(`[data-q="${n+1}"]`).classList.add("active");
+  document.getElementById("progressFill").style.width=`${(n/total)*100}%`;
+}
+function showResult(){
+  const sel=document.querySelector(`input[name="q5"]:checked`);
+  if(!sel){alert("Pick an answer first");return}
+  score+=parseInt(sel.value);
+  document.getElementById("progressFill").style.width="100%";
+  document.querySelectorAll(".q-card").forEach(c=>c.classList.remove("active"));
+  const card=document.getElementById("resultCard");
+  card.classList.add("active");
+  document.getElementById("scoreCircle").textContent=score;
+  let title,desc,cta;
+  if(score<=7){title="You're Running Lean";desc="Your business is efficient, but an AI agent could still 10x your output — handling the small stuff so you focus on growth.";cta="Add an Agent to Your Team →"}
+  else if(score<=11){title="You're Leaving Money on the Table";desc="You're stretched thin. An AI agent catches what you miss — customer messages, content, follow-ups — while you sleep.";cta="Catch What You're Missing →"}
+  else{title="You're Drowning — And You Know It";desc="You're doing the work of 5 people. An AI agent fills every seat — receptionist, writer, admin, support — for less than one part-timer.";cta="Get Your Lifeline →"}
+  document.getElementById("resultTitle").textContent=title;
+  document.getElementById("resultDesc").textContent=desc;
+  document.getElementById("resultCta").textContent=cta;
+  document.getElementById("resultCta").href="https://t.me/GodseyeXbot?start=audit";
+  if(window.umami)umami.track('audit_complete',{score:score});
+}
+</script>
+</body>
+</html>

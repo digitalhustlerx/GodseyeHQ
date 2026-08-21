@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>30-Day Content Calendar — GodsEye</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0A0E1A;--surface:#111827;--surface-hover:#1a2332;--border:rgba(255,255,255,0.06);--brand:#C4A484;--brand-dim:rgba(196,164,132,0.15);--text:#F8FAFC;--text-dim:#94A3B8;--text-muted:#64748B;--radius:16px;--green:#22c55e;--green-bg:rgba(34,197,94,0.08);--purple:#a78bfa;--purple-bg:rgba(167,139,250,0.08)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+nav{display:flex;align-items:center;justify-content:space-between;padding:20px 40px;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(10,14,26,0.92);backdrop-filter:blur(12px);z-index:100}
+.logo{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.25rem;text-decoration:none;color:var(--text)}.logo span{color:var(--brand)}
+.hero{background:linear-gradient(180deg,#0f1629 0%,var(--bg) 100%);text-align:center;padding:100px 40px 60px}
+.badge{background:var(--purple-bg);color:var(--purple);display:inline-block;padding:4px 16px;border-radius:50px;font-size:0.75rem;font-weight:600;margin-bottom:16px}
+h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(2.2rem,5vw,3.8rem);font-weight:700;margin-bottom:16px}h1 span{color:var(--brand)}
+.sub{color:var(--text-dim);font-size:1.1rem;max-width:600px;margin:0 auto 32px;font-weight:300}
+.btn{display:inline-flex;align-items:center;gap:8px;background:var(--brand);color:var(--bg);padding:14px 36px;border-radius:50px;font-weight:600;font-size:1rem;text-decoration:none;border:none;cursor:pointer;transition:all 0.3s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(196,164,132,0.25)}
+.calendar{max-width:800px;margin:0 auto;padding:60px 24px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:32px}
+.cal-header{font-family:'Space Grotesk';font-size:0.7rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;text-align:center;padding:8px}
+.cal-day{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 6px;text-align:center;min-height:60px;transition:border-color 0.2s}
+.cal-day:hover{border-color:var(--brand)}
+.cal-day .day-num{font-family:'Space Grotesk';font-size:0.7rem;color:var(--text-muted);margin-bottom:4px}
+.cal-day .day-type{font-size:0.65rem;padding:2px 6px;border-radius:4px;display:inline-block}
+.type-edu{background:var(--purple-bg);color:var(--purple)}
+.type-promo{background:var(--green-bg);color:var(--green)}
+.type-engage{background:rgba(59,130,246,0.08);color:#3B82F6}
+.type-story{background:rgba(245,158,11,0.08);color:var(--brand)}
+.legend{display:flex;gap:16px;justify-content:center;margin-bottom:40px;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:0.8rem;color:var(--text-dim)}
+.legend-dot{width:10px;height:10px;border-radius:3px}
+.how{max-width:700px;margin:0 auto;padding:60px 24px}
+.how h2{font-family:'Space Grotesk',sans-serif;font-size:1.5rem;margin-bottom:24px;text-align:center}
+.step{display:flex;gap:16px;margin-bottom:24px;align-items:flex-start}
+.step-num{width:36px;height:36px;border-radius:50%;background:var(--brand-dim);border:1px solid rgba(196,164,132,0.3);display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:700;color:var(--brand);flex-shrink:0}
+.step-text{font-size:0.95rem;color:var(--text-dim)}
+.step-text strong{color:var(--text)}
+.cta-section{text-align:center;padding:80px 40px}
+.cta-section h2{font-family:'Space Grotesk',sans-serif;font-size:clamp(1.8rem,4vw,2.8rem);margin-bottom:16px}
+.cta-section p{color:var(--text-dim);margin-bottom:32px;font-size:1.05rem}
+.footer{text-align:center;padding:40px;border-top:1px solid var(--border);color:var(--text-muted);font-size:0.85rem}
+@media(max-width:768px){.cal-grid{grid-template-columns:repeat(4,1fr)}nav{padding:16px 20px}.hero{padding:80px 20px 40px}.cta-section{padding:60px 20px}}
+</style>
+</head>
+<body>
+<nav>
+<a href="/" class="logo">GODS<span>EYE</span></a>
+<a href="https://t.me/GodseyeXbot" class="btn" style="padding:8px 20px;font-size:0.85rem;text-decoration:none">Try Free →</a>
+</nav>
+
+<section class="hero">
+<div class="badge">📅 FREE CALENDAR</div>
+<h1>30 Days of Content. <span>Your Agent Posts It.</span></h1>
+<p class="sub">Stop staring at a blank screen. 30 proven post ideas — your agent handles the rest.</p>
+<a href="#calendar" class="btn">See the Calendar ↓</a>
+</section>
+
+<div class="calendar" id="calendar">
+<div class="legend">
+<div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div>Educational</div>
+<div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>Promotional</div>
+<div class="legend-item"><div class="legend-dot" style="background:#3B82F6"></div>Engagement</div>
+<div class="legend-item"><div class="legend-dot" style="background:var(--brand)"></div>Story</div>
+</div>
+<div class="cal-grid" id="calGrid"></div>
+</div>
+
+<div class="how">
+<h2>How It Works</h2>
+<div class="step"><div class="step-num">1</div><div class="step-text"><strong>Pick a post type</strong> — educational, promotional, engagement, or story.</div></div>
+<div class="step"><div class="step-num">2</div><div class="step-text"><strong>Give it to your agent</strong> — it writes the post, picks the best time, adds hashtags.</div></div>
+<div class="step"><div class="step-num">3</div><div class="step-text"><strong>It posts for you</strong> — across Instagram, Twitter, LinkedIn, or wherever your audience is.</div></div>
+</div>
+
+<section class="cta-section">
+<h2>Your agent handles the content.</h2>
+<p>No dashboard. No code. Just text it on Telegram and it gets to work.</p>
+<a href="https://t.me/GodseyeXbot?start=calendar" class="btn">Get Your Free Agent →</a>
+</section>
+
+<footer class="footer">© 2026 GodsEye. Built by DigitalHustlerX.</footer>
+
+<script>
+const types=[
+{day:1,type:'edu',label:'Tip'},
+{day:2,type:'engage',label:'Question'},
+{day:3,type:'edu',label:'How-to'},
+{day:4,type:'promo',label:'Offer'},
+{day:5,type:'story',label:'Behind Scenes'},
+{day:6,type:'edu',label:'Myth Bust'},
+{day:7,type:'engage',label:'Poll'},
+{day:8,type:'edu',label:'Quick Tip'},
+{day:9,type:'story',label:'Customer Win'},
+{day:10,type:'promo',label:'Feature'},
+{day:11,type:'edu',label:'Tutorial'},
+{day:12,type:'engage',label:'Challenge'},
+{day:13,type:'edu',label:'Checklist'},
+{day:14,type:'story',label:'Day in Life'},
+{day:15,type:'promo',label:'Testimonial'},
+{day:16,type:'edu',label:'Guide'},
+{day:17,type:'engage',label:'This or That'},
+{day:18,type:'edu',label:'Listicle'},
+{day:19,type:'story',label:'Mistake'},
+{day:20,type:'promo',label:'Social Proof'},
+{day:21,type:'edu',label:'Deep Dive'},
+{day:22,type:'engage',label:'Fill Blank'},
+{day:23,type:'edu',label:'Quick Win'},
+{day:24,type:'story',label:'Origin'},
+{day:25,type:'promo',label:'Limited'},
+{day:26,type:'edu',label:'Comparison'},
+{day:27,type:'engage',label:'Unpopular'},
+{day:28,type:'edu',label:'Framework'},
+{day:29,type:'story',label:'Gratitude'},
+{day:30,type:'promo',label:'CTA'}
+];
+const grid=document.getElementById('calGrid');
+['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].forEach(d=>{const h=document.createElement('div');h.className='cal-header';h.textContent=d;grid.appendChild(h)});
+types.forEach(t=>{const d=document.createElement('div');d.className='cal-day';d.innerHTML=`<div class="day-num">Day ${t.day}</div><div class="day-type type-${t.type}">${t.label}</div>`;grid.appendChild(d)});
+</script>
+</body>
+</html>
