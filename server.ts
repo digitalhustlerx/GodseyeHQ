@@ -594,6 +594,25 @@ async function startServer() {
     const stateJson = JSON.stringify(state);
     if (stateJson.length > 100_000) return res.status(413).json({ error: "telegram profile too large" });
     db.prepare("INSERT INTO telegram_profiles (telegram_id, state_json, updated_at) VALUES (?, ?, datetime('now')) ON CONFLICT(telegram_id) DO UPDATE SET state_json=excluded.state_json, updated_at=datetime('now')").run(telegramId, stateJson);
+    // EMAIL→WAITLIST BRIDGE: when the bot saves a profile with an email, also
+    // ensure the email is in the waitlist table so the drip sequence fires.
+    // This bridges the Telegram funnel to the email nurture system.
+    try {
+      const email = String(state.email || "").trim().toLowerCase();
+      if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        const exists = db.prepare("SELECT id FROM waitlist WHERE email = ?").get(email);
+        if (!exists) {
+          const referralCode = Buffer.from(email).toString("base64").replace(/[^a-zA-Z0-9]/g, "").slice(0, 8).toLowerCase();
+          db.prepare("INSERT OR IGNORE INTO waitlist (email, referral_code) VALUES (?, ?)").run(email, referralCode);
+          // Backfill drip sequence for this new waitlist row
+          try {
+            const wlRow = db.prepare("SELECT id, email, created_at FROM waitlist WHERE email = ?").get(email) as any;
+            if (wlRow) enqueueDrip(wlRow.email, wlRow.id, wlRow.created_at);
+          } catch (_) { /* best-effort drip backfill */ }
+          console.log(`[email-bridge] waitlist entry created for bot user: ${email}`);
+        }
+      }
+    } catch (_) { /* best-effort — never block profile save */ }
     res.json({ ok: true });
   });
 
@@ -755,25 +774,31 @@ Do not include any markdown formatting like \`\`\`json outside the JSON. Return 
       if (!hasGemini) {
         // ---- Hosted DeepSeek-class streaming (OpenAI-compatible) ----
         // Fail fast (20s) when the gateway is down/slow so the bot doesn't
-        // hang the whole turn.
-        const chatRes = await fetch(`${DS_BASE_URL}/chat/completions`, {
-          method: "POST",
-          headers: {
-            "content-type": "application/json",
-            authorization: `Bearer ${DS_API_KEY}`,
-          },
-          signal: AbortSignal.timeout(20000),
-          body: JSON.stringify({
-            model: DS_MODEL,
-            stream: true,
-            messages: [
-              { role: "system", content: systemInstruction },
-              ...history.map((m: any) => ({ role: m.role === "assistant" ? "assistant" : "user", content: String(m.content || "") })),
-            ],
-            temperature: 0.7,
-          }),
-        });
-        if (!chatRes.ok || !chatRes.body) {
+        // hang the whole turn. Retry once on transient failure before giving up.
+        let chatRes;
+        for (let attempt = 0; attempt < 2; attempt++) {
+          chatRes = await fetch(`${DS_BASE_URL}/chat/completions`, {
+            method: "POST",
+            headers: {
+              "content-type": "application/json",
+              authorization: `Bearer ${DS_API_KEY}`,
+            },
+            signal: AbortSignal.timeout(20000),
+            body: JSON.stringify({
+              model: DS_MODEL,
+              stream: true,
+              messages: [
+                { role: "system", content: systemInstruction },
+                ...history.map((m: any) => ({ role: m.role === "assistant" ? "assistant" : "user", content: String(m.content || "") })),
+              ],
+              temperature: 0.7,
+            }),
+          });
+          if (chatRes.ok && chatRes.body) break;
+          // Transient failure — wait briefly and retry once
+          if (attempt === 0) await new Promise((r) => setTimeout(r, 1500));
+        }
+        if (!chatRes!.ok || !chatRes!.body) {
           // Gateway live but the model failed on its side. Friendly nudge.
           sendError("Godseye's chat engine is warming up — try again in a minute.");
           return res.end();

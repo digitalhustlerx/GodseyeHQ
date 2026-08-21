@@ -1214,8 +1214,21 @@ async function handleMessage(message) {
     }
 
     if (state.onboardingStep === 11 && state.previewProfile) {
-      state.onboardingStep = 12;
-      return await send(chatId, "You are onboarded. Tell me what you want to do next, or use the buttons below.", ACTION_PLAN_KYBD);
+      state.onboardingStep = 99;
+      state.onboardingChatHistory = [];
+      const limitsLine = state.freeTierShown
+        ? ""
+        : "📊 Free tier: 25 messages/day · 100 total\n\n";
+      state.freeTierShown = true;
+      return await send(
+        chatId,
+        [
+          "✅ Got it — I have your starting picture.",
+          "",
+          limitsLine + "Now you can just talk to me. What are you working on today? I'll help you plan, organize, and think things through.",
+        ].join("\n"),
+        CHAT_MODE_KYBD
+      );
     }
 
     // Niche template onboarding: after a template deep-link, a free-text reply
@@ -1287,6 +1300,12 @@ export async function runPolling() {
           await handleCallback(chatId, queryId, data);
         } else if (update.message?.text) {
           await handleMessage(update.message);
+        } else if (update.message && !update.message.text) {
+          // Non-text messages (photos, stickers, documents, voice, etc.)
+          // Acknowledge instead of silently dropping — keeps the conversation alive.
+          const chatId = update.message.chat.id;
+          const type = update.message.photo ? "photo" : update.message.sticker ? "sticker" : update.message.document ? "document" : update.message.voice ? "voice message" : update.message.video ? "video" : "message";
+          await send(chatId, `I got your ${type} — but I work best with text. Tell me what you need and I'll help.`).catch(() => {});
         }
       }
     } catch (err) {
