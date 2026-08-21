@@ -108,7 +108,7 @@ assert.equal(ctx.waitlist_position, 3);
 const e1 = getEmailDef("e1");
 assert.ok(e1.buildText(ctx).includes("Alice Wonder"));
 const e3txt = getEmailDef("e3").buildText(ctx);
-assert.ok(e3txt.includes("Here's exactly what happens when Godseye opens"));
+assert.ok(e3txt.includes("Here's exactly what happens when GodsEye opens"));
 const e5 = getEmailDef("e5");
 assert.ok(e5.buildText({ ...ctx, purchase_link: "https://godseye.digitalhustlerx.com/go" }).includes("https://godseye.digitalhustlerx.com/go"));
 const e6 = getEmailDef("e6");
