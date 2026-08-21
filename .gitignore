@@ -23,3 +23,5 @@ drafts/fde-analysis.pdf
 
 # Local nginx config backups (pre-edit snapshots, not source)
 nginx/*.bak-*
+# Generated graphify analysis artifacts
+graphify-out/
