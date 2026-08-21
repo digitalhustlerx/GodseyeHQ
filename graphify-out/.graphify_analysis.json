@@ -1,30 +1,309 @@
 {
   "communities": {
     "0": [
-      "src_app",
-      "src_app_app",
-      "src_components_wordpressdashboard",
-      "src_components_wordpressdashboard_wordpressdashboard",
-      "src_components_wordpressdashboard_wordpressdashboardprops",
-      "src_main",
-      "src_mockdata_initial_wp_state",
-      "src_mockdata_pricing_plans",
-      "src_types_activeview",
-      "src_types_mockwpstate"
+      "telegram_bot_src_index",
+      "telegram_bot_src_index_action_plan_kybd",
+      "telegram_bot_src_index_activatedlicenses",
+      "telegram_bot_src_index_answer",
+      "telegram_bot_src_index_api",
+      "telegram_bot_src_index_api_base_url",
+      "telegram_bot_src_index_back_to_plan_kybd",
+      "telegram_bot_src_index_businessrooms",
+      "telegram_bot_src_index_chat_mode_kybd",
+      "telegram_bot_src_index_commands_kybd",
+      "telegram_bot_src_index_commandstext",
+      "telegram_bot_src_index_connect_site_kybd",
+      "telegram_bot_src_index_demo_fallback_kybd",
+      "telegram_bot_src_index_dopersistsession",
+      "telegram_bot_src_index_emitactivation",
+      "telegram_bot_src_index_findsitesforlicense",
+      "telegram_bot_src_index_formatsite",
+      "telegram_bot_src_index_fullmsgid",
+      "telegram_bot_src_index_getlicense",
+      "telegram_bot_src_index_getwaitliststats",
+      "telegram_bot_src_index_group_kybd",
+      "telegram_bot_src_index_handlecallback",
+      "telegram_bot_src_index_handlecommand",
+      "telegram_bot_src_index_handlemessage",
+      "telegram_bot_src_index_have_license_kybd",
+      "telegram_bot_src_index_hydratesession",
+      "telegram_bot_src_index_inlinekeyboard",
+      "telegram_bot_src_index_landing_api_base_url",
+      "telegram_bot_src_index_laststreamedmessageid",
+      "telegram_bot_src_index_new_user_kybd",
+      "telegram_bot_src_index_persistablestate",
+      "telegram_bot_src_index_persistqueues",
+      "telegram_bot_src_index_persistsession",
+      "telegram_bot_src_index_plantelegrammessage",
+      "telegram_bot_src_index_platform_kybd",
+      "telegram_bot_src_index_preview_kybd",
+      "telegram_bot_src_index_previewwelcometext",
+      "telegram_bot_src_index_pricing_kybd",
+      "telegram_bot_src_index_room_topics",
+      "telegram_bot_src_index_runpolling",
+      "telegram_bot_src_index_send",
+      "telegram_bot_src_index_sendtyping",
+      "telegram_bot_src_index_session",
+      "telegram_bot_src_index_sessions",
+      "telegram_bot_src_index_setupbusinessroom",
+      "telegram_bot_src_index_starttask",
+      "telegram_bot_src_index_streamreply",
+      "telegram_bot_src_index_telegram",
+      "telegram_bot_src_index_website_kybd",
+      "telegram_bot_src_index_welcome_kybd",
+      "telegram_bot_src_index_welcometext",
+      "telegram_bot_src_templates",
+      "telegram_bot_src_templates_bot_templates",
+      "telegram_bot_src_templates_bottemplate"
     ],
     "1": [
+      "scripts_god15_drip_test",
+      "scripts_god15_drip_test_afterclear",
+      "scripts_god15_drip_test_afterset",
+      "scripts_god15_drip_test_afterslip",
+      "scripts_god15_drip_test_cfgdefaults",
+      "scripts_god15_drip_test_ctx",
+      "scripts_god15_drip_test_db",
+      "scripts_god15_drip_test_e1",
+      "scripts_god15_drip_test_e3txt",
+      "scripts_god15_drip_test_e5",
+      "scripts_god15_drip_test_e6",
+      "scripts_god15_drip_test_expect",
+      "scripts_god15_drip_test_jobs",
+      "scripts_god15_drip_test_ok",
+      "scripts_god15_drip_test_tables",
+      "scripts_god15_drip_test_tmp",
+      "scripts_god15_drip_test_wl",
+      "src_lib_drip",
+      "src_lib_drip_backfilllaunchjobs",
+      "src_lib_drip_button",
+      "src_lib_drip_cfg_mirror",
+      "src_lib_drip_drip_defaults",
+      "src_lib_drip_drip_keys",
+      "src_lib_drip_dripconfig",
+      "src_lib_drip_dripdb",
+      "src_lib_drip_dripdb_prepare",
+      "src_lib_drip_driprecipientctx",
+      "src_lib_drip_emaildef",
+      "src_lib_drip_emails",
+      "src_lib_drip_enqueuedrip",
+      "src_lib_drip_ensureschema",
+      "src_lib_drip_fill",
+      "src_lib_drip_flushdue",
+      "src_lib_drip_footer",
+      "src_lib_drip_getconfig",
+      "src_lib_drip_getemaildef",
+      "src_lib_drip_initdrip",
+      "src_lib_drip_isoadddays",
+      "src_lib_drip_launch_offset_days",
+      "src_lib_drip_recipientrow",
+      "src_lib_drip_refreshconfig",
+      "src_lib_drip_relative_delay_min",
+      "src_lib_drip_resolvectx",
+      "src_lib_drip_setconfig",
+      "src_lib_drip_startdripworker",
+      "src_lib_mailer",
+      "src_lib_mailer_mailoptions",
+      "src_lib_mailer_mailresult",
+      "src_lib_mailer_sanitize",
+      "src_lib_mailer_sendmail"
+    ],
+    "2": [
+      "wp_plugin_godseye_bridge_includes_admin",
+      "wp_plugin_godseye_bridge_includes_admin_godseye_bridge_admin_menu",
+      "wp_plugin_godseye_bridge_includes_admin_godseye_bridge_defaults",
+      "wp_plugin_godseye_bridge_includes_admin_godseye_bridge_get_settings",
+      "wp_plugin_godseye_bridge_includes_admin_godseye_bridge_register_settings",
+      "wp_plugin_godseye_bridge_includes_admin_godseye_bridge_render_admin_page",
+      "wp_plugin_godseye_bridge_includes_rest",
+      "wp_plugin_godseye_bridge_includes_rest_godseye_bridge_authorize_request",
+      "wp_plugin_godseye_bridge_includes_rest_godseye_bridge_capabilities",
+      "wp_plugin_godseye_bridge_includes_rest_godseye_bridge_connect_site",
+      "wp_plugin_godseye_bridge_includes_rest_godseye_bridge_create_page",
+      "wp_plugin_godseye_bridge_includes_rest_godseye_bridge_create_post",
+      "wp_plugin_godseye_bridge_includes_rest_godseye_bridge_create_term",
+      "wp_plugin_godseye_bridge_includes_rest_godseye_bridge_cron_status",
+      "wp_plugin_godseye_bridge_includes_rest_godseye_bridge_flush_cache",
+      "wp_plugin_godseye_bridge_includes_rest_godseye_bridge_list_comments",
+      "wp_plugin_godseye_bridge_includes_rest_godseye_bridge_list_media",
+      "wp_plugin_godseye_bridge_includes_rest_godseye_bridge_list_pages",
+      "wp_plugin_godseye_bridge_includes_rest_godseye_bridge_list_posts",
+      "wp_plugin_godseye_bridge_includes_rest_godseye_bridge_list_products",
+      "wp_plugin_godseye_bridge_includes_rest_godseye_bridge_list_taxonomy",
+      "wp_plugin_godseye_bridge_includes_rest_godseye_bridge_plugin_status",
+      "wp_plugin_godseye_bridge_includes_rest_godseye_bridge_post_summary",
+      "wp_plugin_godseye_bridge_includes_rest_godseye_bridge_query_posts",
+      "wp_plugin_godseye_bridge_includes_rest_godseye_bridge_register_routes",
+      "wp_plugin_godseye_bridge_includes_rest_godseye_bridge_seo_status",
+      "wp_plugin_godseye_bridge_includes_rest_godseye_bridge_site",
+      "wp_plugin_godseye_bridge_includes_rest_godseye_bridge_status",
+      "wp_plugin_godseye_bridge_includes_rest_godseye_bridge_theme_status",
+      "wp_plugin_godseye_bridge_includes_rest_godseye_bridge_update_comment",
+      "wp_plugin_godseye_bridge_includes_rest_godseye_bridge_update_page",
+      "wp_plugin_godseye_bridge_includes_rest_godseye_bridge_update_product",
+      "wp_rest_request"
+    ],
+    "3": [
+      "server",
+      "server_ai",
+      "server_bridgesecretmatches",
+      "server_clearsession",
+      "server_createsession",
+      "server_data_dir",
+      "server_db",
+      "server_ensureuserworkspace",
+      "server_founder_bonus_tokens",
+      "server_getorcreatereferrer",
+      "server_hashpassword",
+      "server_makereftoken",
+      "server_normalizerefemail",
+      "server_pch",
+      "server_pendingreferraldiscount",
+      "server_planstatus",
+      "server_recordreferralevent",
+      "server_reward_defs",
+      "server_rewardladderfor",
+      "server_setsessioncookie",
+      "server_startserver",
+      "server_syncrewardsledger",
+      "server_ucols",
+      "server_user_cols",
+      "server_userfromrequest",
+      "server_verifypassword",
+      "server_wlc",
+      "server_wlcols",
+      "server_wlmigrate",
+      "src_lib_drip_dripkey"
+    ],
+    "4": [
+      "src_app",
+      "src_app_app",
+      "src_app_blogredirect",
+      "src_app_scrolltotop",
+      "src_main",
+      "src_pages_agentpage",
+      "src_pages_agentpage_agent_pages",
+      "src_pages_agentpage_agentpage",
+      "src_pages_agentpage_agentpageconfig",
+      "src_pages_communitypage",
+      "src_pages_communitypage_benefits",
+      "src_pages_communitypage_communitypage",
+      "src_pages_communitypage_paths",
+      "src_pages_docspage",
+      "src_pages_docspage_docspage",
+      "src_pages_featurespage",
+      "src_pages_featurespage_features",
+      "src_pages_featurespage_featurespage",
+      "src_pages_landingpage",
+      "src_pages_landingpage_agent_fleet",
+      "src_pages_landingpage_audiences",
+      "src_pages_landingpage_cost_comparison",
+      "src_pages_landingpage_faqs",
+      "src_pages_landingpage_hero_slides",
+      "src_pages_landingpage_landingpage",
+      "src_pages_landingpage_nudges",
+      "src_pages_landingpage_use_cases",
+      "src_pages_startpage",
+      "src_pages_startpage_onboarding_steps",
+      "src_pages_startpage_startpage"
+    ],
+    "5": [
+      "src_components_layout",
+      "src_components_layout_layout",
+      "src_components_waitlistmodal",
+      "src_components_waitlistmodal_waitlistmodal",
+      "src_components_waitlistmodal_waitlistmodalprops",
+      "src_components_waitlistmodal_waitlistsession",
+      "src_lib_auth",
+      "src_lib_auth_accountdata",
+      "src_lib_auth_getaccount",
+      "src_lib_auth_getme",
+      "src_lib_auth_jsonfetch",
+      "src_lib_auth_login",
+      "src_lib_auth_logout",
+      "src_lib_auth_register",
+      "src_lib_auth_reward",
+      "src_lib_auth_subscription",
+      "src_lib_auth_user",
+      "src_lib_referral",
+      "src_lib_referral_getreferralstats",
+      "src_lib_referral_getreferraltoken",
+      "src_lib_referral_referralstatsdata",
+      "src_lib_referral_referralurl",
+      "src_mockdata_pricing_plans",
+      "src_pages_accountpage",
+      "src_pages_accountpage_accountpage",
+      "src_pages_accountpage_plan_label",
+      "src_pages_authpage",
+      "src_pages_authpage_authpage",
+      "src_types_pricingplan"
+    ],
+    "6": [
       "src_components_liveplayground",
       "src_components_liveplayground_liveplayground",
       "src_components_liveplayground_liveplaygroundprops",
+      "src_components_wordpressdashboard",
+      "src_components_wordpressdashboard_wordpressdashboard",
+      "src_components_wordpressdashboard_wordpressdashboardprops",
+      "src_mockdata",
+      "src_mockdata_credit_packs",
+      "src_mockdata_initial_wp_state",
       "src_mockdata_sample_commands",
+      "src_mockdata_self_host_plans",
+      "src_pages_templatespage",
+      "src_pages_templatespage_templatedetail",
+      "src_pages_templatespage_templatespage",
+      "src_templates",
+      "src_templates_templates",
       "src_types",
+      "src_types_activeview",
+      "src_types_mockwpstate",
+      "src_types_onboardingquestion",
       "src_types_playgroundmessage",
+      "src_types_profiletemplate",
+      "src_types_selfhostplan",
+      "src_types_templatecapability",
       "src_types_woocommerceorder",
       "src_types_wordpressmedia",
       "src_types_wordpressplugin",
       "src_types_wordpresspost"
     ],
-    "2": [
+    "7": [
+      "scripts_wrong_answer_agent",
+      "scripts_wrong_answer_agent_ask_voice",
+      "scripts_wrong_answer_agent_chat",
+      "scripts_wrong_answer_agent_deterministic_flags",
+      "scripts_wrong_answer_agent_judge",
+      "scripts_wrong_answer_agent_main",
+      "scripts_wrong_answer_agent_rationale_117",
+      "scripts_wrong_answer_agent_rationale_153",
+      "scripts_wrong_answer_agent_rationale_191",
+      "scripts_wrong_answer_agent_rationale_200",
+      "scripts_wrong_answer_agent_read_key_sources"
+    ],
+    "8": [
+      "drafts_pricing_draft",
+      "drafts_pricing_draft_addon",
+      "drafts_pricing_draft_addons",
+      "drafts_pricing_draft_free_tier",
+      "drafts_pricing_draft_hour_bundles",
+      "drafts_pricing_draft_hourbundle",
+      "drafts_pricing_draft_monthly_hires",
+      "drafts_pricing_draft_monthlyhire",
+      "drafts_pricing_draft_referral"
+    ],
+    "9": [
+      "scripts_god9_rewards_test",
+      "scripts_god9_rewards_test_check",
+      "scripts_god9_rewards_test_main",
+      "scripts_god9_rewards_test_require",
+      "scripts_god9_rewards_test_results",
+      "scripts_god9_rewards_test_server",
+      "scripts_god9_rewards_test_server_cjs",
+      "scripts_god9_rewards_test_waitready",
+      "scripts_god9_rewards_test_work"
+    ],
+    "10": [
       "components_ui_prisma_hero",
       "components_ui_prisma_hero_navitems",
       "components_ui_prisma_hero_prismahero",
@@ -34,115 +313,293 @@
       "components_ui_prisma_hero_wordspullupmultistyleprops",
       "components_ui_prisma_hero_wordspullupprops"
     ],
-    "3": [
-      "src_mockdata",
-      "src_mockdata_credit_packs",
-      "src_mockdata_self_host_plans",
-      "src_types_pricingplan",
-      "src_types_selfhostplan"
+    "11": [
+      "scripts_god9_account_check",
+      "scripts_god9_account_check_db",
+      "scripts_god9_account_check_inv",
+      "scripts_god9_account_check_require",
+      "scripts_god9_account_check_rref",
+      "scripts_god9_account_check_server",
+      "scripts_god9_account_check_server_cjs",
+      "scripts_god9_account_check_work"
     ],
-    "4": [
-      "src_components_waitlistmodal",
-      "src_components_waitlistmodal_waitlistmodal",
-      "src_components_waitlistmodal_waitlistmodalprops",
-      "src_components_waitlistmodal_waitlistsession"
+    "12": [
+      "scripts_god9_test",
+      "scripts_god9_test_check",
+      "scripts_god9_test_main",
+      "scripts_god9_test_results",
+      "scripts_god9_test_server",
+      "scripts_god9_test_server_cjs",
+      "scripts_god9_test_waitready",
+      "scripts_god9_test_work"
     ],
-    "5": [
-      "server",
-      "server_ai",
-      "server_startserver"
+    "13": [
+      "src_components_githubcontributions",
+      "src_components_githubcontributions_contributionday",
+      "src_components_githubcontributions_githubcontributions",
+      "src_components_githubcontributions_githubcontributionsprops",
+      "src_components_githubcontributions_level_colors",
+      "src_components_githubcontributions_monthname",
+      "src_components_githubcontributions_responsedata",
+      "src_components_githubcontributions_weekday_labels"
     ],
-    "6": [
+    "14": [
+      "src_pages_pricingpage",
+      "src_pages_pricingpage_cell",
+      "src_pages_pricingpage_comparison_rows",
+      "src_pages_pricingpage_credit_packs",
+      "src_pages_pricingpage_faq",
+      "src_pages_pricingpage_faqitem",
+      "src_pages_pricingpage_pricingpage",
+      "src_pages_pricingpage_rendercell"
+    ],
+    "15": [
+      "telegram_bot_scripts_onboarding_smoke",
+      "telegram_bot_scripts_onboarding_smoke_api",
+      "telegram_bot_scripts_onboarding_smoke_check",
+      "telegram_bot_scripts_onboarding_smoke_main",
+      "telegram_bot_scripts_onboarding_smoke_results",
+      "telegram_bot_scripts_onboarding_smoke_telegram"
+    ],
+    "16": [
+      "scripts_polar_wire_benefit",
+      "scripts_polar_wire_benefit_jqget",
+      "scripts_polar_wire_benefit_part_headers",
+      "scripts_polar_wire_benefit_sh__entry"
+    ],
+    "17": [
+      "seo_assets_render_token_wrapped",
+      "seo_assets_render_token_wrapped_font",
+      "seo_assets_render_token_wrapped_stat_card",
+      "seo_assets_render_token_wrapped_wrap"
+    ],
+    "18": [
+      "scripts_make_og_image",
+      "scripts_make_og_image_font",
+      "scripts_make_og_image_load"
+    ],
+    "19": [
+      "seo_assets_tracker",
+      "seo_assets_tracker_flush",
+      "seo_assets_tracker_push"
+    ],
+    "20": [
+      "scripts_backup",
+      "scripts_backup_sh__entry"
+    ],
+    "21": [
+      "scripts_deploy",
+      "scripts_deploy_sh__entry"
+    ],
+    "22": [
+      "scripts_godseye_site_guard",
+      "scripts_godseye_site_guard_sh__entry"
+    ],
+    "23": [
+      "scripts_polar_webhook_guard",
+      "scripts_polar_webhook_guard_sh__entry"
+    ],
+    "24": [
+      "scripts_restore_seo_assets",
+      "scripts_restore_seo_assets_sh__entry"
+    ],
+    "25": [
+      "scripts_wire_polar_webhook",
+      "scripts_wire_polar_webhook_sh__entry"
+    ],
+    "26": [
+      "brand_make_brand"
+    ],
+    "27": [
+      "brand_make_lockup"
+    ],
+    "28": [
       "vite_config"
+    ],
+    "29": [
+      "wp_plugin_godseye_bridge_godseye_bridge"
+    ],
+    "30": [
+      "wp_plugin_godseye_bridge_uninstall"
     ]
   },
   "cohesion": {
-    "0": 0.28888888888888886,
-    "1": 0.26666666666666666,
-    "2": 0.25,
-    "3": 0.4,
-    "4": 0.5,
-    "5": 0.6666666666666666,
-    "6": 1.0
+    "0": 0.07547169811320754,
+    "1": 0.06938775510204082,
+    "2": 0.09848484848484848,
+    "3": 0.11264367816091954,
+    "4": 0.07126436781609195,
+    "5": 0.14532019704433496,
+    "6": 0.11375661375661375,
+    "7": 0.23636363636363636,
+    "8": 0.2222222222222222,
+    "9": 0.3055555555555556,
+    "10": 0.25,
+    "11": 0.25,
+    "12": 0.32142857142857145,
+    "13": 0.2857142857142857,
+    "14": 0.2857142857142857,
+    "15": 0.4666666666666667,
+    "16": 0.5,
+    "17": 0.5,
+    "18": 0.6666666666666666,
+    "19": 1.0,
+    "20": 1.0,
+    "21": 1.0,
+    "22": 1.0,
+    "23": 1.0,
+    "24": 1.0,
+    "25": 1.0,
+    "26": 1.0,
+    "27": 1.0,
+    "28": 1.0,
+    "29": 1.0,
+    "30": 1.0
   },
   "gods": [
     {
-      "id": "src_types_mockwpstate",
-      "label": "MockWPState",
+      "id": "server_startserver",
+      "label": "startServer()",
+      "degree": 22
+    },
+    {
+      "id": "telegram_bot_src_index_handlecommand",
+      "label": "handleCommand()",
+      "degree": 15
+    },
+    {
+      "id": "telegram_bot_src_index_handlemessage",
+      "label": "handleMessage()",
+      "degree": 14
+    },
+    {
+      "id": "src_lib_drip_getconfig",
+      "label": "getConfig()",
+      "degree": 11
+    },
+    {
+      "id": "telegram_bot_src_index_api",
+      "label": "api()",
+      "degree": 11
+    },
+    {
+      "id": "telegram_bot_src_index_handlecallback",
+      "label": "handleCallback()",
+      "degree": 10
+    },
+    {
+      "id": "src_lib_drip_flushdue",
+      "label": "flushDue()",
+      "degree": 9
+    },
+    {
+      "id": "src_lib_drip_enqueuedrip",
+      "label": "enqueueDrip()",
+      "degree": 8
+    },
+    {
+      "id": "telegram_bot_src_index_telegram",
+      "label": "telegram()",
+      "degree": 8
+    },
+    {
+      "id": "src_lib_drip_setconfig",
+      "label": "setConfig()",
       "degree": 7
-    },
-    {
-      "id": "src_types_activeview",
-      "label": "ActiveView",
-      "degree": 3
-    },
-    {
-      "id": "src_components_liveplayground_liveplaygroundprops",
-      "label": "LivePlaygroundProps",
-      "degree": 2
-    },
-    {
-      "id": "src_components_wordpressdashboard_wordpressdashboardprops",
-      "label": "WordPressDashboardProps",
-      "degree": 2
-    },
-    {
-      "id": "src_components_wordpressdashboard_wordpressdashboard",
-      "label": "WordPressDashboard()",
-      "degree": 2
-    },
-    {
-      "id": "src_mockdata_pricing_plans",
-      "label": "PRICING_PLANS",
-      "degree": 2
-    },
-    {
-      "id": "src_mockdata_initial_wp_state",
-      "label": "INITIAL_WP_STATE",
-      "degree": 2
-    },
-    {
-      "id": "src_mockdata_sample_commands",
-      "label": "SAMPLE_COMMANDS",
-      "degree": 2
-    },
-    {
-      "id": "src_types_wordpresspost",
-      "label": "WordPressPost",
-      "degree": 2
-    },
-    {
-      "id": "src_types_wordpressplugin",
-      "label": "WordPressPlugin",
-      "degree": 2
     }
   ],
   "surprises": [
     {
-      "source": "LivePlaygroundProps",
-      "target": "MockWPState",
+      "source": "startServer()",
+      "target": "enqueueDrip()",
       "source_files": [
-        "src/components/LivePlayground.tsx",
-        "src/types.ts"
+        "server.ts",
+        "src/lib/drip.ts"
       ],
       "confidence": "EXTRACTED",
-      "relation": "references",
-      "why": "bridges separate communities; peripheral node `LivePlaygroundProps` unexpectedly reaches hub `MockWPState`"
+      "relation": "calls",
+      "why": "connects across different repos/directories; bridges separate communities"
     },
     {
-      "source": "WordPressDashboardProps",
-      "target": "MockWPState",
+      "source": "startServer()",
+      "target": "flushDue()",
       "source_files": [
-        "src/components/WordPressDashboard.tsx",
-        "src/types.ts"
+        "server.ts",
+        "src/lib/drip.ts"
       ],
       "confidence": "EXTRACTED",
-      "relation": "references",
-      "why": "peripheral node `WordPressDashboardProps` unexpectedly reaches hub `MockWPState`"
+      "relation": "calls",
+      "why": "connects across different repos/directories; bridges separate communities"
+    },
+    {
+      "source": "startServer()",
+      "target": "getConfig()",
+      "source_files": [
+        "server.ts",
+        "src/lib/drip.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "connects across different repos/directories; bridges separate communities"
+    },
+    {
+      "source": "startServer()",
+      "target": "setConfig()",
+      "source_files": [
+        "server.ts",
+        "src/lib/drip.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "connects across different repos/directories; bridges separate communities"
+    },
+    {
+      "source": "startServer()",
+      "target": "startDripWorker()",
+      "source_files": [
+        "server.ts",
+        "src/lib/drip.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "connects across different repos/directories; bridges separate communities"
     }
   ],
-  "tokens": {
-    "input": 0,
-    "output": 0
-  }
+  "questions": [
+    {
+      "type": "bridge_node",
+      "question": "Why does `PRICING_PLANS` connect `AccountPage.tsx` to `App.tsx`, `types.ts`, `PricingPage.tsx`?",
+      "why": "High betweenness centrality (0.003) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `startServer()` connect `server.ts` to `drip.ts`?",
+      "why": "High betweenness centrality (0.003) - this node is a cross-community bridge."
+    },
+    {
+      "type": "isolated_nodes",
+      "question": "What connects `WordsPullUpProps`, `Segment`, `WordsPullUpMultiStyleProps` to the rest of the system?",
+      "why": "127 weakly-connected nodes found - possible documentation gaps or missing edges."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `index.js` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.07547169811320754 - nodes in this community are weakly interconnected."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `drip.ts` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.06938775510204082 - nodes in this community are weakly interconnected."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `rest.php` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.09848484848484848 - nodes in this community are weakly interconnected."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `server.ts` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.11264367816091954 - nodes in this community are weakly interconnected."
+    }
+  ]
 }

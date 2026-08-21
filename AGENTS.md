@@ -29,6 +29,21 @@ Read first:
 
 When documents conflict, update the conflicting document. Do not create a third interpretation.
 
+## Control-plane session protocol
+
+The VPS-wide operating control plane is `/root/dhx-operating-system/`. It maps work but does not replace this repository's source of truth.
+
+At the start of a meaningful GodsEye session:
+
+1. Read `/root/dhx-operating-system/MASTER-INDEX.md`.
+2. Read `/root/dhx-operating-system/ACTIVE-PRIORITIES.md`.
+3. Read the relevant project card and Job card.
+4. Continue with this file and the canonical documents listed above.
+
+Before producing work, load the relevant Job's `READ BEFORE WORKING` context. At the end of any session that changes a decision, file, priority, or durable procedure, update the appropriate control-plane daily note and read the written change back. A daily note is an index, not the only home for durable knowledge.
+
+Anti-drift rules: evidence before claims; full reads for audits; one source of truth; no loose ends; scope before action; no destructive cleanup during discovery; distinguish facts, decisions, proposals, and hypotheses.
+
 Legacy/reference-only paths:
 
 - `/root/godseye`
