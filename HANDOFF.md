@@ -1,6 +1,6 @@
 # GodsEye — Current Handoff
 
-**Updated:** 2026-08-15
+**Updated:** 2026-08-21
 **Status:** Live, documented, active development
 
 ## Read first
