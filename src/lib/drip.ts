@@ -332,26 +332,18 @@ const EMAILS: EmailDef[] = [
         `Hi {first_name},\n\n` +
         `Doors are open.\n\n` +
         `  • Claim your spot → {{purchase_link}}\n` +
-        `  • Your 500 free credits are already on your account\n` +
-        `  • Early-bird price is yours until the first 500 fills\n\n` +
-        `Choose what fits:\n` +
-        `  🧑 Starter — $9/mo: 500 credits, 1 site\n` +
-        `  🚀 Pro — $29/mo: 2,000 credits, 3 sites\n` +
-        `  🌟 Elite — $99/mo: 10,000 credits, 10 sites\n\n` +
-        `Every plan comes with your locked early-bird rate and a cancel-anytime guarantee.\n` +
-        `Credits never expire.\n\n` +
+        `  • Your place is reserved while the commercial offer is confirmed\n\n` +
+        `Plan and founding-member details will be shared before activation.\n\n` +
         `This is the email we promised — no further pushes unless you want one.\n\n` +
         `— The GodsEye team\n`,
         c
       ),
     buildHtml: (c) =>
-      `${BODY}<h2 style="color:#fff;">GodsEye is live — your early-bird price is waiting</h2>` +
+      `${BODY}<h2 style="color:#fff;">GodsEye is live — your place is reserved</h2>` +
       `<p>Hi ${c.first_name},</p>` +
       `<p>Doors are open.</p>` +
-      `${BUTTON(c.purchase_link || "https://godseye.digitalhustlerx.com", "Claim your early-bird spot →")}` +
-      `<ul><li>Your <strong>500 free credits</strong> are already on your account</li><li><strong>Early-bird price</strong> is yours until the first 500 fills</li></ul>` +
-      `<p><strong>Choose what fits:</strong><br>🧑 Starter — $9/mo: 500 credits, 1 site<br>🚀 Pro — $29/mo: 2,000 credits, 3 sites<br>🌟 Elite — $99/mo: 10,000 credits, 10 sites</p>` +
-      `<p>Every plan comes with your locked early-bird rate and a cancel-anytime guarantee. Credits never expire.</p>` +
+      `${BUTTON(c.purchase_link || "https://godseye.digitalhustlerx.com", "See your next step →")}` +
+      `<ul><li>Your place is reserved while the commercial offer is confirmed</li><li>Plan and founding-member details will be shared before activation</li></ul>` +
       `<p>This is the email we promised — no further pushes unless you want one.</p>` +
       `${footer("— The GodsEye team")}</div></div>`,
   },
@@ -361,11 +353,9 @@ const EMAILS: EmailDef[] = [
     buildText: (c) =>
       fill(
         `Hi {first_name},\n\n` +
-        `The first 500 marker is filling. Your early-bird price is still held for\n` +
-        `you, but once the list fills it's normal pricing and that rate goes away.\n\n` +
-        `If the reason you haven't claimed is "I'm not sure it'll handle my setup,"\n` +
-        `that's exactly what your 500 free credits are for — real use, no obligation.\n\n` +
-        `Or if you'd rather hand the whole thing to someone else: reply "custom"\n` +
+        `The founders list is filling. Commercial plan details will be confirmed\n` +
+        `before activation.\n\n` +
+        `If you're unsure whether Godseye can handle your setup, reply "custom"\n` +
         `and we'll quote a done-for-you setup. We get you on GodsEye and working\n` +
         `in two weeks.\n\n` +
         `Either way, the spot is yours until {{early_bird_deadline}}.\n\n` +
@@ -373,11 +363,10 @@ const EMAILS: EmailDef[] = [
         c
       ),
     buildHtml: (c) =>
-      `${BODY}<h2 style="color:#fff;">Your early-bird spot is still here — just barely</h2>` +
+      `${BODY}<h2 style="color:#fff;">Your founders-list place is still here</h2>` +
       `<p>Hi ${c.first_name},</p>` +
-      `<p>The first 500 marker is filling. Your early-bird price is still held for you, but once the list fills it's normal pricing and that rate goes away.</p>` +
-      `<p>If the reason you haven't claimed is "I'm not sure it'll handle my setup," that's exactly what your <strong>500 free credits</strong> are for — real use, no obligation.</p>` +
-      `<p>Or if you'd rather hand the whole thing to someone else: reply "custom" and we'll quote a done-for-you setup. We get you on GodsEye and working in two weeks.</p>` +
+      `<p>The founders list is filling. Commercial plan details will be confirmed before activation.</p>` +
+      `<p>If you're unsure whether Godseye can handle your setup, reply "custom" and we'll quote a done-for-you setup. We get you on GodsEye and working in two weeks.</p>` +
       `<p>Either way, the spot is yours until <strong>${c.early_bird_deadline || "the first 500 is full"}</strong>.</p>` +
       `${footer("— The GodsEye team")}</div></div>`,
   },
