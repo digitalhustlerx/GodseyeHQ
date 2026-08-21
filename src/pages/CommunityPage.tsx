@@ -14,20 +14,20 @@ const benefits = [
 const paths = [
   {
     title: "Agent Orientation",
-    price: "$99",
+    price: "Details after signup",
     text: "A focused session to map your work, choose the right infrastructure, and leave with a practical build plan.",
     points: ["90-minute session", "VPS and tool recommendations", "Written action plan"],
   },
   {
     title: "Forward-Deployed Setup",
-    price: "$1,000",
+    price: "Details after consultation",
     text: "A done-for-you private AI environment for people who want to start using agents now.",
     points: ["VPS setup and configuration", "One workflow deployed", "Guide, walkthrough, and 30-day support"],
     featured: true,
   },
   {
     title: "Private AI Network",
-    price: "From $2,500",
+    price: "Details after consultation",
     text: "For creators, founders, and teams that need multiple agents, integrations, and operating rules.",
     points: ["Multiple workspaces or agents", "Custom integrations", "Extended support and security review"],
   },

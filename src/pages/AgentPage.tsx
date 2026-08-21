@@ -36,7 +36,7 @@ const AGENT_PAGES: AgentPageConfig[] = [
     slug: "lead-gen",
     badge: "Hire an agent for leads",
     h1: "Hire one agent. It finds you real leads, every day, while you do anything else.",
-    h2: "24/7. On Telegram. $9 to start.",
+    h2: "24/7. On Telegram. Choose a plan when you're ready.",
     body:
       "A lead agent doesn't wait for you to look. It hunts every day — finding people who need what you sell, reaching out for you, and keeping every opportunity warm until it closes. You just answer when it brings you a buyer.",
     needs: [
@@ -183,7 +183,7 @@ export function AgentPage({ slug }: { slug: string }) {
           Hire this agent <ArrowRight className="w-4 h-4" />
         </Link>
         <span className="font-mono text-[11px] uppercase tracking-widest text-white/40">
-          $9 to start · No code · Live in Telegram
+          Choose a plan when you're ready · No code · Live in Telegram
         </span>
       </div>
 
@@ -259,7 +259,7 @@ export function AgentPage({ slug }: { slug: string }) {
           {cfg.outro}
         </h2>
         <p className="font-mono text-[10px] uppercase tracking-widest text-white/40 mb-6">
-          $9 trial · $69 for 10 hours · More hours & monthly hires
+          Plan details available after signup
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <Link

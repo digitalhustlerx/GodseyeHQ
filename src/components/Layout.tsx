@@ -89,7 +89,7 @@ export default function Layout({ children }: { children: ReactNode }) {
     <div className="min-h-screen bg-[#0A0A0A] text-[#F2F2F2] flex flex-col font-sans selection:bg-[#C4A484]/30 selection:text-[#d9c4af]">
       {/* Top Banner */}
       <div className="bg-white/5 border-b border-white/10 text-center py-2.5 px-4 text-xs font-mono text-[#C4A484] uppercase tracking-widest">
-        👁️ Now live — Start your first agent today. Get bonus credits as a founding member.
+        👁️ Now live — Start your first agent today. Founding-member details will be shared when the commercial offer is confirmed.
       </div>
 
       {/* Navigation */}

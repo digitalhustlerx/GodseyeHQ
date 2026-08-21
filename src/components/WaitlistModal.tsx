@@ -215,7 +215,7 @@ export default function WaitlistModal({ open, onClose, onSuccess, referralParam 
 
             <p className="text-white/50 text-sm leading-relaxed">
               {waitlistCount < 100
-                ? "🎉 You're one of the first 100. Your 50% founder pricing is locked in for 1 year once you subscribe."
+                ? "🎉 You're one of the first 100. We'll keep your place on the founders list and notify you when the commercial offer is confirmed."
                 : `You're #${waitlistCount} on the list.`}
             </p>
 
@@ -223,7 +223,7 @@ export default function WaitlistModal({ open, onClose, onSuccess, referralParam 
               <div className="bg-white/5 border border-[#C4A484]/30 rounded-xl p-4 space-y-1.5">
                 <p className="text-[10px] uppercase tracking-widest text-[#C4A484] font-bold font-mono">Your founder code</p>
                 <p className="text-2xl font-bold tracking-[0.2em] text-[#C4A484] font-mono">{founderCode}</p>
-                <p className="text-white/40 text-[11px]">Use this on launch day for 50% off your first year. We've emailed it to you too.</p>
+                <p className="text-white/40 text-[11px]">Your founder code will be used for launch updates and eligibility details. We've emailed it to you too.</p>
               </div>
             )}
 

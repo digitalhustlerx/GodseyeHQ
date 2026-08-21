@@ -130,7 +130,7 @@ export default function AccountPage() {
                 <h2 className="text-2xl font-bold">{PLAN_LABEL[planId] || planId}</h2>
                 {isFree && (
                   <span className="rounded-full bg-white/10 border border-white/10 px-3 py-0.5 font-mono text-[10px] uppercase tracking-widest text-white/60">
-                    Free · 50 credits/mo
+                    Free preview
                   </span>
                 )}
               </div>
@@ -192,10 +192,9 @@ export default function AccountPage() {
                   )}
                   <h4 className="font-semibold text-base">{plan.name}</h4>
                   <div className="mt-2 flex items-baseline gap-1">
-                    <span className="text-3xl font-bold">{plan.price}</span>
-                    <span className="text-white/50 text-xs">/month</span>
+                    <span className="text-3xl font-bold">Choose a plan</span>
                   </div>
-                  <p className="mt-1 text-xs text-[#C4A484]">{plan.credits} credits/mo</p>
+                  <p className="mt-1 text-xs text-[#C4A484]">Plan details available after signup</p>
                   <ul className="mt-4 mb-6 flex-1 space-y-2">
                     {plan.features.slice(0, 5).map((f) => (
                       <li key={f} className="flex items-start gap-2 text-[11px] text-white/70 font-light">

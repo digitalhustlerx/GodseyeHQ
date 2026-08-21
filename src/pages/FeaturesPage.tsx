@@ -91,7 +91,7 @@ export default function FeaturesPage() {
                 <li className="flex gap-2"><span className="text-[#C4A484] mt-0.5">•</span><span>Type "fix the pricing on homepage" — done instantly. No menus.</span></li>
                 <li className="flex gap-2"><span className="text-[#C4A484] mt-0.5">•</span><span>Your agent is ready 24/7, no waiting on developers.</span></li>
                 <li className="flex gap-2"><span className="text-[#C4A484] mt-0.5">•</span><span>Proactive monitoring catches issues before customers do.</span></li>
-                <li className="flex gap-2"><span className="text-[#C4A484] mt-0.5">•</span><span>One agent replaces a dozen plugins. Save $1,200+/yr.</span></li>
+                <li className="flex gap-2"><span className="text-[#C4A484] mt-0.5">•</span><span>One agent can replace a stack of disconnected tools.</span></li>
               </ul>
             </div>
           </div>
@@ -114,13 +114,13 @@ export default function FeaturesPage() {
           </div>
           <div className="bg-[#121212] border border-[#C4A484]/40 rounded-2xl p-8 text-center">
             <p className="text-[10px] uppercase tracking-widest font-semibold font-mono text-white/40">Your Cost</p>
-            <p className="mt-3 text-5xl font-bold text-[#C4A484]">$9</p>
-            <p className="mt-2 text-xs text-white/50">/month</p>
+            <p className="mt-3 text-5xl font-bold text-[#C4A484]">Choose a plan</p>
+            <p className="mt-2 text-xs text-white/50">Details after signup</p>
           </div>
           <div className="bg-[#121212] border border-white/10 rounded-2xl p-8 text-center">
             <p className="text-[10px] uppercase tracking-widest font-semibold font-mono text-white/40">Cost of Alternatives</p>
-            <p className="mt-3 text-5xl font-bold text-[#F2F2F2]">$1,200+</p>
-            <p className="mt-2 text-xs text-white/50">/year</p>
+            <p className="mt-3 text-5xl font-bold text-[#F2F2F2]">Varies by stack</p>
+            <p className="mt-2 text-xs text-white/50">Compare your current tools</p>
           </div>
         </div>
       </section>

@@ -306,11 +306,9 @@ const EMAILS: EmailDef[] = [
         `Hi {first_name},\n\n` +
         `We're days out.\n\n` +
         `When GodsEye opens, the first 500 (you included) get:\n` +
-        `  • 500 free credits\n` +
-        `  • Early-bird pricing held forever: Starter $9/mo, Pro $29/mo, Elite $99/mo\n` +
-        `  • Your price never goes up as long as you're in\n` +
-        `That locked-in price only exists for the first 500. When the list fills,\n` +
-        `it's normal pricing, and those spots stay filled.\n\n` +
+        `  • Founding-member details will be confirmed before launch\n` +
+        `  • Your place is reserved while the commercial offer is finalized\n` +
+        `The commercial offer will be confirmed before launch.\n\n` +
         `If you know a site owner who's done paying developers for every small\n` +
         `change, forward this — invited members skip the line.\n\n` +
         `We'll send one more email: the second doors actually open.\n`,
@@ -321,9 +319,8 @@ const EMAILS: EmailDef[] = [
       `<p>Hi ${c.first_name},</p>` +
       `<p>We're days out.</p>` +
       `<p>When GodsEye opens, the first 500 (you included) get:</p>` +
-      `<ul><li><strong>500 free credits</strong></li><li><strong>Early-bird pricing held forever:</strong> Starter $9/mo, Pro $29/mo, Elite $99/mo</li><li><strong>Your price never goes up</strong> as long as you're in</li></ul>` +
-      `<p>That locked-in price only exists for the first 500. When the list fills, it's normal pricing, and those spots stay filled.</p>` +
-      `<p>If you know a site owner who's done paying developers for every small change, forward this — invited members skip the line.</p>` +
+      `<ul><li><strong>Founding-member details confirmed before launch</strong></li><li><strong>Your place reserved</strong> while the commercial offer is finalized</li></ul>` +
+      `<p>We'll share the confirmed offer before launch. If you know a site owner who's done paying developers for every small change, forward this — invited members skip the line.</p>` +
       `<p>We'll send one more email: the second doors actually open.</p>` +
       `${footer("— The GodsEye team")}</div></div>`,
   },
