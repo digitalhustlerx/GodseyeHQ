@@ -33,7 +33,7 @@ https://godseye.digitalhustlerx.com/
 - GodsEye TypeScript check passes.
 - Polar handler supports `order.paid` in source.
 - Resend configured.
-- Gemini configured, but Telegram bot chat still has a separate 403 issue.
+- Gemini key dead (403) — chat no longer depends on it; pinned to groq `gpt-oss-20b`, re-verified live 2026-08-21.
 
 ## Important runtime paths
 
@@ -51,7 +51,7 @@ Back up before edits. Do not blindly commit mixed OpenSaaS working-tree changes.
 
 ## Next section
 
-Investigate the Gemini Telegram bot 403 separately from landing copy, Polar webhooks, and OpenSaaS first-paint work.
+SUPERSEDED 2026-08-21: Gemini-403 already root-caused (dead Gemini key) and routed around — chat verified live on gpt-oss-20b. Only reopen if gpt-oss-20b degrades (fallbacks in 2026-08-21 entry below). Remaining OpenSaaS first-paint / Polar / copy work unchanged.
 
 ## Standard verification
 
