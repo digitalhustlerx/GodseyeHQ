@@ -33,35 +33,9 @@ export default function Layout({ children }: { children: ReactNode }) {
     setShowCheckoutModal(true);
   };
 
-  const handleCreateCheckout = async (e: FormEvent) => {
+  const handleCreateCheckout = (e: FormEvent) => {
     e.preventDefault();
-    if (!selectedPlan || !checkoutEmail) return;
-    setCheckoutLoading(true);
-    try {
-      const priceNum = parseFloat(String(selectedPlan.price).replace(/[^0-9.]/g, ""));
-      const res = await fetch("/api/create-checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: checkoutEmail,
-          plan_name: selectedPlan.name,
-          price: priceNum,
-          plan_id: selectedPlan.id,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || "Checkout failed");
-      }
-      setCheckoutLoading(false);
-      setShowCheckoutModal(false);
-      setCheckoutEmail("");
-      window.dispatchEvent(new CustomEvent("godseye:authed"));
-      window.location.href = data.checkout_url;
-    } catch (err: any) {
-      setCheckoutLoading(false);
-      alert(err.message || "Something went wrong. Please try again.");
-    }
+    alert("Commercial plan details are being finalized. Checkout will open after the offer is confirmed.");
   };
 
   // Expose checkout handler globally so page components can trigger it
@@ -361,10 +335,9 @@ export default function Layout({ children }: { children: ReactNode }) {
                 <span className="text-[#C4A484]">{selectedPlan.name}</span> Plan
               </h2>
               <div>
-                <span className="text-3xl font-black text-white">{selectedPlan.price}</span>
-                <span className="text-xs text-white/50 font-light ml-1">/month</span>
+                <span className="text-3xl font-black text-white">Commercial details confirmed at checkout</span>
               </div>
-              <p className="text-[11px] text-white/60 font-light">{selectedPlan.credits} credits/mo · {selectedPlan.sites}</p>
+              <p className="text-[11px] text-white/60 font-light">Your selected plan and eligibility will be confirmed before payment.</p>
               {user && (
                 <p className="text-[11px] text-[#C4A484] font-medium">
                   Logged in as {checkoutEmail || user.email}
